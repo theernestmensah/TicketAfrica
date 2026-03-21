@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Account & Ticket Wallet — Ticket Africa</title>
+    <script type="module" src="/assets/js/db.js"></script>
+    <link rel="stylesheet" href="assets/css/core.css" />
+    <link rel="stylesheet" href="assets/css/nav-footer.css" />
+    <style>
+        .account-layout {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            gap: var(--space-8);
+            padding-top: var(--space-8);
+            padding-bottom: var(--space-16);
+            margin-top: 68px;
+        }
+
+        .account-sidebar {
+            position: sticky;
+            top: 84px;
+        }
+
+        .account-nav {
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+        }
+
+        .account-nav__user {
+            padding: var(--space-5);
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .account-nav__avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(139, 92, 246, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .account-nav__name {
+            font-weight: 700;
+            font-size: var(--text-sm);
+        }
+
+        .account-nav__email {
+            font-size: var(--text-xs);
+            color: var(--color-text-muted);
+        }
+
+        .account-nav__links {
+            padding: var(--space-2);
+        }
+
+        .account-nav__link {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-3) var(--space-4);
+            border-radius: var(--radius-md);
+            font-size: var(--text-sm);
+            font-weight: 500;
+            color: var(--color-text-muted);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            text-decoration: none;
+            margin-bottom: 2px;
+        }
+
+        .account-nav__link:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--color-text-primary);
+        }
+
+        .account-nav__link.active {
+            background: rgba(139, 92, 246, 0.1);
+            color: var(--color-primary-light);
+        }
+
+        .account-nav__link svg {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+        }
+
+        .account-nav__section {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--color-text-muted);
+            padding: var(--space-4) var(--space-4) var(--space-2);
+        }
+
+        /* Ticket Wallet */
+        .wallet-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-5);
+        }
+
+        /* Ticket card */
+        .ticket-card {
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            position: relative;
+            transition: all var(--transition-base);
+        }
+
+        .ticket-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--color-border-light);
+        }
+
+        .ticket-card--upcoming {
+            border-color: rgba(139, 92, 246, 0.25);
+        }
+
+        .ticket-card--used {
+            opacity: 0.6;
+        }
+
+        .ticket-card__top {
+            padding: var(--space-5);
+            background: linear-gradient(135deg, #1a0540, #3d0f80);
+            position: relative;
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+
+        .ticket-card__top--sports {
+            background: linear-gradient(135deg, #0a1a30, #0d3060);
+        }
+
+        .ticket-card__top--conf {
+            background: linear-gradient(135deg, #0d1f0d, #1a4020);
+        }
+
+        .ticket-card__event-name {
+            font-family: var(--font-display);
+            font-size: var(--text-base);
+            font-weight: 800;
+            color: white;
+            line-height: 1.3;
+        }
+
+        .ticket-card__venue {
+            font-size: var(--text-xs);
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 4px;
+        }
+
+        .ticket-card__status-badge {
+            position: absolute;
+            top: var(--space-4);
+            right: var(--space-4);
+        }
+
+        .ticket-card__bottom {
+            padding: var(--space-4) var(--space-5);
+        }
+
+        .ticket-card__divider {
+            display: flex;
+            align-items: center;
+            margin: 0 var(--space-5) var(--space-1);
+        }
+
+        .ticket-card__divider::before,
+        .ticket-card__divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--color-border);
+        }
+
+        .ticket-card__divider-dots {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            padding: 0 8px;
+        }
+
+        .ticket-card__divider-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--color-border-light);
+        }
+
+        .ticket-info-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: var(--text-xs);
+        }
+
+        .ticket-info-row+.ticket-info-row {
+            margin-top: var(--space-2);
+        }
+
+        .ticket-info-row span:first-child {
+            color: var(--color-text-muted);
+        }
+
+        .ticket-info-row span:last-child {
+            font-weight: 600;
+            color: var(--color-text-primary);
+        }
+
+        .ticket-card__qr {
+            display: flex;
+            justify-content: center;
+            padding: var(--space-5);
+        }
+
+        .ticket-qr-box {
+            width: 100px;
+            height: 100px;
+            background: white;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem;
+            padding: 6px;
+        }
+
+        .ticket-card__actions {
+            display: flex;
+            gap: var(--space-2);
+            padding: 0 var(--space-5) var(--space-4);
+        }
+
+        /* Page sections */
+        .page-section {
+            margin-bottom: var(--space-8);
+        }
+
+        .page-section__header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--space-5);
+        }
+
+        .page-section__title {
+            font-family: var(--font-display);
+            font-size: var(--text-xl);
+            font-weight: 700;
+        }
+
+        /* Order history */
+        .order-row {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+            padding: var(--space-4) 0;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .order-row:last-child {
+            border-bottom: none;
+        }
+
+        .order-row__img {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+            background: linear-gradient(135deg, #1a0540, #3d0f80);
+        }
+
+        .order-row__name {
+            font-size: var(--text-sm);
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .order-row__meta {
+            font-size: var(--text-xs);
+            color: var(--color-text-muted);
+        }
+
+        .order-row__amount {
+            font-family: var(--font-display);
+            font-size: var(--text-base);
+            font-weight: 800;
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        .order-row__ref {
+            font-size: var(--text-xs);
+            color: var(--color-text-muted);
+            text-align: right;
+        }
+
+        /* Transfer modal */
+        .panel {
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            padding: var(--space-6);
+        }
+
+        @media(max-width:1024px) {
+            .account-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .account-sidebar {
+                position: static;
+            }
+
+            .wallet-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media(max-width:640px) {
+            .wallet-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="nav-root"></div>
+
+    <div class="container">
+        <div class="account-layout">
+
+            <!-- Sidebar -->
+            <aside class="account-sidebar">
+                <div class="account-nav">
+                    <div class="account-nav__user">
+                        <div class="account-nav__avatar">😊</div>
+                        <div>
+                            <div class="account-nav__name">Kwame Mensah</div>
+                            <div class="account-nav__email">kwame@example.com</div>
+                        </div>
+                    </div>
+                    <div class="account-nav__links">
+                        <a href="#wallet" class="account-nav__link active" id="nav-wallet">
+                            <iconify-icon icon="hugeicons:credit-card"></iconify-icon>
+                            My Tickets
+                        </a>
+                        <a href="#upcoming" class="account-nav__link" id="nav-upcoming">
+                            <iconify-icon icon="hugeicons:calendar-01"></iconify-icon>
+                            Upcoming Events
+                        </a>
+                        <a href="#history" class="account-nav__link" id="nav-history">
+                            <iconify-icon icon="hugeicons:time-04"></iconify-icon>
+                            Purchase History
+                        </a>
+                        <a href="#saved" class="account-nav__link" id="nav-saved">
+                            <iconify-icon icon="hugeicons:favourite"></iconify-icon>
+                            Saved Events
+                        </a>
+                        <div class="account-nav__section">Account</div>
+                        <a href="#profile" class="account-nav__link" id="nav-profile">
+                            <iconify-icon icon="hugeicons:user"></iconify-icon>
+                            Profile
+                        </a>
+                        <a href="#notifications" class="account-nav__link" id="nav-notifs">
+                            <iconify-icon icon="hugeicons:lock-password"></iconify-icon>
+                            Notifications
+                        </a>
+                        <a href="#support" class="account-nav__link" id="nav-support">
+                            <iconify-icon icon="hugeicons:help-circle"></iconify-icon>
+                            Support
+                        </a>
+                        <a href="index.html" class="account-nav__link" style="color:var(--color-error);"
+                            id="nav-signout">
+                            <iconify-icon icon="hugeicons:logout-01"></iconify-icon>
+                            Sign Out
+                        </a>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <main>
+                <!-- Ticket Wallet -->
+                <div class="page-section" id="wallet">
+                    <div class="page-section__header">
+                        <h1 class="page-section__title">My Ticket Wallet</h1>
+                        <a href="events.html" class="btn btn--primary btn--sm" id="browse-more-btn">+ Browse Events</a>
+                    </div>
+
+                    <div class="wallet-grid">
+                        <!-- Upcoming ticket -->
+                        <div class="ticket-card ticket-card--upcoming" id="ticket-card-1">
+                            <div class="ticket-card__top">
+                                <div class="ticket-card__status-badge"><span
+                                        class="badge badge--success">Upcoming</span></div>
+                                <div class="ticket-card__event-name">Afrobeats Night: Grand Finale</div>
+                                <div class="ticket-card__venue">Accra Sports Stadium, Accra</div>
+                            </div>
+                            <div class="ticket-card__divider">
+                                <div class="ticket-card__divider-dots">
+                                    <div class="ticket-card__divider-dot"></div>
+                                    <div class="ticket-card__divider-dot"></div>
+                                    <div class="ticket-card__divider-dot"></div>
+                                </div>
+                            </div>
+                            <div class="ticket-card__bottom">
+                                <div class="ticket-info-row"><span>Date</span><span>Sat, 15 Mar 2026 · 8:00 PM</span>
+                                </div>
+                                <div class="ticket-info-row"><span>Ticket Type</span><span>VIP Section</span></div>
+                                <div class="ticket-info-row"><span>Ticket No.</span><span
+                                        style="font-family:var(--font-mono);font-size:11px;">TKA-2026-83921</span></div>
+                                <div class="ticket-info-row"><span>Owner</span><span>Kwame Mensah</span></div>
+                            </div>
+                            <div class="ticket-card__qr">
+                                <div class="ticket-qr-box">▦</div>
+                            </div>
+                            <div class="ticket-card__actions">
+                                <button class="btn btn--primary btn--sm" style="flex:1;" id="download-ticket-1">Download
+                                    PDF</button>
+                                <button class="btn btn--secondary btn--sm" id="transfer-ticket-1">Transfer</button>
+                                <button class="btn btn--ghost btn--sm" id="resell-ticket-1">Resell</button>
+                            </div>
+                        </div>
+
+                        <!-- Another upcoming -->
+                        <div class="ticket-card ticket-card--upcoming" id="ticket-card-2">
+                            <div class="ticket-card__top ticket-card__top--sports">
+                                <div class="ticket-card__status-badge"><span class="badge badge--info">Upcoming</span>
+                                </div>
+                                <div class="ticket-card__event-name">CAF Champions League Q-Final</div>
+                                <div class="ticket-card__venue">FNB Stadium, Johannesburg</div>
+                            </div>
+                            <div class="ticket-card__divider">
+                                <div class="ticket-card__divider-dots">
+                                    <div class="ticket-card__divider-dot"></div>
+                                    <div class="ticket-card__divider-dot"></div>
+                                    <div class="ticket-card__divider-dot"></div>
+                                </div>
+                            </div>
+                            <div class="ticket-card__bottom">
+                                <div class="ticket-info-row"><span>Date</span><span>Wed, 19 Mar 2026 · 7:00 PM</span>
+                                </div>
+                                <div class="ticket-info-row"><span>Ticket Type</span><span>West Stand Lower</span></div>
+                                <div class="ticket-info-row"><span>Ticket No.</span><span
+                                        style="font-family:var(--font-mono);font-size:11px;">TKA-2026-94122</span></div>
+                                <div class="ticket-info-row"><span>Seat</span><span>Block C, Row 12, Seat 7</span></div>
+                            </div>
+                            <div class="ticket-card__qr">
+                                <div class="ticket-qr-box">▦</div>
+                            </div>
+                            <div class="ticket-card__actions">
+                                <button class="btn btn--primary btn--sm" style="flex:1;" id="download-ticket-2">Download
+                                    PDF</button>
+                                <button class="btn btn--secondary btn--sm" id="transfer-ticket-2">Transfer</button>
+                                <button class="btn btn--ghost btn--sm" id="resell-ticket-2">Resell</button>
+                            </div>
+                        </div>
+
+                        <!-- Used ticket -->
+                        <div class="ticket-card ticket-card--used" id="ticket-card-3">
+                            <div class="ticket-card__top ticket-card__top--conf">
+                                <div class="ticket-card__status-badge"><span class="badge badge--neutral">Used</span>
+                                </div>
+                                <div class="ticket-card__event-name">Ghana Business Leaders Summit</div>
+                                <div class="ticket-card__venue">Kempinski Hotel, Accra</div>
+                            </div>
+                            <div class="ticket-card__divider">
+                                <div class="ticket-card__divider-dots">
+                                    <div class="ticket-card__divider-dot"></div>
+                                    <div class="ticket-card__divider-dot"></div>
+                                    <div class="ticket-card__divider-dot"></div>
+                                </div>
+                            </div>
+                            <div class="ticket-card__bottom">
+                                <div class="ticket-info-row"><span>Date</span><span>Mon, 3 Feb 2026</span></div>
+                                <div class="ticket-info-row"><span>Ticket Type</span><span>Full Conference Pass</span>
+                                </div>
+                                <div class="ticket-info-row"><span>Used at</span><span>09:14 AM, Gate B</span></div>
+                            </div>
+                            <div class="ticket-card__qr" style="opacity:0.4;">
+                                <div class="ticket-qr-box">▦</div>
+                            </div>
+                            <div class="ticket-card__actions">
+                                <button class="btn btn--ghost btn--sm btn--full" id="view-history-3"
+                                    style="color:var(--color-text-muted);">View Details</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Purchase History -->
+                <div class="page-section" id="history">
+                    <div class="page-section__header">
+                        <h2 class="page-section__title" style="font-size:var(--text-xl);">Purchase History</h2>
+                        <button class="btn btn--secondary btn--sm" id="download-history-btn">Export CSV</button>
+                    </div>
+                    <div class="panel">
+                        <div class="order-row">
+                            <div class="order-row__img"><iconify-icon icon="hugeicons:music-note-01" style="vertical-align:middle;"></iconify-icon></div>
+                            <div style="flex:1;min-width:0;">
+                                <div class="order-row__name">Afrobeats Night: Grand Finale (VIP × 2)</div>
+                                <div class="order-row__meta">15 Mar 2026 · Mobile Money · Ref: TKA-2026-83921</div>
+                            </div>
+                            <div style="text-align:right;">
+                                <div class="order-row__amount">GH₵ 736</div>
+                                <div style="font-size:var(--text-xs);color:var(--color-success);font-weight:600;">✓
+                                    Confirmed</div>
+                            </div>
+                        </div>
+                        <div class="order-row">
+                            <div class="order-row__img" style="background:linear-gradient(135deg,#0a1a30,#0d3060);"><iconify-icon icon="hugeicons:football" style="vertical-align:middle;"></iconify-icon>
+                            </div>
+                            <div style="flex:1;min-width:0;">
+                                <div class="order-row__name">CAF Champions League Q-Final (× 1)</div>
+                                <div class="order-row__meta">19 Mar 2026 · Visa card · Ref: TKA-2026-94122</div>
+                            </div>
+                            <div style="text-align:right;">
+                                <div class="order-row__amount">R 92</div>
+                                <div style="font-size:var(--text-xs);color:var(--color-success);font-weight:600;">✓
+                                    Confirmed</div>
+                            </div>
+                        </div>
+                        <div class="order-row">
+                            <div class="order-row__img" style="background:linear-gradient(135deg,#0d1f0d,#1a4020);"><iconify-icon icon="hugeicons:briefcase-01" style="vertical-align:middle;"></iconify-icon>
+                            </div>
+                            <div style="flex:1;min-width:0;">
+                                <div class="order-row__name">Ghana Business Leaders Summit (× 1)</div>
+                                <div class="order-row__meta">3 Feb 2026 · Mobile Money · Ref: TKA-2026-71043</div>
+                            </div>
+                            <div style="text-align:right;">
+                                <div class="order-row__amount">GH₵ 105</div>
+                                <div style="font-size:var(--text-xs);color:var(--color-text-muted);font-weight:600;">✓
+                                    Used</div>
+                            </div>
+                        </div>
+                        <div class="order-row">
+                            <div class="order-row__img" style="background:linear-gradient(135deg,#1a0a20,#3d1060);"><iconify-icon icon="hugeicons:tent-01" style="vertical-align:middle;"></iconify-icon>
+                            </div>
+                            <div style="flex:1;min-width:0;">
+                                <div class="order-row__name">Chale Wote Festival (GA × 2)</div>
+                                <div class="order-row__meta">21 Aug 2025 · Mobile Money · Ref: TKA-2025-44812</div>
+                            </div>
+                            <div style="text-align:right;">
+                                <div class="order-row__amount">GH₵ 200</div>
+                                <div style="font-size:var(--text-xs);color:var(--color-text-muted);font-weight:600;">✓
+                                    Used</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Transfer modal trigger area -->
+                <div style="padding:var(--space-6);background:var(--color-bg-elevated);border:1px solid var(--color-border);border-radius:var(--radius-xl);margin-bottom:var(--space-8);"
+                    id="transfer-section">
+                    <h3 style="margin-bottom:var(--space-4);">Transfer a Ticket</h3>
+                    <p
+                        style="font-size:var(--text-sm);color:var(--color-text-muted);margin-bottom:var(--space-5);line-height:1.7;">
+                        Transfer a ticket to another person by entering their phone number or email. The original QR
+                        code will be invalidated and a new one issued to the recipient.</p>
+                    <div style="display:flex;flex-direction:column;gap:var(--space-4);">
+                        <div class="form-group">
+                            <label class="form-label" for="transfer-ticket-select">Select Ticket to Transfer</label>
+                            <select class="form-control" id="transfer-ticket-select">
+                                <option value="">Choose a ticket…</option>
+                                <option value="1">Afrobeats Night — VIP Section (TKA-2026-83921)</option>
+                                <option value="2">CAF Champions League — West Stand (TKA-2026-94122)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="transfer-recipient">Recipient Phone or Email</label>
+                            <input type="text" class="form-control" id="transfer-recipient"
+                                placeholder="0244 000 000 or recipient@email.com" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="transfer-message">Optional Message</label>
+                            <input type="text" class="form-control" id="transfer-message"
+                                placeholder="Enjoy the show!" />
+                        </div>
+                        <button class="btn btn--primary" id="submit-transfer-btn" style="max-width:200px;">
+                            <iconify-icon icon="hugeicons:sent" style="width:16px;height:16px;"></iconify-icon>
+                            Send Transfer
+                        </button>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <div id="footer-root"></div>
+    <script src="assets/js/core.js"></script>
+    <script src="assets/js/nav.js"></script>
+    <script src="assets/js/layout.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Nav active state
+            document.querySelectorAll('.account-nav__link').forEach(function (link) {
+                link.addEventListener('click', function () {
+                    document.querySelectorAll('.account-nav__link').forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+
+            // Download ticket
+            document.querySelectorAll('[id^="download-ticket"]').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    TA.toast('Preparing PDF ticket for download…', 'success');
+                });
+            });
+
+            // Transfer
+            document.getElementById('submit-transfer-btn').addEventListener('click', function () {
+                const ticket = document.getElementById('transfer-ticket-select').value;
+                const recipient = document.getElementById('transfer-recipient').value.trim();
+                if (!ticket) { TA.toast('Please select a ticket to transfer', 'warning'); return; }
+                if (!recipient) { TA.toast('Please enter the recipient phone or email', 'warning'); return; }
+                this.disabled = true;
+                this.textContent = 'Sending…';
+                setTimeout(() => {
+                    TA.toast('Ticket transferred — recipient will receive their QR via SMS and email', 'success');
+                    this.disabled = false;
+                    this.innerHTML = '<iconify-icon icon="hugeicons:sent" style="width:16px;height:16px;"></iconify-icon> Send Transfer';
+                    document.getElementById('transfer-recipient').value = '';
+                    document.getElementById('transfer-ticket-select').value = '';
+                }, 2000);
+            });
+
+            // Resell buttons
+            document.querySelectorAll('[id^="resell-ticket"]').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    TA.toast('Resale listing — navigate to resale.html to complete', 'info');
+                });
+            });
+
+            // Export history
+            document.getElementById('download-history-btn').addEventListener('click', function () {
+                TA.toast('Exporting purchase history as CSV…', 'success');
+            });
+        });
+    </script>
+</body>
+
+</html>

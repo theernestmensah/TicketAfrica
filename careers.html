@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#07070f" />
+    <title>Careers — Ticket Africa</title>
+    <script type="module" src="/assets/js/db.js"></script>
+    <link rel="stylesheet" href="assets/css/core.css" />
+    <link rel="stylesheet" href="assets/css/nav-footer.css" />
+    <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+    <style>
+        .page-header {
+            padding: var(--space-20) 0;
+            background: #07070f;
+            text-align: center;
+            position: relative;
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 50% 0%, rgba(236, 72, 153, 0.1), transparent 60%);
+            pointer-events: none;
+        }
+
+        .page-title {
+            font-family: var(--font-display);
+            font-size: clamp(2.5rem, 4vw, 3.5rem);
+            font-weight: 800;
+            margin-bottom: var(--space-4);
+            color: var(--color-text-primary);
+        }
+
+        .page-subtitle {
+            color: var(--color-text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .job-list {
+            padding: var(--space-16) 0;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .job-dept {
+            font-family: var(--font-display);
+            font-size: var(--text-xl);
+            margin-bottom: var(--space-6);
+            color: var(--color-primary);
+            border-bottom: 1px solid var(--color-border);
+            padding-bottom: var(--space-2);
+        }
+
+        .job-card {
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            padding: var(--space-6);
+            margin-bottom: var(--space-4);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all var(--transition-base);
+            cursor: pointer;
+        }
+
+        .job-card:hover {
+            border-color: rgba(236, 72, 153, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(236, 72, 153, 0.1);
+        }
+
+        .job-info h3 {
+            font-family: var(--font-display);
+            font-size: var(--text-lg);
+            margin-bottom: var(--space-2);
+            color: var(--color-text-primary);
+        }
+
+        .job-meta {
+            font-size: var(--text-sm);
+            color: var(--color-text-muted);
+            display: flex;
+            gap: var(--space-4);
+        }
+
+        .job-tag {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 4px 10px;
+            border-radius: var(--radius-full);
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        @media (max-width: 640px) {
+            .job-card {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--space-4);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="nav-root"></div>
+
+    <div class="page-header">
+        <div class="container">
+            <h1 class="page-title">Build the Future of Ticketing</h1>
+            <p class="page-subtitle">Join the team powering Africa's fastest-growing events infrastructure. We're
+                looking for passionate builders, designers, and operators.</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="job-list">
+
+            <div class="job-dept">Engineering</div>
+
+            <div class="job-card">
+                <div class="job-info">
+                    <h3>Senior Frontend Engineer</h3>
+                    <div class="job-meta">
+                        <span style="display:flex;align-items:center;gap:4px;"><iconify-icon
+                                icon="hugeicons:location-01"></iconify-icon> Remote (Africa)</span>
+                        <span style="display:flex;align-items:center;gap:4px;"><iconify-icon
+                                icon="hugeicons:clock-01"></iconify-icon> Full-time</span>
+                    </div>
+                </div>
+                <div class="job-tag">Engineering</div>
+            </div>
+
+            <div class="job-card">
+                <div class="job-info">
+                    <h3>Backend Developer (Go / Convex)</h3>
+                    <div class="job-meta">
+                        <span style="display:flex;align-items:center;gap:4px;"><iconify-icon
+                                icon="hugeicons:location-01"></iconify-icon> Accra, Ghana</span>
+                        <span style="display:flex;align-items:center;gap:4px;"><iconify-icon
+                                icon="hugeicons:clock-01"></iconify-icon> Full-time</span>
+                    </div>
+                </div>
+                <div class="job-tag">Engineering</div>
+            </div>
+
+            <div class="job-dept" style="margin-top: var(--space-10);">Design & Product</div>
+
+            <div class="job-card">
+                <div class="job-info">
+                    <h3>Product Designer</h3>
+                    <div class="job-meta">
+                        <span style="display:flex;align-items:center;gap:4px;"><iconify-icon
+                                icon="hugeicons:location-01"></iconify-icon> Lagos, Nigeria / Remote</span>
+                        <span style="display:flex;align-items:center;gap:4px;"><iconify-icon
+                                icon="hugeicons:clock-01"></iconify-icon> Full-time</span>
+                    </div>
+                </div>
+                <div class="job-tag">Design</div>
+            </div>
+
+            <div class="job-dept" style="margin-top: var(--space-10);">Operations & Sales</div>
+
+            <div class="job-card">
+                <div class="job-info">
+                    <h3>Event Success Manager</h3>
+                    <div class="job-meta">
+                        <span style="display:flex;align-items:center;gap:4px;"><iconify-icon
+                                icon="hugeicons:location-01"></iconify-icon> Nairobi, Kenya</span>
+                        <span style="display:flex;align-items:center;gap:4px;"><iconify-icon
+                                icon="hugeicons:clock-01"></iconify-icon> Full-time</span>
+                    </div>
+                </div>
+                <div class="job-tag">Operations</div>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="footer-root"></div>
+    <script src="assets/js/core.js"></script>
+    <script src="assets/js/layout.js"></script>
+</body>
+
+</html>

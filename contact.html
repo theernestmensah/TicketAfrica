@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Contact Us — Ticket Africa</title>
+    <script type="module" src="/assets/js/db.js"></script>
+    <link rel="stylesheet" href="assets/css/core.css" />
+    <link rel="stylesheet" href="assets/css/nav-footer.css" />
+    <style>
+        .contact-hero {
+            padding: var(--space-20) 0 var(--space-12);
+            background: var(--color-bg-elevated);
+            margin-top: 68px;
+            border-bottom: 1px solid var(--color-border);
+            text-align: center;
+        }
+
+        .contact-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-12);
+            margin-top: var(--space-16);
+            margin-bottom: var(--space-20);
+        }
+
+        .contact-form {
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            padding: var(--space-8);
+        }
+
+        .contact-form textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-8);
+        }
+
+        .info-block__title {
+            font-family: var(--font-display);
+            font-size: var(--text-lg);
+            font-weight: 700;
+            margin-bottom: var(--space-3);
+            color: var(--color-text-primary);
+        }
+
+        .info-block__desc {
+            color: var(--color-text-muted);
+            font-size: var(--text-sm);
+            line-height: 1.7;
+            margin-bottom: var(--space-4);
+        }
+
+        .info-block__link {
+            color: var(--color-primary);
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .info-block__link:hover {
+            text-decoration: underline;
+        }
+
+        .office-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-5);
+            margin-top: var(--space-6);
+        }
+
+        .office-card {
+            padding: var(--space-5);
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+        }
+
+        .office-city {
+            font-weight: 700;
+            margin-bottom: var(--space-2);
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .office-details {
+            font-size: var(--text-xs);
+            color: var(--color-text-muted);
+            line-height: 1.6;
+        }
+
+        @media(max-width: 768px) {
+            .contact-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .office-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="nav-root"></div>
+
+    <section class="contact-hero">
+        <div class="container">
+            <div class="section-label" style="justify-content:center;margin-bottom:var(--space-5);">Get in touch</div>
+            <h1 class="h1" style="margin-bottom:var(--space-4);">We're here to help</h1>
+            <p style="color:var(--color-text-muted);max-width:560px;margin:0 auto;font-size:var(--text-lg);">Questions
+                about an event, experiencing payment issues, or want to integrate Ticket Africa for your festival? Reach
+                out to our team.</p>
+        </div>
+    </section>
+
+    <div class="container">
+        <div class="contact-layout">
+
+            <!-- Contact Form -->
+            <div>
+                <div class="contact-form">
+                    <h2
+                        style="font-family:var(--font-display);font-size:1.5rem;font-weight:700;margin-bottom:var(--space-6);">
+                        Send a message</h2>
+                    <form id="contact-form-el">
+                        <div class="form-group">
+                            <label class="form-label" for="subject">How can we help?</label>
+                            <select class="form-control" id="subject" required>
+                                <option value="" disabled selected>Select an option...</option>
+                                <option value="buyer">I need help with a ticket I bought</option>
+                                <option value="organizer">I'm an organizer and need support</option>
+                                <option value="sales">I want to discuss enterprise sales</option>
+                                <option value="bug">I found a bug on the platform</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);">
+                            <div class="form-group">
+                                <label class="form-label" for="name">Full Name</label>
+                                <input type="text" class="form-control" id="name" placeholder="Kwame Mensah" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="email">Email Address</label>
+                                <input type="email" class="form-control" id="email" placeholder="you@example.com"
+                                    required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="order">Ticket Reference (if applicable)</label>
+                            <input type="text" class="form-control" id="order" placeholder="e.g. TKA-2026-83921">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="message">Message</label>
+                            <textarea class="form-control" id="message"
+                                placeholder="Please describe your issue in detail..." required></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn--primary btn--full" id="btn-submit">
+                            Send Message
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Contact Info -->
+            <div class="contact-info">
+                <div class="info-block">
+                    <div class="info-block__title">Chat with Support</div>
+                    <div class="info-block__desc">Our customer success team is available Monday to Saturday, 8am to 8pm
+                        GMT. We aim to respond to all queries within 2 hours.</div>
+                    <a href="#" class="info-block__link">
+                        <iconify-icon icon="hugeicons:star" style="width:18px;height:18px;"></iconify-icon>
+                        Open Live Chat
+                    </a>
+                </div>
+
+                <div class="info-block" style="padding-top:var(--space-6);border-top:1px solid var(--color-border);">
+                    <div class="info-block__title">Email Us</div>
+                    <div class="info-block__desc">For non-urgent issues, press inquiries, or partnership discussions,
+                        send us an email.</div>
+                    <a href="mailto:hello@ticketafrica.com" class="info-block__link">
+                        <iconify-icon icon="hugeicons:mail-01" style="width:18px;height:18px;"></iconify-icon>
+                        hello@ticketafrica.com
+                    </a>
+                </div>
+
+                <div class="info-block" style="padding-top:var(--space-6);border-top:1px solid var(--color-border);">
+                    <div class="info-block__title">Our Offices</div>
+                    <div class="office-grid">
+                        <div class="office-card">
+                            <div class="office-city"><iconify-icon icon="hugeicons:flag-01" style="vertical-align:middle;"></iconify-icon> Accra, Ghana (HQ)</div>
+                            <div class="office-details">
+                                Stanbic Heights, 5th Floor<br>
+                                Airport City, Accra<br>
+                                +233 55 000 0000
+                            </div>
+                        </div>
+                        <div class="office-card">
+                            <div class="office-city"><iconify-icon icon="hugeicons:flag-01" style="vertical-align:middle;"></iconify-icon> Lagos, Nigeria</div>
+                            <div class="office-details">
+                                Landmark Towers<br>
+                                Victoria Island, Lagos<br>
+                                +234 800 000 0000
+                            </div>
+                        </div>
+                        <div class="office-card">
+                            <div class="office-city"><iconify-icon icon="hugeicons:flag-01" style="vertical-align:middle;"></iconify-icon> Nairobi, Kenya</div>
+                            <div class="office-details">
+                                Nairobi Garage, Kilimani<br>
+                                Nairobi<br>
+                                +254 700 000 000
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <div id="footer-root"></div>
+    <script src="assets/js/core.js"></script>
+    <script src="assets/js/nav.js"></script>
+    <script src="assets/js/layout.js"></script>
+    <script>
+        document.getElementById('contact-form-el').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-submit');
+            const ogText = btn.innerHTML;
+
+            btn.disabled = true;
+            btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-color:rgba(255,255,255,0.3);border-top-color:white;"></div>';
+
+            // Simulate submission
+            setTimeout(() => {
+                TA.toast('Message sent! Our team will get back to you shortly.', 'success');
+                this.reset();
+                btn.disabled = false;
+                btn.innerHTML = ogText;
+            }, 1500);
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1073 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description"
+    content="Ticket Africa — Africa's leading event ticketing platform. Buy and sell tickets for concerts, festivals, sports, conferences and more across Ghana, Nigeria, Kenya, South Africa and Rwanda." />
+  <meta property="og:title" content="Ticket Africa — Events Across Africa" />
+  <meta property="og:description"
+    content="Buy tickets for the biggest events across Africa. Secure payments, QR tickets, mobile money and USSD support." />
+  <meta name="theme-color" content="#07070f" />
+  <title>Ticket Africa — Africa's Event Ticketing Platform</title>
+  <script type="module" src="/assets/js/db.js"></script>
+  <link rel="stylesheet" href="assets/css/core.css" />
+  <link rel="stylesheet" href="assets/css/nav-footer.css" />
+  <link rel="stylesheet" href="assets/css/home.css" />
+  <style>
+    /* Reveal animation */
+    [data-reveal] {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 500ms ease, transform 500ms ease;
+    }
+
+    [data-reveal].revealed {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    [data-reveal][data-delay="1"] {
+      transition-delay: 100ms;
+    }
+
+    [data-reveal][data-delay="2"] {
+      transition-delay: 200ms;
+    }
+
+    [data-reveal][data-delay="3"] {
+      transition-delay: 300ms;
+    }
+
+    [data-reveal][data-delay="4"] {
+      transition-delay: 400ms;
+    }
+
+    /* Countdown units */
+    .countdown {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .countdown-unit {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .countdown-unit strong {
+      font-family: var(--font-display);
+      font-size: var(--text-2xl);
+      font-weight: 800;
+      color: var(--color-text-primary);
+    }
+
+    .countdown-unit small {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--color-text-muted);
+    }
+
+    .countdown-sep {
+      font-family: var(--font-display);
+      font-size: var(--text-xl);
+      font-weight: 800;
+      color: var(--color-primary);
+      padding-bottom: 12px;
+    }
+
+    /* Hero category colors */
+    .cat-concerts {
+      background: rgba(139, 92, 246, 0.15);
+    }
+
+    .cat-sports {
+      background: rgba(59, 130, 246, 0.15);
+    }
+
+    .cat-festivals {
+      background: rgba(236, 72, 153, 0.15);
+    }
+
+    .cat-church {
+      background: rgba(139, 92, 246, 0.15);
+    }
+
+    .cat-conf {
+      background: rgba(34, 197, 94, 0.15);
+    }
+
+    .cat-nightlife {
+      background: rgba(236, 72, 153, 0.15);
+    }
+
+    .cat-culture {
+      background: rgba(20, 184, 166, 0.15);
+    }
+
+    /* Live badge pulse */
+    .live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .live-badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--color-error);
+      animation: pulse 1.5s infinite;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Navigation -->
+  <div id="nav-root"></div>
+
+  <!-- ═══ HERO ═══════════════════════════════════════════ -->
+  <section class="hero" id="hero">
+
+    <!-- Layered background -->
+    <div class="hero__bg">
+      <canvas class="hero__canvas" id="hero-canvas"></canvas>
+      <div class="hero__bg-mesh"></div>
+      <div class="hero__bg-vignette"></div>
+    </div>
+    <div class="hero__orb hero__orb--1"></div>
+    <div class="hero__orb hero__orb--2"></div>
+    <div class="hero__orb hero__orb--3"></div>
+
+    <!-- ── MAIN CONTENT ── -->
+    <div class="hero__content">
+      <div class="container">
+
+        <!-- HEADLINE — no eyebrow, just power -->
+        <h1 class="hero__headline" data-reveal>
+          <span class="hero__headline-line">Every great</span>
+          <span class="hero__headline-line hero__headline-line--accent">African event</span>
+          <span class="hero__headline-line">starts here.</span>
+        </h1>
+
+        <!-- SUBTEXT — one line, punchy -->
+        <p class="hero__subtext" data-reveal data-delay="1">
+          Tickets. Verified. Delivered. Across Ghana, Nigeria, Kenya, South Africa &amp; Rwanda.
+        </p>
+
+        <!-- CTAs — two, nothing more -->
+        <div class="hero__ctas" data-reveal data-delay="2">
+          <a href="events.html" class="btn btn--primary hero__cta-primary" id="hero-browse-btn">
+            Browse Events
+            <iconify-icon icon="hugeicons:arrow-right-01"></iconify-icon>
+          </a>
+          <a href="for-organizers.html" class="btn btn--secondary hero__cta-secondary" id="hero-organizer-btn">
+            Sell Tickets
+          </a>
+        </div>
+
+        <!-- STATS — stark numbers, no decoration -->
+        <div class="hero__stats-row" data-reveal data-delay="3">
+          <div class="hero__stat-item">
+            <span class="hero__stat-num" id="stat-live-events">248</span>
+            <span class="hero__stat-txt">Live Events</span>
+          </div>
+          <div class="hero__stat-sep">·</div>
+          <div class="hero__stat-item">
+            <span class="hero__stat-num">5</span>
+            <span class="hero__stat-txt">Countries</span>
+          </div>
+          <div class="hero__stat-sep">·</div>
+          <div class="hero__stat-item">
+            <span class="hero__stat-num">2M+</span>
+            <span class="hero__stat-txt">Tickets Issued</span>
+          </div>
+          <div class="hero__stat-sep">·</div>
+          <div class="hero__stat-item">
+            <span class="hero__stat-num">*123*88#</span>
+            <span class="hero__stat-txt">USSD Access</span>
+          </div>
+        </div>
+
+        <!-- SEARCH BAR — minimal, utilitarian -->
+        <div class="hero__search-wrap" data-reveal data-delay="3">
+          <div class="hero__command-inner">
+            <div class="hero__command-field">
+              <iconify-icon icon="hugeicons:search-01" class="hero__command-icon"></iconify-icon>
+              <input type="text" class="hero__command-input" id="hero-search"
+                placeholder="Search events, artists, venues…" autocomplete="off" />
+            </div>
+            <div class="hero__command-divider"></div>
+            <div class="hero__command-select-wrap">
+              <iconify-icon icon="hugeicons:location-01" class="hero__command-icon"></iconify-icon>
+              <select class="hero__command-select" id="hero-country">
+                <option value="">All Countries</option>
+                <option value="GH">🇬🇭 Ghana</option>
+                <option value="NG">🇳🇬 Nigeria</option>
+                <option value="KE">🇰🇪 Kenya</option>
+                <option value="ZA">🇿🇦 South Africa</option>
+                <option value="RW">🇷🇼 Rwanda</option>
+              </select>
+            </div>
+            <div class="hero__command-divider"></div>
+            <div class="hero__command-select-wrap">
+              <iconify-icon icon="hugeicons:calendar-01" class="hero__command-icon"></iconify-icon>
+              <select class="hero__command-select" id="hero-when">
+                <option value="">Any Date</option>
+                <option>This Week</option>
+                <option>This Month</option>
+                <option>Next 3 Months</option>
+              </select>
+            </div>
+            <button class="hero__command-btn btn btn--primary"
+              onclick="window.location='events.html?q='+document.getElementById('hero-search').value+'&country='+document.getElementById('hero-country').value">
+              Find Events
+            </button>
+          </div>
+        </div>
+
+
+      </div>
+    </div>
+
+    <!-- Floating chips — social proof, anchored bottom corners -->
+
+
+    <div class="hero__chip hero__chip--ussd">
+      <div class="hero__chip-icon hero__chip-icon--ussd">
+        <iconify-icon icon="hugeicons:smart-phone-01"></iconify-icon>
+      </div>
+      <div>
+        <div class="hero__chip-title" style="font-family:var(--font-mono);letter-spacing:0.06em;">*123*88#</div>
+        <div class="hero__chip-sub">No internet needed</div>
+      </div>
+    </div>
+
+
+  </section>
+
+  <!-- ═══ TRUST BAR ═══════════════════════════════════════ -->
+  <div class="trust-bar" id="trust-bar">
+    <div class="trust-bar__inner">
+      <div class="trust-bar__item"><iconify-icon icon="hugeicons:shield-01"></iconify-icon>SSL Encrypted</div>
+      <div class="trust-bar__dot"></div>
+      <div class="trust-bar__item"><iconify-icon icon="hugeicons:tick-01"></iconify-icon>QR Authentic Tickets</div>
+      <div class="trust-bar__dot"></div>
+      <div class="trust-bar__item"><iconify-icon icon="hugeicons:credit-card"></iconify-icon>Mobile Money Supported
+      </div>
+      <div class="trust-bar__dot"></div>
+      <div class="trust-bar__item"><iconify-icon icon="hugeicons:smart-phone-01"
+          style="vertical-align:middle;"></iconify-icon> USSD Purchasing Available</div>
+      <div class="trust-bar__dot"></div>
+      <div class="trust-bar__item"><iconify-icon icon="hugeicons:tick-01"></iconify-icon>Instant QR Delivery</div>
+      <div class="trust-bar__dot"></div>
+      <div class="trust-bar__item"><iconify-icon icon="hugeicons:help-circle"></iconify-icon>24/7 Support</div>
+      <div class="trust-bar__dot"></div>
+      <div class="trust-bar__item"><iconify-icon icon="hugeicons:smart-phone-01"></iconify-icon>Offline Scanning</div>
+      <div class="trust-bar__dot"></div>
+      <!-- Duplicate for seamless loop -->
+      <div class="trust-bar__item"><iconify-icon icon="hugeicons:shield-01"></iconify-icon>SSL Encrypted</div>
+      <div class="trust-bar__dot"></div>
+      <div class="trust-bar__item"><iconify-icon icon="hugeicons:tick-01"></iconify-icon>QR Authentic Tickets</div>
+      <div class="trust-bar__dot"></div>
+      <div class="trust-bar__item"><iconify-icon icon="hugeicons:credit-card"></iconify-icon>Mobile Money Supported
+      </div>
+      <div class="trust-bar__dot"></div>
+      <div class="trust-bar__item"><iconify-icon icon="hugeicons:smart-phone-01"
+          style="vertical-align:middle;"></iconify-icon> USSD Purchasing Available</div>
+    </div>
+  </div>
+
+  <!-- ═══ CATEGORIES ══════════════════════════════════════ -->
+  <section class="categories-section section" id="categories">
+    <div class="container">
+      <div class="section-label" data-reveal>Browse by Category</div>
+      <h2 class="h2" data-reveal data-delay="1">Every kind of event, <br>one platform</h2>
+      <div class="categories-grid" style="margin-top:var(--space-10);">
+        <a href="events.html?cat=concerts" class="category-card" id="cat-concerts" data-reveal data-delay="1">
+          <div class="category-card__icon cat-concerts"><iconify-icon icon="hugeicons:music-note-01"
+              style="vertical-align:middle;"></iconify-icon></div>
+          <div>
+            <div class="category-card__name">Concerts & Music</div>
+            <div class="category-card__count" id="cat-count-concerts">Browse →</div>
+          </div>
+        </a>
+        <a href="events.html?cat=sports" class="category-card" id="cat-sports" data-reveal data-delay="2">
+          <div class="category-card__icon cat-sports"><iconify-icon icon="hugeicons:football"
+              style="vertical-align:middle;"></iconify-icon></div>
+          <div>
+            <div class="category-card__name">Sports & Athletics</div>
+            <div class="category-card__count" id="cat-count-sports">Browse →</div>
+          </div>
+        </a>
+        <a href="events.html?cat=festivals" class="category-card" id="cat-festivals" data-reveal data-delay="3">
+          <div class="category-card__icon cat-festivals"><iconify-icon icon="hugeicons:tent-01"
+              style="vertical-align:middle;"></iconify-icon></div>
+          <div>
+            <div class="category-card__name">Festivals</div>
+            <div class="category-card__count" id="cat-count-festivals">Browse →</div>
+          </div>
+        </a>
+        <a href="events.html?cat=church" class="category-card" id="cat-church" data-reveal data-delay="4">
+          <div class="category-card__icon cat-church"><iconify-icon icon="hugeicons:church"
+              style="vertical-align:middle;"></iconify-icon></div>
+          <div>
+            <div class="category-card__name">Church & Faith</div>
+            <div class="category-card__count" id="cat-count-church">Browse →</div>
+          </div>
+        </a>
+        <a href="events.html?cat=conferences" class="category-card" id="cat-conferences" data-reveal data-delay="1">
+          <div class="category-card__icon cat-conf"><iconify-icon icon="hugeicons:briefcase-01"
+              style="vertical-align:middle;"></iconify-icon></div>
+          <div>
+            <div class="category-card__name">Conferences</div>
+            <div class="category-card__count" id="cat-count-conferences">Browse →</div>
+          </div>
+        </a>
+        <a href="events.html?cat=nightlife" class="category-card" id="cat-nightlife" data-reveal data-delay="2">
+          <div class="category-card__icon cat-nightlife"><iconify-icon icon="hugeicons:party-01"
+              style="vertical-align:middle;"></iconify-icon></div>
+          <div>
+            <div class="category-card__name">Nightlife & Parties</div>
+            <div class="category-card__count" id="cat-count-nightlife">Browse →</div>
+          </div>
+        </a>
+
+        <a href="events.html?cat=culture" class="category-card" id="cat-culture" data-reveal data-delay="4">
+          <div class="category-card__icon cat-culture"><iconify-icon icon="hugeicons:drum"
+              style="vertical-align:middle;"></iconify-icon></div>
+          <div>
+            <div class="category-card__name">Cultural Events</div>
+            <div class="category-card__count" id="cat-count-culture">Browse →</div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ FEATURED EVENTS ══════════════════════════════════ -->
+  <section class="events-section" id="featured-events"
+    style="background:var(--color-bg-elevated);border-top:1px solid var(--color-border);border-bottom:1px solid var(--color-border);">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-header__left">
+          <div class="section-label" data-reveal>Featured This Week</div>
+          <h2 class="h2" data-reveal data-delay="1">Don't miss these events</h2>
+        </div>
+        <div class="section-header__right">
+          <a href="events.html" class="btn btn--secondary" id="view-all-events">View all events →</a>
+        </div>
+      </div>
+
+      <div class="events-grid" id="featured-events-grid">
+        <!-- Events will be dynamically injected here by Convex Hook -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ VOTING & POLLS ═══════════════════════════════════ -->
+  <section class="voting-section section" id="home-polls" style="padding-bottom:var(--space-20);">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-header__left">
+          <div class="section-label" data-reveal>Real-time Competitions</div>
+          <h2 class="h2" data-reveal data-delay="1">Your vote, <br>your voice</h2>
+        </div>
+        <div class="section-header__right">
+          <a href="voting.html" class="btn btn--secondary" id="view-all-polls">All active polls →</a>
+        </div>
+      </div>
+
+      <div class="polls-grid" id="home-polls-grid" style="display:grid;grid-template-columns:repeat(auto-fill, minmax(320px, 1fr));gap:var(--space-6);margin-top:var(--space-8);">
+        <!-- Polls will be injected here -->
+        <div style="grid-column:1/-1;padding:60px;text-align:center;background:var(--color-bg-card);border:1px solid var(--color-border);border-radius:var(--radius-xl);">
+          <div class="spinner" style="width:40px;height:40px;margin:0 auto var(--space-4);"></div>
+          <p style="color:var(--color-text-muted);">Fetching active competitions...</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ CITIES ═══════════════════════════════════════════ -->
+  <section class="cities-section" id="cities">
+    <div class="container">
+      <div class="section-label" data-reveal>Where We Operate</div>
+      <h2 class="h2" data-reveal data-delay="1">Find events in your city</h2>
+      <div class="cities-grid" style="margin-top:var(--space-10);">
+        <a href="events.html?city=accra" class="city-card" id="city-accra" data-reveal data-delay="1">
+          <div class="city-card__bg"><iconify-icon icon="hugeicons:flag-01"
+              style="vertical-align:middle;"></iconify-icon></div>
+          <div class="city-card__content">
+            <div class="city-card__name">Accra</div>
+            <div class="city-card__country">Ghana</div>
+            <div class="city-card__count" id="city-count-accra">Explore →</div>
+          </div>
+        </a>
+        <a href="events.html?city=lagos" class="city-card" id="city-lagos" data-reveal data-delay="2">
+          <div class="city-card__bg"><iconify-icon icon="hugeicons:flag-01"
+              style="vertical-align:middle;"></iconify-icon></div>
+          <div class="city-card__content">
+            <div class="city-card__name">Lagos</div>
+            <div class="city-card__country">Nigeria</div>
+            <div class="city-card__count" id="city-count-lagos">Explore →</div>
+          </div>
+        </a>
+        <a href="events.html?city=nairobi" class="city-card" id="city-nairobi" data-reveal data-delay="3">
+          <div class="city-card__bg"><iconify-icon icon="hugeicons:flag-01"
+              style="vertical-align:middle;"></iconify-icon></div>
+          <div class="city-card__content">
+            <div class="city-card__name">Nairobi</div>
+            <div class="city-card__country">Kenya</div>
+            <div class="city-card__count" id="city-count-nairobi">Explore →</div>
+          </div>
+        </a>
+        <a href="events.html?city=johannesburg" class="city-card" id="city-johannesburg" data-reveal data-delay="4">
+          <div class="city-card__bg"><iconify-icon icon="hugeicons:flag-01"
+              style="vertical-align:middle;"></iconify-icon></div>
+          <div class="city-card__content">
+            <div class="city-card__name">Johannesburg</div>
+            <div class="city-card__country">South Africa</div>
+            <div class="city-card__count" id="city-count-johannesburg">Explore →</div>
+          </div>
+        </a>
+        <a href="events.html?city=kigali" class="city-card" id="city-kigali" data-reveal data-delay="5">
+          <div class="city-card__bg"><iconify-icon icon="hugeicons:flag-01"
+              style="vertical-align:middle;"></iconify-icon></div>
+          <div class="city-card__content">
+            <div class="city-card__name">Kigali</div>
+            <div class="city-card__country">Rwanda</div>
+            <div class="city-card__count" id="city-count-kigali">Explore →</div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ HOW IT WORKS ══════════════════════════════════════ -->
+  <section class="how-section" id="how-it-works">
+    <div class="container">
+      <div style="text-align:center;">
+        <div class="section-label" style="justify-content:center;" data-reveal>Simple & Accessible</div>
+        <h2 class="h2" data-reveal data-delay="1">Buying tickets has never been easier</h2>
+        <p style="color:var(--color-text-muted);margin-top:var(--space-4);max-width:500px;margin-left:auto;margin-right:auto;"
+          data-reveal data-delay="2">
+          Multiple ways to buy — from our website to your basic mobile phone. No smartphone required.
+        </p>
+      </div>
+
+      <div class="how-tabs" data-tabs>
+        <button class="how-tab active" data-tab="web" id="tab-web"><iconify-icon icon="hugeicons:global"
+            style="vertical-align:middle;"></iconify-icon> Web / App</button>
+        <button class="how-tab" data-tab="ussd" id="tab-ussd"><iconify-icon icon="hugeicons:smart-phone-01"
+            style="vertical-align:middle;"></iconify-icon> USSD</button>
+        <button class="how-tab" data-tab="agent" id="tab-agent"><iconify-icon icon="hugeicons:store-01"
+            style="vertical-align:middle;"></iconify-icon> Agent</button>
+      </div>
+
+      <div data-panel="web" class="how-panel active">
+        <div class="how-steps">
+          <div class="how-step" data-reveal>
+            <div class="how-step__number">1</div>
+            <div class="how-step__content">
+              <h4>Find Your Event</h4>
+              <p>Browse by city, category, or date. Search for your favourite artist, team, or conference.</p>
+            </div>
+          </div>
+          <div class="how-step" data-reveal>
+            <div class="how-step__number">2</div>
+            <div class="how-step__content">
+              <h4>Select Your Tickets</h4>
+              <p>Choose ticket type, quantity, and seat (where applicable). See transparent pricing with all fees.</p>
+            </div>
+          </div>
+          <div class="how-step" data-reveal>
+            <div class="how-step__number">3</div>
+            <div class="how-step__content">
+              <h4>Pay Securely</h4>
+              <p>Pay with Mobile Money (MTN, Vodafone, AirtelTigo), Visa/Mastercard, or bank transfer.</p>
+            </div>
+          </div>
+          <div class="how-step" data-reveal>
+            <div class="how-step__number">4</div>
+            <div class="how-step__content">
+              <h4>Receive Your QR Ticket</h4>
+              <p>Get your ticket instantly via email, SMS, and in your Ticket Africa wallet. Show QR at venue.</p>
+            </div>
+          </div>
+        </div>
+        <div class="how-visual">
+          <div style="text-align:center;">
+            <div style="font-size:4rem;margin-bottom:var(--space-4);"><iconify-icon icon="hugeicons:ticket-01"
+                style="vertical-align:middle;"></iconify-icon></div>
+            <div
+              style="font-family:var(--font-display);font-size:var(--text-xl);font-weight:700;margin-bottom:var(--space-2);">
+              Your Ticket</div>
+            <div
+              style="background:var(--color-bg);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:var(--space-4);display:inline-block;margin-bottom:var(--space-4);">
+              <div
+                style="width:120px;height:120px;background:linear-gradient(135deg,var(--color-bg-card),var(--color-border));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:3rem;">
+                ▦</div>
+            </div>
+            <div style="font-size:var(--text-sm);color:var(--color-text-muted);">Scan QR at gate</div>
+            <div
+              style="margin-top:var(--space-4);padding:var(--space-3) var(--space-4);background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);border-radius:var(--radius-md);font-size:var(--text-sm);color:var(--color-success);font-weight:600;">
+              ✓ Ticket Verified — Valid Entry
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div data-panel="ussd" class="how-panel">
+        <div class="how-steps">
+          <div class="how-step">
+            <div class="how-step__number">1</div>
+            <div class="how-step__content">
+              <h4>Dial *123*88#</h4>
+              <p>Works on any mobile phone — no internet, no smartphone required. Available 24/7.</p>
+            </div>
+          </div>
+          <div class="how-step">
+            <div class="how-step__number">2</div>
+            <div class="how-step__content">
+              <h4>Browse & Select</h4>
+              <p>Navigate featured events by number. Select your event, ticket type, and quantity.</p>
+            </div>
+          </div>
+          <div class="how-step">
+            <div class="how-step__number">3</div>
+            <div class="how-step__content">
+              <h4>Confirm Mobile Money</h4>
+              <p>Approve the payment prompt sent to your phone. No card needed — your mobile wallet pays.</p>
+            </div>
+          </div>
+          <div class="how-step">
+            <div class="how-step__number">4</div>
+            <div class="how-step__content">
+              <h4>Receive SMS Ticket Link</h4>
+              <p>Get a confirmation SMS with a ticket link. Show the code at the gate or retrieve QR via
+                *123*88*RETRIEVE#.</p>
+            </div>
+          </div>
+        </div>
+        <div class="how-visual">
+          <div class="ussd-phone">
+            <div class="ussd-phone__screen">
+              <div class="ussd-phone__header">*123*88# — Ticket Africa</div>
+              <div class="ussd-phone__content">
+                Welcome to TicketAfrica<br><br>
+                1. Browse Events<br>
+                2. My Tickets<br>
+                3. Retrieve Ticket<br>
+                4. Support<br><br>
+                Reply with option:
+              </div>
+              <div class="ussd-phone__input-line">
+                <span style="color:#888;font-size:11px;">&gt;</span>
+                <span class="ussd-phone__cursor"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div data-panel="agent" class="how-panel">
+        <div class="how-steps">
+          <div class="how-step">
+            <div class="how-step__number">1</div>
+            <div class="how-step__content">
+              <h4>Find a Ticket Agent</h4>
+              <p>Visit any authorised Ticket Africa agent — found at mobile money shops, markets, and transport hubs
+                across the city.</p>
+            </div>
+          </div>
+          <div class="how-step">
+            <div class="how-step__number">2</div>
+            <div class="how-step__content">
+              <h4>Tell the Agent Your Event</h4>
+              <p>Provide the event name and ticket type. The agent processes your order on the platform.</p>
+            </div>
+          </div>
+          <div class="how-step">
+            <div class="how-step__number">3</div>
+            <div class="how-step__content">
+              <h4>Pay Cash or Mobile Money</h4>
+              <p>Pay the agent directly. No bank account or card required.</p>
+            </div>
+          </div>
+          <div class="how-step">
+            <div class="how-step__number">4</div>
+            <div class="how-step__content">
+              <h4>Collect Your Ticket</h4>
+              <p>Receive a printed QR ticket or SMS link. Present at the venue gate.</p>
+            </div>
+          </div>
+        </div>
+        <div class="how-visual">
+          <div style="text-align:center;padding:var(--space-8);">
+            <div style="font-size:4rem;margin-bottom:var(--space-4);"><iconify-icon icon="hugeicons:store-01"
+                style="vertical-align:middle;"></iconify-icon></div>
+            <div
+              style="font-family:var(--font-display);font-size:var(--text-lg);font-weight:700;margin-bottom:var(--space-4);">
+              Authorised Agent Network</div>
+            <div style="display:flex;flex-direction:column;gap:var(--space-3);max-width:240px;margin:0 auto;">
+              <div
+                style="padding:var(--space-3) var(--space-4);background:var(--color-bg);border:1px solid var(--color-border);border-radius:var(--radius-md);font-size:var(--text-sm);text-align:left;display:flex;gap:var(--space-3);align-items:center;">
+                <span><iconify-icon icon="hugeicons:location-01"
+                    style="vertical-align:middle;"></iconify-icon></span><span
+                  style="color:var(--color-text-secondary);">500+ agent locations</span>
+              </div>
+              <div
+                style="padding:var(--space-3) var(--space-4);background:var(--color-bg);border:1px solid var(--color-border);border-radius:var(--radius-md);font-size:var(--text-sm);text-align:left;display:flex;gap:var(--space-3);align-items:center;">
+                <span><iconify-icon icon="hugeicons:money-01" style="vertical-align:middle;"></iconify-icon></span><span
+                  style="color:var(--color-text-secondary);">Cash & mobile money</span>
+              </div>
+              <div
+                style="padding:var(--space-3) var(--space-4);background:var(--color-bg);border:1px solid var(--color-border);border-radius:var(--radius-md);font-size:var(--text-sm);text-align:left;display:flex;gap:var(--space-3);align-items:center;">
+                <span><iconify-icon icon="hugeicons:printer" style="vertical-align:middle;"></iconify-icon></span><span
+                  style="color:var(--color-text-secondary);">Printed or SMS tickets</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ PAYMENT METHODS ═══════════════════════════════════ -->
+  <section class="payment-section" id="payment-methods">
+    <div class="container">
+      <div class="payment-grid">
+        <div>
+          <div class="section-label" data-reveal>Payment Infrastructure</div>
+          <h2 class="h2" data-reveal data-delay="1">Pay your way</h2>
+          <p style="color:var(--color-text-muted);margin-top:var(--space-4);line-height:1.7;" data-reveal
+            data-delay="2">
+            We support every major payment method across Africa. From mobile money to bank cards — no one is excluded
+            from accessing events.
+          </p>
+          <div class="payment-methods">
+            <div class="payment-method-card">
+              <div class="payment-method-icon" style="background:rgba(255,204,0,0.15);"><iconify-icon
+                  icon="hugeicons:smart-phone-01" style="vertical-align:middle;"></iconify-icon></div>
+              <div>
+                <div class="payment-method-name">MTN MoMo</div>
+                <div class="payment-method-region">GH · NG · RW · ZM</div>
+              </div>
+            </div>
+            <div class="payment-method-card">
+              <div class="payment-method-icon" style="background:rgba(139, 92, 246,0.15);"><iconify-icon
+                  icon="hugeicons:smart-phone-01" style="vertical-align:middle;"></iconify-icon></div>
+              <div>
+                <div class="payment-method-name">Airtel Money</div>
+                <div class="payment-method-region">KE · NG · RW</div>
+              </div>
+            </div>
+            <div class="payment-method-card">
+              <div class="payment-method-icon" style="background:rgba(0,120,212,0.15);"><iconify-icon
+                  icon="hugeicons:smart-phone-01" style="vertical-align:middle;"></iconify-icon></div>
+              <div>
+                <div class="payment-method-name">M-Pesa</div>
+                <div class="payment-method-region">KE · TZ</div>
+              </div>
+            </div>
+            <div class="payment-method-card">
+              <div class="payment-method-icon" style="background:rgba(34,197,94,0.15);"><iconify-icon
+                  icon="hugeicons:smart-phone-01" style="vertical-align:middle;"></iconify-icon></div>
+              <div>
+                <div class="payment-method-name">Vodafone Cash</div>
+                <div class="payment-method-region">GH</div>
+              </div>
+            </div>
+            <div class="payment-method-card">
+              <div class="payment-method-icon" style="background:rgba(59,130,246,0.15);"><iconify-icon
+                  icon="hugeicons:credit-card" style="vertical-align:middle;"></iconify-icon></div>
+              <div>
+                <div class="payment-method-name">Visa / Mastercard</div>
+                <div class="payment-method-region">All markets</div>
+              </div>
+            </div>
+            <div class="payment-method-card">
+              <div class="payment-method-icon" style="background:rgba(236, 72, 153,0.15);"><iconify-icon
+                  icon="hugeicons:bank" style="vertical-align:middle;"></iconify-icon></div>
+              <div>
+                <div class="payment-method-name">Bank Transfer</div>
+                <div class="payment-method-region">All markets</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="payment-visual">
+            <div class="payment-receipt">
+              <div class="payment-receipt__header">
+                <h4>Payment Successful</h4>
+                <p>Transaction ref: TKA-2026-83921</p>
+              </div>
+              <div class="payment-receipt__body">
+                <div class="receipt-row"><span>Event</span><span>Afrobeats Night</span></div>
+                <div class="receipt-row"><span>Ticket Type</span><span>VIP Access</span></div>
+                <div class="receipt-row"><span>Quantity</span><span>2 tickets</span></div>
+                <div class="receipt-row"><span>Subtotal</span><span>GH₵ 500.00</span></div>
+                <div class="receipt-row"><span>Service Fee (5%)</span><span>GH₵ 25.00</span></div>
+                <div class="receipt-row receipt-total"><span style="font-weight:700;">Total Charged</span><span>GH₵
+                    525.00</span></div>
+                <div class="receipt-row" style="margin-top:var(--space-3);"><span>Payment Method</span><span>MTN
+                    MoMo</span></div>
+                <div class="receipt-row"><span>Status</span><span style="color:var(--color-success);font-weight:700;">✓
+                    Confirmed</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ FRAUD PROTECTION ══════════════════════════════════ -->
+  <section class="security-section" id="security">
+    <div class="container">
+      <div class="security-grid">
+        <div>
+          <div class="section-label" data-reveal>Fraud Protection</div>
+          <h2 class="h2" data-reveal data-delay="1">Every ticket is authentic.<br>Every scan is verified.</h2>
+          <p style="color:var(--color-text-muted);margin-top:var(--space-4);line-height:1.7;" data-reveal
+            data-delay="2">
+            Ticket fraud is a major problem in African markets. We've built multi-layer protection to ensure that every
+            QR code issued is genuine and every entry is legitimate.
+          </p>
+          <div class="security-features">
+            <div class="security-feature" data-reveal>
+              <div class="security-feature__icon">
+                <iconify-icon icon="hugeicons:shield-01"></iconify-icon>
+              </div>
+              <div>
+                <div class="security-feature__title">Dynamic QR Codes</div>
+                <div class="security-feature__desc">Each ticket generates a unique, time-sensitive QR code that cannot
+                  be photocopied or duplicated. Invalidated immediately on transfer.</div>
+              </div>
+            </div>
+            <div class="security-feature" data-reveal>
+              <div class="security-feature__icon">
+                <iconify-icon icon="hugeicons:target-01"></iconify-icon>
+              </div>
+              <div>
+                <div class="security-feature__title">Real-Time Validation</div>
+                <div class="security-feature__desc">Scanner app connects to our servers in real-time. Duplicate scan
+                  attempts are instantly flagged and denied — even with offline backup mode.</div>
+              </div>
+            </div>
+            <div class="security-feature" data-reveal>
+              <div class="security-feature__icon">
+                <iconify-icon icon="hugeicons:finger-print-scan"></iconify-icon>
+              </div>
+              <div>
+                <div class="security-feature__title">Device Fingerprinting</div>
+                <div class="security-feature__desc">Bot detection and per-device purchase limits prevent scalpers from
+                  bulk-buying and reselling at exploitative prices.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <a href="ticket-authenticity.html" class="card card--interactive" id="authenticity-link">
+            <div class="card__body" style="padding:var(--space-8);text-align:center;">
+              <div style="font-size:4rem;margin-bottom:var(--space-4);"><iconify-icon icon="hugeicons:shield-01"
+                  style="vertical-align:middle;"></iconify-icon></div>
+              <h3 style="margin-bottom:var(--space-3);">Verify a Ticket</h3>
+              <p
+                style="color:var(--color-text-muted);font-size:var(--text-sm);margin-bottom:var(--space-6);line-height:1.7;">
+                Enter a ticket code or scan a QR to instantly verify its authenticity before the event.</p>
+              <div class="form-group" style="margin-bottom:var(--space-4);" onclick="event.preventDefault();">
+                <input type="text" class="form-control" placeholder="Enter ticket code e.g. TKA-2026-XXXXX"
+                  id="verify-input" />
+              </div>
+              <button class="btn btn--primary btn--full" id="verify-btn"
+                onclick="event.preventDefault();TA.toast('Ticket verification is available at ticket-authenticity.html','info');">Verify
+                Ticket</button>
+              <p style="margin-top:var(--space-4);font-size:var(--text-xs);color:var(--color-text-muted);">Or scan with
+                your camera using the Ticket Africa Scanner app</p>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ ORGANIZER CTA ═════════════════════════════════════ -->
+  <section class="organizer-cta" id="organizer-cta">
+    <div class="container">
+      <div class="organizer-cta__inner">
+        <div>
+          <div class="section-label" data-reveal>For Event Professionals</div>
+          <h2 class="h2" data-reveal data-delay="1">Sell tickets with infrastructure<br>built for Africa</h2>
+          <p style="color:var(--color-text-muted);margin-top:var(--space-4);margin-bottom:var(--space-8);line-height:1.7;"
+            data-reveal data-delay="2">
+            From a single community gathering to a 50,000-seat stadium show — our organizer tools handle everything.
+            Create events, manage sales, control inventory, and get paid.
+          </p>
+          <div style="display:flex;gap:var(--space-4);flex-wrap:wrap;" data-reveal data-delay="3">
+            <a href="for-organizers.html" class="btn btn--primary btn--lg" id="cta-organizer">Start Selling Tickets</a>
+            <a href="organizer-dashboard.html" class="btn btn--secondary btn--lg" id="cta-demo">View Dashboard →</a>
+          </div>
+        </div>
+
+        <div>
+          <div class="pricing-cards">
+            <div class="pricing-card">
+              <div class="pricing-card__tier">Standard</div>
+              <div class="pricing-card__fee">5% <span>+ GH₵ 0.50</span></div>
+              <div class="pricing-card__desc">Per ticket sold. No setup fees. No monthly charges.</div>
+              <div class="pricing-card__features">
+                <div class="pricing-card__feature">
+                  <iconify-icon icon="hugeicons:tick-01"></iconify-icon>
+                  Unlimited events
+                </div>
+                <div class="pricing-card__feature">
+                  <iconify-icon icon="hugeicons:tick-01"></iconify-icon>
+                  Mobile money payouts
+                </div>
+                <div class="pricing-card__feature">
+                  <iconify-icon icon="hugeicons:tick-01"></iconify-icon>
+                  QR scanning app
+                </div>
+              </div>
+            </div>
+            <div class="pricing-card pricing-card--featured">
+              <div class="pricing-card__tier">Professional</div>
+              <div class="pricing-card__fee">3.5% <span>+ GH₵ 0.50</span></div>
+              <div class="pricing-card__desc">For high-volume events. Priority support included.</div>
+              <div class="pricing-card__features">
+                <div class="pricing-card__feature">
+                  <iconify-icon icon="hugeicons:tick-01"></iconify-icon>
+                  Everything in Standard
+                </div>
+                <div class="pricing-card__feature">
+                  <iconify-icon icon="hugeicons:tick-01"></iconify-icon>
+                  Reserved seating maps
+                </div>
+                <div class="pricing-card__feature">
+                  <iconify-icon icon="hugeicons:tick-01"></iconify-icon>
+                  Analytics dashboard
+                </div>
+                <div class="pricing-card__feature">
+                  <iconify-icon icon="hugeicons:tick-01"></iconify-icon>
+                  Promo code engine
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ FINAL CTA BANNER ══════════════════════════════════ -->
+  <section style="padding:var(--space-20) 0;background:var(--color-primary);position:relative;overflow:hidden;"
+    id="final-cta">
+    <div
+      style="position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.05) 1px,transparent 1px);background-size:40px 40px;">
+    </div>
+    <div class="container" style="position:relative;z-index:1;text-align:center;">
+      <h2
+        style="font-family:var(--font-display);font-size:clamp(1.875rem,4vw,3rem);font-weight:800;color:white;letter-spacing:-0.02em;margin-bottom:var(--space-4);">
+        Ready to experience live events?</h2>
+      <p style="color:rgba(255,255,255,0.8);font-size:var(--text-lg);max-width:480px;margin:0 auto var(--space-8);">Join
+        over 2 million Africans buying tickets on the platform built for our continent.</p>
+      <div style="display:flex;gap:var(--space-4);justify-content:center;flex-wrap:wrap;">
+        <a href="events.html" class="btn btn--lg" style="background:white;color:var(--color-primary);font-weight:700;"
+          id="final-cta-browse">Browse Events</a>
+        <a href="signup.html" class="btn btn--lg"
+          style="background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3);"
+          id="final-cta-signup">Create Free Account</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <div id="footer-root"></div>
+
+  <script src="assets/js/core.js"></script>
+  <script src="assets/js/nav.js"></script>
+  <script src="assets/js/layout.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // ── Gold Constellation Canvas ───────────────────────────
+      var canvas = document.getElementById('hero-canvas');
+      if (canvas) {
+        var ctx = canvas.getContext('2d');
+        var W, H, mouse = { x: 0.5, y: 0.5 };
+        var particles = [];
+
+        function resize() {
+          W = canvas.width = canvas.offsetWidth;
+          H = canvas.height = canvas.offsetHeight;
+        }
+        resize();
+        window.addEventListener('resize', function() { resize(); buildParticles(); });
+        window.addEventListener('mousemove', function(e) {
+          mouse.x = e.clientX / window.innerWidth;
+          mouse.y = e.clientY / window.innerHeight;
+        });
+
+        function rand(a, b) { return Math.random() * (b - a) + a; }
+
+        // Layer configs: [count, minSize, maxSize, minSpeed, maxSpeed, depth, minAlpha, maxAlpha]
+        var LAYERS = [
+          [18, 2.0, 3.4, 0.008, 0.018, 0.06, 0.40, 0.80],  // large, slow, close
+          [45, 1.0, 2.0, 0.020, 0.050, 0.03, 0.25, 0.55],  // medium
+          [55, 0.4, 1.1, 0.045, 0.090, 0.01, 0.12, 0.32],  // small, fast, far
+        ];
+
+        // Gold palette: liquid gold, champagne shimmer, warm ember
+        var COLORS = [
+          '201,168,76',   // liquid gold
+          '232,212,138',  // champagne
+          '201,168,76',   // liquid gold (weighted)
+          '224,123,57',   // ember orange accent
+          '201,168,76',   // liquid gold (weighted)
+        ];
+
+        function buildParticles() {
+          particles = [];
+          LAYERS.forEach(function(L) {
+            var count = L[0], minS = L[1], maxS = L[2],
+                minV = L[3], maxV = L[4], depth = L[5],
+                minA = L[6], maxA = L[7];
+            for (var i = 0; i < count; i++) {
+              var speed = rand(minV, maxV);
+              var angle = rand(0, Math.PI * 2);
+              particles.push({
+                x:     rand(0, 1),
+                y:     rand(0, 1),
+                vx:    Math.cos(angle) * speed,
+                vy:    Math.sin(angle) * speed * 0.6,
+                size:  rand(minS, maxS),
+                alpha: rand(minA, maxA),
+                baseAlpha: rand(minA, maxA),
+                pulseSpeed: rand(0.003, 0.009),
+                pulsePhase: rand(0, Math.PI * 2),
+                depth: depth,
+                color: COLORS[Math.floor(Math.random() * COLORS.length)]
+              });
+            }
+          });
+        }
+        buildParticles();
+
+        var CONNECT_DIST = 140;
+        var CONNECT_DIST_SQ = CONNECT_DIST * CONNECT_DIST;
+        var frame = 0;
+
+        function draw() {
+          ctx.clearRect(0, 0, W, H);
+          frame++;
+
+          var px = particles;
+          var n  = px.length;
+
+          // Update positions + alpha pulse
+          for (var i = 0; i < n; i++) {
+            var p = px[i];
+            // Parallax offset based on mouse and depth
+            var ox = (mouse.x - 0.5) * p.depth * W;
+            var oy = (mouse.y - 0.5) * p.depth * H;
+
+            p.x += p.vx / W * 60;
+            p.y += p.vy / H * 60;
+            if (p.x < -0.05) p.x = 1.05;
+            if (p.x >  1.05) p.x = -0.05;
+            if (p.y < -0.05) p.y = 1.05;
+            if (p.y >  1.05) p.y = -0.05;
+
+            // Pulse alpha
+            p.pulsePhase += p.pulseSpeed;
+            p.alpha = p.baseAlpha + Math.sin(p.pulsePhase) * (p.baseAlpha * 0.4);
+
+            p.sx = p.x * W + ox;
+            p.sy = p.y * H + oy;
+          }
+
+          // Draw connection lines first (under dots)
+          ctx.lineWidth = 0.5;
+          for (var i = 0; i < n - 1; i++) {
+            var a = px[i];
+            for (var j = i + 1; j < n; j++) {
+              var b = px[j];
+              var dx = a.sx - b.sx;
+              var dy = a.sy - b.sy;
+              var distSq = dx * dx + dy * dy;
+              if (distSq < CONNECT_DIST_SQ) {
+                var t = 1 - Math.sqrt(distSq) / CONNECT_DIST;
+                var lineAlpha = t * t * 0.18; // quadratic falloff
+                ctx.beginPath();
+                ctx.moveTo(a.sx, a.sy);
+                ctx.lineTo(b.sx, b.sy);
+                ctx.strokeStyle = 'rgba(201,168,76,' + lineAlpha + ')';
+                ctx.stroke();
+              }
+            }
+          }
+
+          // Draw particles
+          for (var i = 0; i < n; i++) {
+            var p = px[i];
+            ctx.beginPath();
+            // Soft glow: large diffuse circle behind
+            var grd = ctx.createRadialGradient(p.sx, p.sy, 0, p.sx, p.sy, p.size * 3.5);
+            grd.addColorStop(0,   'rgba(' + p.color + ',' + (p.alpha * 0.9) + ')');
+            grd.addColorStop(0.4, 'rgba(' + p.color + ',' + (p.alpha * 0.3) + ')');
+            grd.addColorStop(1,   'rgba(' + p.color + ',0)');
+            ctx.arc(p.sx, p.sy, p.size * 3.5, 0, Math.PI * 2);
+            ctx.fillStyle = grd;
+            ctx.fill();
+
+            // Hard core
+            ctx.beginPath();
+            ctx.arc(p.sx, p.sy, p.size, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(' + p.color + ',' + (p.alpha * 1.2).toFixed(2) + ')';
+            ctx.fill();
+          }
+
+          requestAnimationFrame(draw);
+        }
+        draw();
+      }
+
+      // ── Live Ticker ────────────────────────────────────────
+      var tickerFeed = document.getElementById('hero-ticker');
+      if (tickerFeed) {
+        var ticks = [
+          'Welcome to Ticket Africa — Secure your tickets today'
+        ];
+        var ti = 0;
+        setInterval(function () {
+          ti = (ti + 1) % ticks.length;
+          tickerFeed.style.opacity = 0;
+          setTimeout(function () {
+            tickerFeed.innerHTML = '<span>' + ticks[ti] + '</span>';
+            tickerFeed.style.opacity = 1;
+          }, 300);
+        }, 4000);
+        tickerFeed.style.transition = 'opacity 300ms ease';
+      }
+
+      // ── Category card hover fix ────────────────────────────
+      document.querySelectorAll('.event-card__save').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+          e.preventDefault(); e.stopPropagation();
+          var saved = this.dataset.saved === 'true';
+          this.dataset.saved = !saved;
+          TA.toast(!saved ? 'Event saved to your list' : 'Event removed', !saved ? 'success' : 'info');
+        });
+      });
+    });
+  </script>
+</body>
+
+</html>

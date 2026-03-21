@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Ticket Africa Help Center. Get answers to your ticketing and event questions." />
+    <meta name="theme-color" content="#07070f" />
+    <title>Help Center — Ticket Africa</title>
+    <script type="module" src="/assets/js/db.js"></script>
+    <link rel="stylesheet" href="assets/css/core.css" />
+    <link rel="stylesheet" href="assets/css/nav-footer.css" />
+    <style>
+        /* Support specific styles using dark/violet premium branding */
+        .help-header {
+            padding: var(--space-20) 0;
+            background: #07070f;
+            position: relative;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            overflow: hidden;
+        }
+
+        .help-header::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 50% -20%, rgba(139, 92, 246, 0.15), transparent 70%);
+            pointer-events: none;
+        }
+
+        .help-title {
+            font-family: var(--font-display);
+            font-size: clamp(2.5rem, 4vw, 3.5rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: var(--space-6);
+            text-align: center;
+            color: var(--color-text-primary);
+        }
+
+        .help-subtitle {
+            text-align: center;
+            font-size: var(--text-lg);
+            color: var(--color-text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .help-search {
+            max-width: 600px;
+            margin: var(--space-10) auto 0;
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-xl);
+            padding: var(--space-2) var(--space-4);
+            backdrop-filter: blur(16px);
+            transition: all var(--transition-fast);
+        }
+
+        .help-search:focus-within {
+            border-color: rgba(139, 92, 246, 0.5);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+
+        .help-search iconify-icon {
+            color: var(--color-text-muted);
+            font-size: 20px;
+            margin-right: var(--space-3);
+        }
+
+        .help-search input {
+            flex: 1;
+            background: none;
+            border: none;
+            outline: none;
+            color: var(--color-text-primary);
+            font-size: var(--text-base);
+            padding: var(--space-3) 0;
+        }
+
+        .help-search input::placeholder {
+            color: var(--color-text-muted);
+        }
+
+        .help-content {
+            padding: var(--space-16) 0;
+            background: var(--color-bg);
+            min-height: 50vh;
+        }
+
+        .faq-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--space-6);
+            margin-bottom: var(--space-16);
+        }
+
+        .help-category {
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            padding: var(--space-6);
+            transition: all var(--transition-fast);
+            cursor: pointer;
+            text-decoration: none;
+            display: block;
+        }
+
+        .help-category:hover {
+            border-color: var(--color-primary);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(139, 92, 246, 0.1);
+        }
+
+        .category-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: rgba(139, 92, 246, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-primary);
+            font-size: 24px;
+            margin-bottom: var(--space-4);
+        }
+
+        .category-title {
+            font-family: var(--font-display);
+            font-size: var(--text-lg);
+            font-weight: 700;
+            color: var(--color-text-primary);
+            margin-bottom: var(--space-2);
+        }
+
+        .category-desc {
+            font-size: var(--text-sm);
+            color: var(--color-text-muted);
+            line-height: 1.6;
+        }
+
+        .contact-box {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.05), rgba(236, 72, 153, 0.05));
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: var(--radius-2xl);
+            padding: var(--space-10);
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .contact-box h3 {
+            font-family: var(--font-display);
+            font-size: var(--text-2xl);
+            font-weight: 800;
+            margin-bottom: var(--space-4);
+        }
+
+        .contact-box p {
+            color: var(--color-text-secondary);
+            margin-bottom: var(--space-6);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="nav-root"></div>
+
+    <section class="help-header">
+        <div class="container">
+            <h1 class="help-title">How can we help?</h1>
+            <p class="help-subtitle">Search our knowledge base or browse categories to find answers quickly.</p>
+
+            <div class="help-search">
+                <iconify-icon icon="hugeicons:search-01"></iconify-icon>
+                <input type="text" placeholder="Search for 'refunds', 'tickets', 'mobile money'..." />
+            </div>
+        </div>
+    </section>
+
+    <section class="help-content">
+        <div class="container">
+            <div class="faq-grid">
+
+                <a href="#" class="help-category">
+                    <div class="category-icon">
+                        <iconify-icon icon="hugeicons:ticket-01"></iconify-icon>
+                    </div>
+                    <h3 class="category-title">Buying Tickets</h3>
+                    <p class="category-desc">Learn how to purchase tickets, use Mobile Money, and access your QR codes.
+                    </p>
+                </a>
+
+                <a href="#" class="help-category">
+                    <div class="category-icon">
+                        <iconify-icon icon="hugeicons:building-01"></iconify-icon>
+                    </div>
+                    <h3 class="category-title">Event Organizers</h3>
+                    <p class="category-desc">Guides on how to list an event, track sales, and scan tickets at the door.
+                    </p>
+                </a>
+
+                <a href="#" class="help-category">
+                    <div class="category-icon">
+                        <iconify-icon icon="hugeicons:credit-card"></iconify-icon>
+                    </div>
+                    <h3 class="category-title">Payments & Refunds</h3>
+                    <p class="category-desc">Everything you need to know about billing, failed transactions, and the
+                        refund policy.</p>
+                </a>
+
+                <a href="#" class="help-category">
+                    <div class="category-icon">
+                        <iconify-icon icon="hugeicons:user"></iconify-icon>
+                    </div>
+                    <h3 class="category-title">Account Settings</h3>
+                    <p class="category-desc">Manage your password, email preferences, and personal information securely.
+                    </p>
+                </a>
+
+                <a href="#" class="help-category">
+                    <div class="category-icon">
+                        <iconify-icon icon="hugeicons:call"></iconify-icon>
+                    </div>
+                    <h3 class="category-title">USSD Purchasing</h3>
+                    <p class="category-desc">Step-by-step instructions for buying tickets offline using our USSD short
+                        codes.</p>
+                </a>
+
+                <a href="#" class="help-category">
+                    <div class="category-icon">
+                        <iconify-icon icon="hugeicons:shield-01"></iconify-icon>
+                    </div>
+                    <h3 class="category-title">Security & Fraud</h3>
+                    <p class="category-desc">How Ticket Africa protects buyers from counterfeit tickets and unauthorized
+                        resellers.</p>
+                </a>
+
+            </div>
+
+            <div class="contact-box">
+                <h3>Still need assistance?</h3>
+                <p>Our support team is available 24/7 to help you resolve any issues with your tickets or events.</p>
+                <div style="display:flex; justify-content:center; gap:var(--space-4);">
+                    <a href="#" class="btn btn--primary">Contact Support</a>
+                    <a href="#" class="btn btn--secondary">Live Chat</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div id="footer-root"></div>
+
+    <script src="assets/js/core.js"></script>
+    <script src="assets/js/nav.js"></script>
+    <script src="assets/js/layout.js"></script>
+</body>
+
+</html>

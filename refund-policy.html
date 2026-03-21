@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#07070f" />
+    <title>Refund & Insurance Policies — Ticket Africa</title>
+    <link rel="stylesheet" href="assets/css/core.css" />
+    <link rel="stylesheet" href="assets/css/nav-footer.css" />
+    <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+    <style>
+        .legal-header {
+            padding: var(--space-24) 0 var(--space-12);
+            background: linear-gradient(180deg, rgba(34, 197, 94, 0.05) 0%, transparent 100%);
+            text-align: center;
+        }
+
+        .legal-content {
+            padding-bottom: var(--space-24);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .legal-content h2 {
+            margin: var(--space-10) 0 var(--space-4);
+            color: var(--color-text-primary);
+        }
+
+        .legal-content p {
+            margin-bottom: var(--space-4);
+            color: var(--color-text-secondary);
+            line-height: 1.8;
+        }
+
+        .policy-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            padding: var(--space-8);
+            margin-bottom: var(--space-10);
+        }
+
+        .last-updated {
+            font-size: var(--text-sm);
+            color: var(--color-text-muted);
+            margin-bottom: var(--space-2);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="nav-root"></div>
+
+    <header class="legal-header">
+        <div class="container">
+            <p class="last-updated">Last Updated: March 20, 2026</p>
+            <h1 class="display-3">Refund & Insurance</h1>
+        </div>
+    </header>
+
+    <main class="legal-content container">
+        <div class="policy-card">
+            <h2>Refund Policy</h2>
+            <p>Ticket Africa operates on a conditional refund policy. Generally, all ticket sales are final and
+                non-refundable unless:</p>
+            <ul>
+                <li>The event is cancelled and not rescheduled.</li>
+                <li>The event is postponed and the new date is not suitable for you.</li>
+                <li>There was a technical error during the booking process resulting in double payment.</li>
+            </ul>
+            <p>Refund requests must be submitted within 7 days of the scheduled event date or the announcement of
+                cancellation/postponement.</p>
+        </div>
+
+        <div class="policy-card">
+            <h2>Ticket Insurance Policy</h2>
+            <p>Ticket Africa offers an optional Ticket Insurance for selected high-value events. This insurance
+                provides coverage for:</p>
+            <ul>
+                <li>Personal illness or injury preventing attendance (medical certificate required).</li>
+                <li>Death of an immediate family member.</li>
+                <li>Unforeseen severe weather conditions preventing travel.</li>
+                <li>Loss of employment or involuntary relocation.</li>
+            </ul>
+            <p>Insurance premiums are non-refundable and must be purchased at the time of ticket booking. Coverage
+                is provided by our third-party insurance partners.</p>
+        </div>
+    </main>
+
+    <div id="footer-root"></div>
+
+    <script src="assets/js/core.js"></script>
+    <script src="assets/js/layout.js"></script>
+</body>
+
+</html>

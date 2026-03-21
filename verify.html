@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Verify Ticket Authenticity — Ticket Africa</title>
+    <script type="module" src="/assets/js/db.js"></script>
+    <link rel="stylesheet" href="assets/css/core.css" />
+    <link rel="stylesheet" href="assets/css/nav-footer.css" />
+    <style>
+        .verify-hero {
+            margin-top: 68px;
+            padding: var(--space-20) 0;
+            background: var(--color-bg-elevated);
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .verify-box {
+            max-width: 560px;
+            margin: var(--space-10) auto 0;
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-2xl);
+            padding: var(--space-8);
+        }
+
+        .verify-input-row {
+            display: flex;
+            gap: var(--space-3);
+        }
+
+        .verify-result {
+            max-width: 560px;
+            margin: var(--space-8) auto;
+            display: none;
+        }
+
+        .result-panel {
+            padding: var(--space-8);
+            border-radius: var(--radius-2xl);
+            border: 2px solid;
+            text-align: center;
+        }
+
+        .result-panel--valid {
+            background: rgba(34, 197, 94, 0.06);
+            border-color: rgba(34, 197, 94, 0.3);
+        }
+
+        .result-panel--invalid {
+            background: rgba(239, 68, 68, 0.06);
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        .result-icon-large {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto var(--space-5);
+        }
+
+        .result-icon-large--valid {
+            background: rgba(34, 197, 94, 0.15);
+        }
+
+        .result-icon-large--invalid {
+            background: rgba(239, 68, 68, 0.15);
+        }
+
+        .ticket-detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-4);
+            margin-top: var(--space-6);
+            text-align: left;
+        }
+
+        .ticket-detail-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: var(--space-4);
+        }
+
+        .ticket-detail-item__label {
+            font-size: var(--text-xs);
+            color: var(--color-text-muted);
+            margin-bottom: 4px;
+        }
+
+        .ticket-detail-item__value {
+            font-size: var(--text-sm);
+            font-weight: 600;
+        }
+
+        .trust-list {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-5);
+            margin: var(--space-12) auto 0;
+            max-width: 900px;
+        }
+
+        .trust-item {
+            text-align: center;
+        }
+
+        .trust-item__icon {
+            font-size: 2rem;
+            margin-bottom: var(--space-3);
+        }
+
+        .trust-item__title {
+            font-weight: 700;
+            font-size: var(--text-sm);
+            margin-bottom: var(--space-2);
+        }
+
+        .trust-item__desc {
+            font-size: var(--text-xs);
+            color: var(--color-text-muted);
+            line-height: 1.7;
+        }
+
+        @media(max-width:640px) {
+            .trust-list {
+                grid-template-columns: 1fr;
+            }
+
+            .ticket-detail-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="nav-root"></div>
+    <section class="verify-hero">
+        <div class="container" style="text-align:center;">
+            <div class="section-label" style="justify-content:center;margin-bottom:var(--space-5);">Ticket Authenticity
+            </div>
+            <h1 class="h1" style="margin-bottom:var(--space-4);">Verify Your Ticket</h1>
+            <p style="color:var(--color-text-muted);max-width:480px;margin:0 auto;font-size:var(--text-base);">Enter
+                your ticket reference code or scan the QR code to confirm it is genuine and unaltered.</p>
+
+            <div class="verify-box">
+                <div
+                    style="font-size:var(--text-sm);font-weight:700;margin-bottom:var(--space-4);color:var(--color-text-secondary);">
+                    Enter Ticket Reference Number</div>
+                <div class="verify-input-row">
+                    <input type="text" class="form-control" id="ticket-ref-input" placeholder="TKA-2026-83921"
+                        style="flex:1;font-family:var(--font-mono);letter-spacing:0.05em;" />
+                    <button class="btn btn--primary" id="verify-btn" style="white-space:nowrap;">Verify</button>
+                </div>
+                <div
+                    style="display:flex;align-items:center;gap:var(--space-3);margin:var(--space-5) 0;color:var(--color-text-muted);font-size:var(--text-sm);">
+                    <div style="flex:1;height:1px;background:var(--color-border);"></div>or<div
+                        style="flex:1;height:1px;background:var(--color-border);"></div>
+                </div>
+                <button class="btn btn--secondary btn--full" id="scan-qr-btn">
+                    <iconify-icon icon="hugeicons:grid" style="width:16px;height:16px;"></iconify-icon>
+                    Scan QR Code with Camera
+                </button>
+            </div>
+
+            <!-- Result area -->
+            <div class="verify-result" id="verify-result"></div>
+
+            <!-- Trust signals -->
+            <div class="trust-list">
+                <div class="trust-item">
+                    <div class="trust-item__icon">🔐</div>
+                    <div class="trust-item__title">Dynamic QR Codes</div>
+                    <div class="trust-item__desc">Each ticket's QR code is unique and encrypted. Duplication or
+                        screenshot scanning is detected and rejected at the gate.</div>
+                </div>
+                <div class="trust-item">
+                    <div class="trust-item__icon">⚡</div>
+                    <div class="trust-item__title">Real-Time Validation</div>
+                    <div class="trust-item__desc">Ticket status is checked against our live server every time it is
+                        scanned. Used tickets are immediately flagged.</div>
+                </div>
+                <div class="trust-item">
+                    <div class="trust-item__icon"><iconify-icon icon="hugeicons:smart-phone-01" style="vertical-align:middle;"></iconify-icon></div>
+                    <div class="trust-item__title">Buy Only from Ticket Africa</div>
+                    <div class="trust-item__desc">Never buy tickets from WhatsApp, Facebook, or strangers. Official
+                        sales only via ticketafrica.com or our USSD channel.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <div id="footer-root"></div>
+    <script src="assets/js/core.js"></script>
+    <script src="assets/js/nav.js"></script>
+    <script src="assets/js/layout.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            function showResult(ref) {
+                const resultDiv = document.getElementById('verify-result');
+                resultDiv.style.display = 'block';
+                const isValid = ref.toUpperCase().startsWith('TKA-');
+                const html = isValid ? `
+          <div class="result-panel result-panel--valid">
+            <div class="result-icon-large result-icon-large--valid">
+              <iconify-icon icon="hugeicons:tick-01" style="width:40px;height:40px;"></iconify-icon>
+            </div>
+            <h2 style="color:#22C55E;margin-bottom:8px;">✓ Authentic Ticket</h2>
+            <p style="color:var(--color-text-muted);font-size:var(--text-sm);">This ticket is valid and was issued by Ticket Africa</p>
+            <div class="ticket-detail-grid">
+              <div class="ticket-detail-item"><div class="ticket-detail-item__label">Reference</div><div class="ticket-detail-item__value" style="font-family:var(--font-mono);">${ref.toUpperCase()}</div></div>
+              <div class="ticket-detail-item"><div class="ticket-detail-item__label">Status</div><div class="ticket-detail-item__value" style="color:#22C55E;">Valid — Not Yet Used</div></div>
+              <div class="ticket-detail-item"><div class="ticket-detail-item__label">Event</div><div class="ticket-detail-item__value">Afrobeats Night: Grand Finale</div></div>
+              <div class="ticket-detail-item"><div class="ticket-detail-item__label">Ticket Type</div><div class="ticket-detail-item__value">VIP Section</div></div>
+              <div class="ticket-detail-item"><div class="ticket-detail-item__label">Date</div><div class="ticket-detail-item__value">Sat, 15 Mar 2026</div></div>
+              <div class="ticket-detail-item"><div class="ticket-detail-item__label">Registered To</div><div class="ticket-detail-item__value">K. Mensah</div></div>
+            </div>
+          </div>` : `
+          <div class="result-panel result-panel--invalid">
+            <div class="result-icon-large result-icon-large--invalid">
+              <iconify-icon icon="hugeicons:cancel-01" style="width:40px;height:40px;"></iconify-icon>
+            </div>
+            <h2 style="color:#EF4444;margin-bottom:8px;">✗ Ticket Not Found</h2>
+            <p style="color:var(--color-text-muted);font-size:var(--text-sm);max-width:360px;margin:0 auto;line-height:1.7;">No ticket matching <strong style="font-family:var(--font-mono);">${ref}</strong> was found in our system. This ticket may be counterfeit, or the reference may be misspelled.</p>
+            <div style="margin-top:var(--space-6);padding:var(--space-4);background:rgba(239,68,68,0.06);border-radius:var(--radius-lg);text-align:left;">
+              <p style="font-size:var(--text-sm);font-weight:600;color:#EF4444;margin-bottom:8px;">What to do:</p>
+              <ul style="list-style:none;display:flex;flex-direction:column;gap:6px;">
+                <li style="font-size:var(--text-sm);color:var(--color-text-muted);">→ Check your SMS or email for the correct reference</li>
+                <li style="font-size:var(--text-sm);color:var(--color-text-muted);">→ Contact us via <a href="contact.html" style="color:var(--color-primary);">support</a> with your purchase receipt</li>
+                <li style="font-size:var(--text-sm);color:var(--color-text-muted);">→ Do not use this ticket — it may be fraudulent</li>
+              </ul>
+            </div>
+          </div>`;
+                resultDiv.innerHTML = html;
+                resultDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+
+            document.getElementById('verify-btn').addEventListener('click', function () {
+                const ref = document.getElementById('ticket-ref-input').value.trim();
+                if (!ref) { TA.toast('Enter a ticket reference code', 'warning'); return; }
+                this.disabled = true;
+                this.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-color:rgba(255,255,255,0.3);border-top-color:white;"></div>';
+                setTimeout(() => { this.disabled = false; this.textContent = 'Verify'; showResult(ref); }, 1800);
+            });
+
+            document.getElementById('ticket-ref-input').addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') document.getElementById('verify-btn').click();
+            });
+
+            document.getElementById('scan-qr-btn').addEventListener('click', function () {
+                TA.toast('Camera scanner requires device permission — full integration coming', 'info');
+            });
+        });
+    </script>
+</body>
+
+</html>

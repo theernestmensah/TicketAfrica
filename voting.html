@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voting & Polls | Ticket Africa</title>
+    <meta name="description" content="Cast your vote in elections, competitions, and community polls on Ticket Africa.">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@700;800&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="assets/css/core.css">
+    <link rel="stylesheet" href="assets/css/nav-footer.css">
+    <style>
+        .voting-hero {
+            padding: 120px 0 60px;
+            background: radial-gradient(circle at 20% 30%, rgba(139, 92, 246, 0.15), transparent 40%),
+                        radial-gradient(circle at 80% 70%, rgba(236, 72, 153, 0.1), transparent 40%);
+            text-align: center;
+        }
+        .voting-hero h1 {
+            font-size: clamp(32px, 5vw, 56px);
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.7) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .voting-hero p {
+            font-size: 18px;
+            color: var(--color-text-secondary);
+            max-width: 600px;
+            margin: 0 auto 40px;
+        }
+
+        .polls-section {
+            padding: 60px 0 100px;
+        }
+        .polls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 30px;
+        }
+
+        .poll-card {
+            background: var(--color-bg-elevated);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            padding: 30px;
+            transition: all var(--transition-base);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        .poll-card:hover {
+            border-color: var(--color-primary);
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        .poll-card__status {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 4px 12px;
+            border-radius: 20px;
+            text-transform: uppercase;
+        }
+        .status--active { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+        .status--completed { background: rgba(139, 92, 246, 0.15); color: #8b5cf6; }
+
+        .poll-card__title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--color-text-primary);
+            line-height: 1.3;
+        }
+        .poll-card__desc {
+            font-size: 14px;
+            color: var(--color-text-secondary);
+            line-height: 1.6;
+        }
+        .poll-card__meta {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 13px;
+            color: var(--color-text-muted);
+            margin-top: auto;
+        }
+        .poll-card__meta span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Voting Modal Style */
+        .v-modal {
+            position: fixed;
+            inset: 0;
+            z-index: var(--z-modal);
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .v-modal.active { display: flex; }
+        .v-modal__card {
+            background: #12121e;
+            border: 1px solid var(--color-border-light);
+            border-radius: var(--radius-2xl);
+            width: 100%;
+            max-width: 500px;
+            padding: 40px;
+            position: relative;
+        }
+        .v-modal__close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.05);
+            border: none;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .v-option {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all var(--transition-fast);
+        }
+        .v-option:hover {
+            background: rgba(255,255,255,0.06);
+            border-color: rgba(255,255,255,0.2);
+        }
+        .v-option.selected {
+            border-color: var(--color-primary);
+            background: rgba(139, 92, 246, 0.1);
+        }
+        .v-option__label {
+            font-weight: 600;
+            font-size: 15px;
+        }
+        .v-option__radio {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid var(--color-border);
+            position: relative;
+        }
+        .v-option.selected .v-option__radio {
+            border-color: var(--color-primary);
+        }
+        .v-option.selected .v-option__radio::after {
+            content: '';
+            position: absolute;
+            inset: 4px;
+            background: var(--color-primary);
+            border-radius: 50%;
+        }
+
+        .results-bar-wrap {
+            height: 8px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 4px;
+            margin-top: 8px;
+            width: 100%;
+            overflow: hidden;
+        }
+        .results-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-dark">
+
+    <!-- Header -->
+    <nav class="site-nav nav--transparent" id="main-nav">
+        <div class="container nav-inner">
+            <a href="index.html" class="nav-logo">
+                <div class="nav-logo__mark">
+                    <iconify-icon icon="hugeicons:ticket-01"></iconify-icon>
+                </div>
+                <div class="nav-logo__text">Ticket<span>Africa</span></div>
+            </a>
+            <div class="nav-menu">
+                <a href="events.html" class="nav-link">Explore</a>
+                <a href="voting.html" class="nav-link active">Voting</a>
+                <a href="about.html" class="nav-link">About</a>
+                <a href="contact.html" class="nav-link">Contact</a>
+            </div>
+            <div class="nav-actions">
+                <div id="user-nav">
+                    <!-- Loaded via Clerk -->
+                    <button class="btn btn--secondary btn--sm" id="nav-signin">Sign In</button>
+                    <button class="btn btn--primary btn--sm" id="nav-signup">Get Started</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section class="voting-hero">
+            <div class="container">
+                <h1>Community Power</h1>
+                <p>Cast your vote in ongoing competitions, elections, and decision-making polls across Africa.</p>
+            </div>
+        </section>
+
+        <section class="polls-section">
+            <div class="container">
+                <div class="section-header" style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:40px;">
+                    <div>
+                        <h2 class="section-title">Active Polls</h2>
+                    </div>
+                </div>
+
+                <div id="polls-list" class="polls-grid">
+                    <!-- Loaded dynamically -->
+                    <div class="loading-state" style="grid-column: 1/-1; text-align:center; padding: 100px 0;">
+                        <iconify-icon icon="hugeicons:loading-03" style="font-size:48px; color:var(--color-primary); margin-bottom:20px;"></iconify-icon>
+                        <p>Fetching active polls...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Voting Modal -->
+    <div id="vote-modal" class="v-modal">
+        <div class="v-modal__card">
+            <button class="v-modal__close" onclick="closeVoteModal()">
+                <iconify-icon icon="hugeicons:cancel-01"></iconify-icon>
+            </button>
+            <div id="v-modal-content">
+                <!-- Content loaded dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="container footer-grid">
+            <div class="footer-brand">
+                <a href="index.html" class="nav-logo">
+                    <div class="nav-logo__mark">
+                        <iconify-icon icon="hugeicons:ticket-01"></iconify-icon>
+                    </div>
+                    <div class="nav-logo__text">Ticket<span>Africa</span></div>
+                </a>
+                <p class="footer-brand__desc">Empowering African events and communities through seamless ticketing and engagement.</p>
+                <div class="footer-trust-marks">
+                    <div class="footer-trust-mark">
+                        <iconify-icon icon="hugeicons:check-circle-01"></iconify-icon>
+                        Secure Payments
+                    </div>
+                    <div class="footer-trust-mark">
+                        <iconify-icon icon="hugeicons:check-circle-01"></iconify-icon>
+                        Official Partners
+                    </div>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h4 class="footer-col__title">Platform</h4>
+                <div class="footer-col__links">
+                    <a href="events.html" class="footer-col__link">Browse Events</a>
+                    <a href="voting.html" class="footer-col__link">Voting Systems</a>
+                    <a href="about.html" class="footer-col__link">Our Story</a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h4 class="footer-col__title">Solutions</h4>
+                <div class="footer-col__links">
+                    <a href="organizer-dashboard.html" class="footer-col__link">For Organizers</a>
+                    <a href="#" class="footer-col__link">Partner with Us</a>
+                    <a href="scanner.html" class="footer-col__link">Ticket Scanning</a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h4 class="footer-col__title">Support</h4>
+                <div class="footer-col__links">
+                    <a href="contact.html" class="footer-col__link">Help Center</a>
+                    <a href="terms.html" class="footer-col__link">Terms of Service</a>
+                    <a href="privacy.html" class="footer-col__link">Privacy Policy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/convex@1.8.0/dist/browser.bundle.js"></script>
+    <script type="module">
+        import { Clerk } from 'https://cdn.jsdelivr.net/npm/@clerk/clerk-js@4/dist/index.mjs';
+        
+        window.Clerk = new Clerk('pk_test_Y29yZGlhbC1sb2N1c3QtNzkuY2xlcmsuYWNjb3VudHMuZGV2JA');
+        
+        async function init() {
+            await window.Clerk.load();
+            
+            // Sync with Convex
+            window.ConvexDB = new convex.ConvexClient("https://nimble-puffin-896.convex.cloud");
+            
+            // Load polls
+            loadAllPolls();
+        }
+        
+        init();
+    </script>
+    <script src="assets/js/voting.js"></script>
+</body>
+</html>

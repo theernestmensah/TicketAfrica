@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ticket Scanner — Ticket Africa</title>
+    <script type="module" src="/assets/js/db.js"></script>
+    <link rel="stylesheet" href="assets/css/core.css" />
+    <style>
+        body {
+            background: #0A0A0A;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Header */
+        .scanner-header {
+            background: #141414;
+            border-bottom: 1px solid #2A2A2A;
+            padding: 0 20px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .scanner-header__left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .scanner-logo {
+            font-family: 'Sora', sans-serif;
+            font-size: 16px;
+            font-weight: 800;
+        }
+
+        .scanner-logo span {
+            color: #8B5CF6;
+        }
+
+        .scanner-event-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #A0A0A0;
+        }
+
+        .scanner-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: #22C55E;
+            font-weight: 600;
+        }
+
+        .scanner-status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #22C55E;
+            box-shadow: 0 0 6px #22C55E;
+        }
+
+        /* Layout */
+        .scanner-layout {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 0;
+            flex: 1;
+            height: calc(100vh - 60px);
+            overflow: hidden;
+        }
+
+        /* Camera Area */
+        .scanner-camera {
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .camera-placeholder {
+            width: 100%;
+            max-width: 480px;
+            aspect-ratio: 1;
+            position: relative;
+        }
+
+        .camera-feed {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0d0d0d 0%, #1a0540 50%, #0d0d0d 100%);
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .camera-feed::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(0deg, transparent, transparent 40px, rgba(139, 92, 246, 0.04) 40px, rgba(139, 92, 246, 0.04) 41px), repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(139, 92, 246, 0.04) 40px, rgba(139, 92, 246, 0.04) 41px);
+        }
+
+        .scan-frame {
+            position: absolute;
+            width: 240px;
+            height: 240px;
+        }
+
+        .scan-frame__corner {
+            position: absolute;
+            width: 28px;
+            height: 28px;
+            border-color: #8B5CF6;
+            border-style: solid;
+        }
+
+        .scan-frame__corner--tl {
+            top: 0;
+            left: 0;
+            border-width: 3px 0 0 3px;
+        }
+
+        .scan-frame__corner--tr {
+            top: 0;
+            right: 0;
+            border-width: 3px 3px 0 0;
+        }
+
+        .scan-frame__corner--bl {
+            bottom: 0;
+            left: 0;
+            border-width: 0 0 3px 3px;
+        }
+
+        .scan-frame__corner--br {
+            bottom: 0;
+            right: 0;
+            border-width: 0 3px 3px 0;
+        }
+
+        .scan-line {
+            position: absolute;
+            width: 240px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #8B5CF6, transparent);
+            top: 0;
+            animation: scanMove 2s ease-in-out infinite;
+            box-shadow: 0 0 8px #8B5CF6;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        @keyframes scanMove {
+            0% {
+                top: 0;
+            }
+
+            50% {
+                top: 240px;
+            }
+
+            100% {
+                top: 0;
+            }
+        }
+
+        .scan-hint {
+            position: absolute;
+            bottom: 32px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .camera-controls {
+            position: absolute;
+            bottom: 80px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+        }
+
+        .camera-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.8);
+            cursor: pointer;
+            transition: all 150ms;
+        }
+
+        .camera-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .camera-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Result states */
+        .scan-result-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 16px;
+            animation: fadeIn 200ms ease;
+        }
+
+        .scan-result-overlay--valid {
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(4px);
+        }
+
+        .scan-result-overlay--invalid {
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(4px);
+        }
+
+        .scan-result-overlay--used {
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(4px);
+        }
+
+        .result-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .result-icon--valid {
+            background: rgba(34, 197, 94, 0.15);
+            border: 2px solid rgba(34, 197, 94, 0.5);
+        }
+
+        .result-icon--invalid {
+            background: rgba(239, 68, 68, 0.15);
+            border: 2px solid rgba(239, 68, 68, 0.5);
+        }
+
+        .result-icon--used {
+            background: rgba(245, 158, 11, 0.15);
+            border: 2px solid rgba(245, 158, 11, 0.5);
+        }
+
+        .result-icon svg {
+            width: 40px;
+            height: 40px;
+        }
+
+        .result-label {
+            font-family: 'Sora', sans-serif;
+            font-size: 24px;
+            font-weight: 800;
+        }
+
+        .result-label--valid {
+            color: #22C55E;
+        }
+
+        .result-label--invalid {
+            color: #EF4444;
+        }
+
+        .result-label--used {
+            color: #F59E0B;
+        }
+
+        .result-card {
+            background: #1A1A1A;
+            border: 1px solid #2A2A2A;
+            border-radius: 12px;
+            padding: 16px 20px;
+            min-width: 280px;
+        }
+
+        .result-card__row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            padding: 4px 0;
+        }
+
+        .result-card__row span:first-child {
+            color: #666;
+        }
+
+        .result-card__row span:last-child {
+            font-weight: 600;
+            color: #F5F5F5;
+        }
+
+        /* Right Panel */
+        .scanner-panel {
+            background: #141414;
+            border-left: 1px solid #2A2A2A;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .scanner-panel__header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #2A2A2A;
+        }
+
+        .scanner-panel__title {
+            font-family: 'Sora', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .scanner-panel__sub {
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* Stats bar */
+        .scan-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0;
+            border-bottom: 1px solid #2A2A2A;
+        }
+
+        .scan-stat {
+            padding: 14px 16px;
+            border-right: 1px solid #2A2A2A;
+        }
+
+        .scan-stat:last-child {
+            border-right: none;
+        }
+
+        .scan-stat__value {
+            font-family: 'Sora', sans-serif;
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 2px;
+        }
+
+        .scan-stat__label {
+            font-size: 10px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 600;
+        }
+
+        .scan-stat--valid .scan-stat__value {
+            color: #22C55E;
+        }
+
+        .scan-stat--invalid .scan-stat__value {
+            color: #EF4444;
+        }
+
+        .scan-stat--total .scan-stat__value {
+            color: #F5F5F5;
+        }
+
+        /* Manual lookup */
+        .manual-lookup {
+            padding: 16px;
+            border-bottom: 1px solid #2A2A2A;
+        }
+
+        .lookup-bar {
+            display: flex;
+            gap: 8px;
+        }
+
+        .lookup-input {
+            flex: 1;
+            background: #1F1F1F;
+            border: 1px solid #2A2A2A;
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 13px;
+            color: #F5F5F5;
+            outline: none;
+        }
+
+        .lookup-input:focus {
+            border-color: #8B5CF6;
+        }
+
+        .lookup-input::placeholder {
+            color: #444;
+        }
+
+        .lookup-btn {
+            background: #8B5CF6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 16px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: background 150ms;
+        }
+
+        .lookup-btn:hover {
+            background: #7C3AED;
+        }
+
+        /* Scan log */
+        .scan-log {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .scan-log__header {
+            padding: 12px 16px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #444;
+            border-bottom: 1px solid #1F1F1F;
+            position: sticky;
+            top: 0;
+            background: #141414;
+        }
+
+        .scan-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-bottom: 1px solid #1F1F1F;
+            animation: slideInToast 200ms ease;
+        }
+
+        .scan-item:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .scan-item__icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .scan-item__icon--valid {
+            background: rgba(34, 197, 94, 0.12);
+        }
+
+        .scan-item__icon--invalid {
+            background: rgba(239, 68, 68, 0.12);
+        }
+
+        .scan-item__icon--used {
+            background: rgba(245, 158, 11, 0.12);
+        }
+
+        .scan-item__icon svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .scan-item__name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #F5F5F5;
+            flex: 1;
+        }
+
+        .scan-item__ticket {
+            font-size: 11px;
+            color: #666;
+        }
+
+        .scan-item__time {
+            font-size: 11px;
+            color: #444;
+        }
+
+        .scan-item__status {
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .scan-item__status--valid {
+            color: #22C55E;
+        }
+
+        .scan-item__status--invalid {
+            color: #EF4444;
+        }
+
+        .scan-item__status--used {
+            color: #F59E0B;
+        }
+
+        /* Bottom controls */
+        .scanner-controls {
+            padding: 16px;
+            border-top: 1px solid #2A2A2A;
+            display: flex;
+            gap: 8px;
+        }
+
+        /* Demo buttons */
+        .demo-scan-btns {
+            padding: 12px 16px;
+            background: #0D0D0D;
+            border-bottom: 1px solid #1F1F1F;
+            display: flex;
+            gap: 8px;
+        }
+
+        .demo-scan-btn {
+            flex: 1;
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            border: 1px solid;
+        }
+
+        .demo-scan-btn--valid {
+            background: rgba(34, 197, 94, 0.1);
+            color: #22C55E;
+            border-color: rgba(34, 197, 94, 0.3);
+        }
+
+        .demo-scan-btn--invalid {
+            background: rgba(239, 68, 68, 0.1);
+            color: #EF4444;
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        .demo-scan-btn--used {
+            background: rgba(245, 158, 11, 0.1);
+            color: #F59E0B;
+            border-color: rgba(245, 158, 11, 0.3);
+        }
+
+        /* Offline indicator */
+        .offline-banner {
+            background: rgba(245, 158, 11, 0.1);
+            border-bottom: 1px solid rgba(245, 158, 11, 0.2);
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #F59E0B;
+            display: none;
+        }
+
+        .offline-banner svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        @media(max-width:768px) {
+            .scanner-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .scanner-panel {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Scanner Header -->
+    <div class="scanner-header">
+        <div class="scanner-header__left">
+            <div class="scanner-logo">Ticket<span>Africa</span></div>
+            <div style="width:1px;height:20px;background:#2A2A2A;"></div>
+            <div class="scanner-event-name" id="scanner-event-name">Afrobeats Night: Grand Finale</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;">
+            <div class="scanner-status" id="scanner-status">
+                <div class="scanner-status-dot"></div>
+                Online — Real-time validation
+            </div>
+            <a href="organizer-dashboard.html"
+                style="font-size:12px;color:#666;text-decoration:none;transition:color 150ms;" id="back-dashboard">←
+                Dashboard</a>
+        </div>
+    </div>
+
+    <!-- Offline banner -->
+    <div class="offline-banner" id="offline-banner">
+        <iconify-icon icon="hugeicons:star"></iconify-icon>
+        Offline mode active — scanning against local cache. Changes will sync on reconnection.
+    </div>
+
+    <div class="scanner-layout">
+        <!-- Camera -->
+        <div class="scanner-camera" id="scanner-camera">
+            <div class="camera-placeholder">
+                <div class="camera-feed" id="camera-feed">
+                    <div style="text-align:center;z-index:2;position:relative;">
+                        <div style="font-size:72px;margin-bottom:16px;opacity:0.3;">📷</div>
+                        <div style="font-size:14px;color:rgba(255,255,255,0.4);">Camera inactive</div>
+                        <div style="font-size:12px;color:rgba(255,255,255,0.2);margin-top:4px;">Grant camera access to
+                            begin scanning</div>
+                    </div>
+                    <div class="scan-frame">
+                        <div class="scan-frame__corner scan-frame__corner--tl"></div>
+                        <div class="scan-frame__corner scan-frame__corner--tr"></div>
+                        <div class="scan-frame__corner scan-frame__corner--bl"></div>
+                        <div class="scan-frame__corner scan-frame__corner--br"></div>
+                        <div class="scan-line" id="scan-line"></div>
+                    </div>
+                </div>
+                <div class="scan-hint">Hold camera steady over the QR code</div>
+                <div class="camera-controls">
+                    <button class="camera-btn" id="btn-torch" title="Toggle flashlight">
+                        <iconify-icon icon="hugeicons:star"></iconify-icon>
+                    </button>
+                    <button class="camera-btn" id="btn-camera" title="Activate camera">
+                        <iconify-icon icon="hugeicons:star"></iconify-icon>
+                    </button>
+                    <button class="camera-btn" id="btn-flip" title="Flip camera">
+                        <iconify-icon icon="hugeicons:star"></iconify-icon>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel -->
+        <div class="scanner-panel">
+            <div class="scanner-panel__header">
+                <div class="scanner-panel__title">Check-In Station</div>
+                <div class="scanner-panel__sub">Accra Sports Stadium · Gate A</div>
+            </div>
+
+            <!-- Stats -->
+            <div class="scan-stats">
+                <div class="scan-stat scan-stat--valid">
+                    <div class="scan-stat__value" id="stat-valid">0</div>
+                    <div class="scan-stat__label">Valid</div>
+                </div>
+                <div class="scan-stat scan-stat--invalid">
+                    <div class="scan-stat__value" id="stat-invalid">0</div>
+                    <div class="scan-stat__label">Rejected</div>
+                </div>
+                <div class="scan-stat scan-stat--total">
+                    <div class="scan-stat__value" id="stat-total">0</div>
+                    <div class="scan-stat__label">Total</div>
+                </div>
+            </div>
+
+            <!-- Demo scan buttons -->
+            <div class="demo-scan-btns" id="demo-btns">
+                <button class="demo-scan-btn demo-scan-btn--valid" id="demo-valid">✓ Simulate Valid</button>
+                <button class="demo-scan-btn demo-scan-btn--used" id="demo-used">↩ Simulate Used</button>
+                <button class="demo-scan-btn demo-scan-btn--invalid" id="demo-invalid">✗ Simulate Invalid</button>
+            </div>
+
+            <!-- Manual lookup -->
+            <div class="manual-lookup">
+                <div
+                    style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#444;margin-bottom:8px;">
+                    Manual Ticket Lookup</div>
+                <div class="lookup-bar">
+                    <input type="text" class="lookup-input" id="lookup-input"
+                        placeholder="Enter ticket code TKA-XXXX-XXXXX" />
+                    <button class="lookup-btn" id="lookup-btn">Look Up</button>
+                </div>
+            </div>
+
+            <!-- Log -->
+            <div class="scan-log" id="scan-log">
+                <div class="scan-log__header">Recent Scans</div>
+                <div id="scan-log-items">
+                    <div style="padding:40px 16px;text-align:center;color:#444;font-size:13px;">No scans yet — waiting
+                        for first ticket</div>
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="scanner-controls">
+                <button class="btn"
+                    style="flex:1;background:#1F1F1F;border:1px solid #2A2A2A;color:#A0A0A0;font-size:13px;padding:10px;border-radius:8px;font-weight:600;"
+                    id="btn-export-log">Export Log</button>
+                <button class="btn"
+                    style="flex:1;background:#8B5CF6;color:white;font-size:13px;padding:10px;border-radius:8px;font-weight:600;"
+                    id="btn-sync">↻ Sync</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/js/core.js"></script>
+    <script>
+        const NAMES = ['Kwame Mensah', 'Abena Oti', 'Kofi Boateng', 'Ama Darko', 'Yaw Asante', 'Efua Mensah', 'Nana Akua', 'Kojo Baah', 'Adwoa Sarpong', 'Emmanuel Tetteh'];
+        const TYPES = ['VIP Section', 'General Admission', 'VIP Table', 'GA Standing'];
+        let counts = { valid: 0, invalid: 0 };
+        let firstScan = true;
+
+        function ts() {
+            const d = new Date();
+            return d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        }
+
+        function updateStats() {
+            document.getElementById('stat-valid').textContent = counts.valid;
+            document.getElementById('stat-invalid').textContent = counts.invalid;
+            document.getElementById('stat-total').textContent = counts.valid + counts.invalid;
+        }
+
+        function addLogItem(name, ticket, status) {
+            const log = document.getElementById('scan-log-items');
+            if (firstScan) { log.innerHTML = ''; firstScan = false; }
+
+            const iconMap = {
+                valid: `<iconify-icon icon="hugeicons:tick-01"></iconify-icon>`,
+                invalid: `<iconify-icon icon="hugeicons:cancel-01"></iconify-icon>`,
+                used: `<iconify-icon icon="hugeicons:alert-02"></iconify-icon>`
+            };
+
+            const item = document.createElement('div');
+            item.className = 'scan-item';
+            item.innerHTML = `
+        <div class="scan-item__icon scan-item__icon--${status === 'used' ? 'used' : status === 'valid' ? 'valid' : 'invalid'}">${iconMap[status === 'used' ? 'used' : status]}</div>
+        <div style="flex:1;min-width:0;">
+          <div class="scan-item__name">${name}</div>
+          <div class="scan-item__ticket">${ticket}</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0;">
+          <div class="scan-item__status scan-item__status--${status === 'used' ? 'used' : status === 'valid' ? 'valid' : 'invalid'}">${status === 'valid' ? 'VALID' : status === 'used' ? 'ALREADY USED' : 'INVALID'}</div>
+          <div class="scan-item__time">${ts()}</div>
+        </div>`;
+            log.insertBefore(item, log.firstChild);
+        }
+
+        function showResult(status, name, ticket) {
+            const camera = document.getElementById('camera-feed');
+            const overlay = document.createElement('div');
+            overlay.className = 'scan-result-overlay scan-result-overlay--' + (status === 'valid' ? 'valid' : status === 'used' ? 'used' : 'invalid');
+
+            const config = {
+                valid: { icon: `<iconify-icon icon="hugeicons:tick-01" style="width:40px;height:40px;"></iconify-icon>`, cls: 'valid', label: 'VALID ENTRY', border: 'rgba(34,197,94,0.4)' },
+                invalid: { icon: `<iconify-icon icon="hugeicons:cancel-01" style="width:40px;height:40px;"></iconify-icon>`, cls: 'invalid', label: 'INVALID TICKET', border: 'rgba(239,68,68,0.4)' },
+                used: { icon: `<iconify-icon icon="hugeicons:alert-02" style="width:40px;height:40px;"></iconify-icon>`, cls: 'used', label: 'ALREADY USED', border: 'rgba(245,158,11,0.4)' }
+            };
+            const c = config[status === 'used' ? 'used' : status === 'valid' ? 'valid' : 'invalid'];
+
+            overlay.innerHTML = `
+        <div class="result-icon result-icon--${c.cls}">${c.icon}</div>
+        <div class="result-label result-label--${c.cls}">${c.label}</div>
+        <div class="result-card">
+          <div class="result-card__row"><span>Name</span><span>${name}</span></div>
+          <div class="result-card__row"><span>Ticket Type</span><span>${ticket}</span></div>
+          <div class="result-card__row"><span>Scanned at</span><span>${ts()}</span></div>
+          ${status === 'used' ? '<div class="result-card__row"><span>First scanned</span><span style="color:#F59E0B;">12 min ago</span></div>' : ''}
+        </div>
+        <button style="padding:10px 32px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:8px;color:#F5F5F5;font-size:14px;font-weight:600;cursor:pointer;margin-top:8px;" id="scan-again-btn">Scan Next →</button>`;
+
+            camera.appendChild(overlay);
+            document.getElementById('scan-again-btn').addEventListener('click', function () { overlay.remove(); });
+            setTimeout(function () { if (overlay.parentNode) overlay.remove(); }, 3500);
+
+            addLogItem(name, ticket, status === 'used' ? 'used' : status === 'valid' ? 'valid' : 'invalid');
+        }
+
+        function simulateScan(status) {
+            const name = NAMES[Math.floor(Math.random() * NAMES.length)];
+            const ticket = TYPES[Math.floor(Math.random() * TYPES.length)];
+            if (status === 'valid') counts.valid++;
+            else counts.invalid++;
+            updateStats();
+            showResult(status, name, ticket);
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('demo-valid').addEventListener('click', function () { simulateScan('valid'); });
+            document.getElementById('demo-invalid').addEventListener('click', function () { simulateScan('invalid'); });
+            document.getElementById('demo-used').addEventListener('click', function () { simulateScan('used'); });
+
+            document.getElementById('lookup-btn').addEventListener('click', function () {
+                const code = document.getElementById('lookup-input').value.trim();
+                if (!code) return;
+                const roll = Math.random();
+                const status = roll > 0.6 ? 'valid' : roll > 0.3 ? 'used' : 'invalid';
+                simulateScan(status);
+                document.getElementById('lookup-input').value = '';
+            });
+
+            document.getElementById('lookup-input').addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') document.getElementById('lookup-btn').click();
+            });
+
+            document.getElementById('btn-camera').addEventListener('click', function () {
+                const cf = document.getElementById('camera-feed');
+                cf.style.background = 'linear-gradient(135deg,#050505,#0d0d0d)';
+                cf.querySelector('div').style.display = 'none';
+                window.TA && TA.toast('Camera activated — real integration requires device camera access', 'info');
+            });
+
+            document.getElementById('btn-sync').addEventListener('click', function () {
+                window.TA && TA.toast('Syncing scan data with server…', 'info');
+                setTimeout(() => window.TA && TA.toast('Sync complete — all records up to date', 'success'), 1500);
+            });
+
+            document.getElementById('btn-export-log').addEventListener('click', function () {
+                window.TA && TA.toast('Exporting scan log as CSV…', 'success');
+            });
+
+            document.getElementById('btn-torch').addEventListener('click', function () {
+                window.TA && TA.toast('Flashlight toggled', 'info');
+            });
+
+            // Simulate connected
+            let offline = false;
+            document.getElementById('scanner-status').addEventListener('click', function () {
+                offline = !offline;
+                document.getElementById('offline-banner').style.display = offline ? 'flex' : 'none';
+                this.innerHTML = offline
+                    ? '<div style="width:8px;height:8px;border-radius:50%;background:#F59E0B;"></div><span style="color:#F59E0B;font-size:12px;font-weight:600;">Offline — cached mode</span>'
+                    : '<div class="scanner-status-dot"></div>Online — Real-time validation';
+            });
+        });
+    </script>
+</body>
+
+</html>

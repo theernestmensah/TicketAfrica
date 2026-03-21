@@ -1,0 +1,22 @@
+{
+  "name": "ticket-africa",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@clerk/backend": "^3.0.2",
+    "@clerk/clerk-js": "^6.1.0",
+    "convex": "^1.32.0",
+    "svix": "^1.87.0"
+  },
+  "devDependencies": {
+    "vite": "^7.3.1"
+  }
+}
