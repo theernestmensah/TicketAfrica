@@ -53,7 +53,7 @@
 
         .step.active .step__num {
             background: var(--color-primary);
-            border-color: var(--color-primary);
+            border-color: var(--color-text-primary);
             color: white;
         }
 
@@ -113,13 +113,13 @@
             width: 24px;
             height: 24px;
             border-radius: 50%;
-            background: rgba(139, 92, 246, 0.15);
+            background: var(--color-secondary);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: var(--text-xs);
             font-weight: 800;
-            color: var(--color-primary);
+            color: var(--color-text-primary);
         }
 
         .form-row {
@@ -147,8 +147,8 @@
         }
 
         .pay-method.selected {
-            border-color: var(--color-primary);
-            background: rgba(139, 92, 246, 0.04);
+            border-color: var(--color-text-primary);
+            background: var(--color-bg-elevated);
         }
 
         .pay-method__icon {
@@ -188,7 +188,7 @@
         }
 
         .pay-method.selected .pay-method__radio {
-            border-color: var(--color-primary);
+            border-color: var(--color-text-primary);
             background: var(--color-primary);
         }
 
@@ -225,8 +225,8 @@
 
         .momo-network:hover,
         .momo-network.active {
-            border-color: var(--color-primary);
-            background: rgba(139, 92, 246, 0.06);
+            border-color: var(--color-text-primary);
+            background: var(--color-bg-elevated);
         }
 
         .momo-network__flag {
@@ -294,7 +294,7 @@
             width: 60px;
             height: 60px;
             border-radius: var(--radius-md);
-            background: linear-gradient(135deg, #1a0540, #3d0f80);
+            background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
             display: flex;
             align-items: center;
             justify-content: center;
@@ -349,7 +349,7 @@
             font-family: var(--font-display);
             font-size: var(--text-xl);
             font-weight: 800;
-            color: var(--color-primary);
+            color: var(--color-text-primary);
         }
 
         /* Timer */
@@ -569,11 +569,11 @@
                 <div style="margin-bottom:var(--space-6);">
                     <label style="display:flex;align-items:flex-start;gap:var(--space-3);cursor:pointer;">
                         <input type="checkbox" id="terms-check"
-                            style="width:16px;height:16px;accent-color:var(--color-primary);margin-top:2px;flex-shrink:0;" />
+                            style="width:16px;height:16px;accent-color: var(--color-text-primary);margin-top:2px;flex-shrink:0;" />
                         <span style="font-size:var(--text-sm);color:var(--color-text-secondary);line-height:1.6;">
                             I agree to the <a href="terms.html"
-                                style="color:var(--color-primary);text-decoration:underline;">Terms of Service</a> and
-                            <a href="privacy.html" style="color:var(--color-primary);text-decoration:underline;">Privacy
+                                style="color: var(--color-text-primary);text-decoration:underline;">Terms of Service</a> and
+                            <a href="privacy.html" style="color: var(--color-text-primary);text-decoration:underline;">Privacy
                                 Policy</a>. I understand that tickets are non-refundable unless the event is cancelled
                             by the organizer.
                         </span>
@@ -673,6 +673,7 @@
     <script src="assets/js/core.js"></script>
     <script src="assets/js/nav.js"></script>
     <script src="assets/js/layout.js"></script>
+    <script src="https://js.paystack.co/v1/inline.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             // ── Read cart from URL params ──
@@ -791,23 +792,59 @@
                         currency: 'GH₵'
                     });
 
-                    // Step 2: Simulated Payment Processing
-                    btn.innerHTML = '<iconify-icon icon="hugeicons:smart-phone-01" class="spin" style="margin-right:8px;"></iconify-icon> Waiting for payment prompt...';
-                    
-                    // Delay for realism (simulating MoMo/Redirect)
-                    await new Promise(r => setTimeout(r, 4000));
-                    
-                    btn.innerHTML = '<iconify-icon icon="hugeicons:tick-01" style="margin-right:8px; color:#22c55e;"></iconify-icon> Payment Approved!';
-                    await new Promise(r => setTimeout(r, 1000));
+                    // Step 2: Initialize Paystack
+                    btn.innerHTML = '<iconify-icon icon="hugeicons:credit-card" class="spin" style="margin-right:8px;"></iconify-icon> Connecting to Paystack...';
 
-                    // Step 3: Complete the Order (server-side would do this via Webhook normally)
-                    await window.ConvexDB.completeOrder({ order_id: orderId });
+                    let selectedMethod = document.querySelector('.pay-method.selected')?.dataset.method || 'card';
+                    let paystackChannels = ['card', 'bank', 'mobile_money', 'qr', 'ussd'];
+                    
+                    if (selectedMethod === 'momo') paystackChannels = ['mobile_money'];
+                    else if (selectedMethod === 'card') paystackChannels = ['card'];
+                    else if (selectedMethod === 'bank') paystackChannels = ['bank', 'eft'];
 
-                    // Step 4: Show Success Modal
-                    clearInterval(timer);
-                    const refNum = orderId.toString().slice(-8).toUpperCase();
-                    document.querySelector('#success-modal [style*="font-family:var(--font-mono)"]').textContent = 'TKA-' + refNum;
-                    document.getElementById('success-modal').style.display = 'flex';
+                    let handler = PaystackPop.setup({
+                        key: 'pk_test_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', // Use your test/live public key
+                        email: email,
+                        amount: Math.round(total * 100), // Amount in pesewas
+                        currency: 'GHS', // Ghanaian Cedi
+                        channels: paystackChannels,
+                        ref: 'TKA_' + orderId.toString().replace(/[^a-zA-Z0-9]/g, '').slice(-8) + '_' + Math.floor(Date.now() / 1000), 
+                        metadata: {
+                            custom_fields: [
+                                {
+                                    display_name: "Event Ticket",
+                                    variable_name: "event_ticket",
+                                    value: tierName + " x" + qty
+                                },
+                                {
+                                    display_name: "Phone Number",
+                                    variable_name: "phone_number",
+                                    value: phone
+                                }
+                            ]
+                        },
+                        callback: async function(response) {
+                            // Payment was successful (response.reference contains the trxref)
+                            btn.innerHTML = '<iconify-icon icon="hugeicons:tick-01" style="margin-right:8px; color:#22c55e;"></iconify-icon> Payment Approved!';
+                            
+                            // Step 3: Complete the Order in DB
+                            await window.ConvexDB.completeOrder({ order_id: orderId });
+
+                            // Step 4: Show Success Modal
+                            clearInterval(timer);
+                            const refNum = orderId.toString().slice(-8).toUpperCase();
+                            document.querySelector('#success-modal [style*="font-family:var(--font-mono)"]').textContent = 'TKA-' + refNum;
+                            document.getElementById('success-modal').style.display = 'flex';
+                        },
+                        onClose: function() {
+                            // User closed the popup
+                            TA.toast('Payment was cancelled', 'warning');
+                            btn.disabled = false;
+                            btn.innerHTML = originalHtml;
+                        }
+                    });
+                    
+                    handler.openIframe();
 
                 } catch (e) {
                     console.error('Checkout error:', e);

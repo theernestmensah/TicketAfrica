@@ -28,7 +28,7 @@
         /* Cover */
         .event-cover {
             height: 420px;
-            background: linear-gradient(135deg, #1a0540, #3d0f80, #8B5CF6);
+            background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary), #004D2C);
             border-radius: var(--radius-2xl);
             margin-top: var(--space-6);
             overflow: hidden;
@@ -101,7 +101,7 @@
             width: 36px;
             height: 36px;
             border-radius: var(--radius-md);
-            background: rgba(139, 92, 246, 0.1);
+            background: var(--color-bg-elevated);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -111,7 +111,7 @@
         .event-meta-item__icon svg {
             width: 16px;
             height: 16px;
-            color: var(--color-primary);
+            color: var(--color-text-primary);
         }
 
         .event-meta-item__label {
@@ -140,12 +140,12 @@
         }
 
         .ticket-tier:hover {
-            border-color: var(--color-primary);
+            border-color: var(--color-text-primary);
         }
 
         .ticket-tier.selected {
-            border-color: var(--color-primary);
-            background: rgba(139, 92, 246, 0.04);
+            border-color: var(--color-text-primary);
+            background: var(--color-bg-elevated);
         }
 
         .ticket-tier.sold-out {
@@ -170,7 +170,7 @@
             font-family: var(--font-display);
             font-size: var(--text-xl);
             font-weight: 800;
-            color: var(--color-primary);
+            color: var(--color-text-primary);
         }
 
         .ticket-tier__desc {
@@ -197,8 +197,8 @@
         }
 
         .ticket-tier.selected .ticket-tier__radio {
-            border-color: var(--color-primary);
-            background: var(--color-primary);
+            border-color: var(--color-secondary);
+            background: var(--color-secondary);
         }
 
         .ticket-tier.selected .ticket-tier__radio::after {
@@ -235,8 +235,8 @@
         }
 
         .qty-btn:hover {
-            border-color: var(--color-primary);
-            color: var(--color-primary);
+            border-color: var(--color-text-primary);
+            color: var(--color-text-primary);
         }
 
         .qty-value {
@@ -292,7 +292,7 @@
             font-family: var(--font-display);
             font-size: var(--text-xl);
             font-weight: 800;
-            color: var(--color-primary);
+            color: var(--color-text-primary);
         }
 
         /* Organizer card */
@@ -306,7 +306,7 @@
             width: 56px;
             height: 56px;
             border-radius: var(--radius-xl);
-            background: rgba(139, 92, 246, 0.15);
+            background: var(--color-bg-elevated);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -351,17 +351,18 @@
 
         /* Countdown */
         .sale-countdown {
-            background: rgba(139, 92, 246, 0.08);
-            border: 1px solid rgba(139, 92, 246, 0.2);
+            background: var(--color-secondary);
+            border: none;
             border-radius: var(--radius-lg);
             padding: var(--space-4);
             text-align: center;
             margin-bottom: var(--space-5);
+            color: var(--color-text-primary);
         }
 
         .sale-countdown__label {
             font-size: var(--text-xs);
-            color: var(--color-primary);
+            color: var(--color-text-primary);
             font-weight: 700;
             letter-spacing: 0.06em;
             text-transform: uppercase;
@@ -399,7 +400,7 @@
             font-family: var(--font-display);
             font-size: var(--text-xl);
             font-weight: 800;
-            color: var(--color-primary);
+            color: var(--color-text-primary);
             padding-bottom: 12px;
         }
 

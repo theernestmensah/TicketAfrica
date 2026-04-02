@@ -313,7 +313,7 @@
         }
 
         .result-card__row span:first-child {
-            color: #666;
+            color: var(--color-text-secondary);
         }
 
         .result-card__row span:last-child {
@@ -344,7 +344,7 @@
 
         .scanner-panel__sub {
             font-size: 12px;
-            color: #666;
+            color: var(--color-text-secondary);
         }
 
         /* Stats bar */
@@ -373,7 +373,7 @@
 
         .scan-stat__label {
             font-size: 10px;
-            color: #666;
+            color: var(--color-text-secondary);
             text-transform: uppercase;
             letter-spacing: 0.08em;
             font-weight: 600;
@@ -418,7 +418,7 @@
         }
 
         .lookup-input::placeholder {
-            color: #444;
+            color: var(--color-text-primary);
         }
 
         .lookup-btn {
@@ -450,7 +450,7 @@
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.08em;
-            color: #444;
+            color: var(--color-text-primary);
             border-bottom: 1px solid #1F1F1F;
             position: sticky;
             top: 0;
@@ -506,12 +506,12 @@
 
         .scan-item__ticket {
             font-size: 11px;
-            color: #666;
+            color: var(--color-text-secondary);
         }
 
         .scan-item__time {
             font-size: 11px;
-            color: #444;
+            color: var(--color-text-primary);
         }
 
         .scan-item__status {
@@ -621,7 +621,7 @@
                 Online — Real-time validation
             </div>
             <a href="organizer-dashboard.html"
-                style="font-size:12px;color:#666;text-decoration:none;transition:color 150ms;" id="back-dashboard">←
+                style="font-size:12px;color: var(--color-text-secondary);text-decoration:none;transition:color 150ms;" id="back-dashboard">←
                 Dashboard</a>
         </div>
     </div>
@@ -699,7 +699,7 @@
             <!-- Manual lookup -->
             <div class="manual-lookup">
                 <div
-                    style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#444;margin-bottom:8px;">
+                    style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color: var(--color-text-primary);margin-bottom:8px;">
                     Manual Ticket Lookup</div>
                 <div class="lookup-bar">
                     <input type="text" class="lookup-input" id="lookup-input"
@@ -712,7 +712,7 @@
             <div class="scan-log" id="scan-log">
                 <div class="scan-log__header">Recent Scans</div>
                 <div id="scan-log-items">
-                    <div style="padding:40px 16px;text-align:center;color:#444;font-size:13px;">No scans yet — waiting
+                    <div style="padding:40px 16px;text-align:center;color: var(--color-text-primary);font-size:13px;">No scans yet — waiting
                         for first ticket</div>
                 </div>
             </div>

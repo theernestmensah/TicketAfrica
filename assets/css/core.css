@@ -7,48 +7,57 @@
 
 /* ─── CSS Custom Properties ─────────────────────────────── */
 :root {
-    /* ══ LIQUID GOLD ON OBSIDIAN — $10B Palette ══════════════
-       Inspired by Bloomberg Terminal, Coinbase, Visa Black,
-       and Africa's most ambitious unicorn brands.
+    /* ══ THE $10B PROJECT — LIGHT LUXURY ═════════════════════
+       Inspired by high-end financial & tech unicorn brands.
        ════════════════════════════════════════════════════════ */
 
-    /* ── Brand: Liquid Gold ── */
-    --color-primary: #C9A84C;          /* Liquid Gold */
-    --color-primary-dark: #A8893A;     /* Deep Gold */
-    --color-primary-light: #E8D48A;    /* Champagne Shimmer */
-    --color-primary-rgb: 201, 168, 76;
+    /* ── Brand: Obsidian ── */
+    --color-primary: #191919;          /* Antigravity Charcoal */
+    --color-primary-dark: #0F0F0F;
+    --color-primary-light: #2A2A2A;
+    --color-primary-rgb: 25, 25, 25;
 
-    /* ── Accent: Burnished Ember ── */
-    --color-secondary: #E07B39;        /* Ember Orange — urgency/alerts */
-    --color-secondary-dark: #C06530;
-    --color-accent: #E8D48A;           /* Champagne — highlights */
-    --color-accent-dark: #C9A84C;
+    /* ── Accent: Champagne Gold ── */
+    --color-secondary: #D4AF37;        /* Liquid Gold */
+    --color-secondary-dark: #AA8C2C;
+    --color-secondary-rgb: 212, 175, 55;
+    
+    --color-accent: #E8D48A;           /* Shimmer Gold */
+    --color-accent-dark: #D4AF37;
+    --color-accent-rgb: 232, 212, 138;
 
-    /* ── Neutral Scale (Deep Obsidian) ── */
-    --color-bg: #06070C;               /* Deep Space Black */
-    --color-bg-elevated: #0D0F1A;      /* Midnight Layer */
-    --color-bg-card: #111320;          /* Card Surface */
-    --color-bg-input: #0D0F1A;
-    --color-border: #1C1F30;           /* Barely-there border */
-    --color-border-light: #262A40;     /* Visible border */
+    /* ── Neutral Scale (Dark Theme) ── */
+    --color-bg: #191919;               /* Deep Charcoal Base */
+    --color-bg-elevated: #212121;      /* Elevated Dark */
+    --color-bg-card: #282828;          /* Card Surface */
+    --color-bg-input: rgba(255, 255, 255, 0.05);
+    --color-border: rgba(212, 175, 55, 0.15); /* Subtle gold border */
+    --color-border-light: rgba(212, 175, 55, 0.08);
 
     /* ── Text Scale ── */
-    --color-text-primary: #F2F3F7;     /* Ice White */
-    --color-text-secondary: #8A95A3;   /* Burnished Silver */
-    --color-text-muted: #4A5262;       /* Charcoal Mist */
-    --color-text-inverse: #06070C;     /* Text on gold buttons */
+    --color-text-primary: #FFFFFF;     /* Pure White */
+    --color-text-secondary: rgba(255, 255, 255, 0.75);   /* Muted White */
+    --color-text-muted: rgba(255, 255, 255, 0.5);       /* Subtle */
+    --color-text-inverse: #191919;     /* Text on light backgrounds */
 
     /* ── Status Colors ── */
-    --color-success: #2ECC71;
-    --color-warning: #C9A84C;          /* Gold as warning — intentional */
-    --color-error: #E05252;
-    --color-info: #5B8EE6;
+    --color-success: #D4AF37;          /* Use gold for success in luxury theme */
+    --color-success-rgb: 212, 175, 55;
+    
+    --color-warning: #FFB300;
+    --color-warning-rgb: 255, 179, 0;
+
+    --color-error: #FF4500;            /* Antigravity Ember */
+    --color-error-rgb: 255, 69, 0;
+    
+    --color-info: #D4AF37;
+    --color-info-rgb: 212, 175, 55;
 
     /* ── Semantic ── */
-    --color-valid: #2ECC71;
-    --color-invalid: #E05252;
-    --color-used: #E07B39;
-    --color-pending: #5B8EE6;
+    --color-valid: var(--color-success);
+    --color-invalid: var(--color-error);
+    --color-used: var(--color-error);
+    --color-pending: var(--color-warning);
 
     /* ── Typography ── */
     --font-display: 'Sora', sans-serif;
@@ -91,13 +100,13 @@
     --radius-2xl: 24px;
     --radius-full: 9999px;
 
-    /* ── Shadows (rich depth for dark mode) ── */
-    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
-    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5);
-    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.6);
-    --shadow-xl: 0 16px 60px rgba(0, 0, 0, 0.7);
-    --shadow-glow: 0 0 40px rgba(201, 168, 76, 0.25);
-    --shadow-glow-lg: 0 0 80px rgba(201, 168, 76, 0.15);
+    /* ── Shadows (light mode depth) ── */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.6), 0 4px 6px -2px rgba(0, 0, 0, 0.4), 0 0 1px 1px rgba(var(--color-secondary-rgb), 0.15) inset;
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.7), 0 10px 10px -5px rgba(0, 0, 0, 0.5), 0 0 1px 1px rgba(var(--color-secondary-rgb), 0.25) inset;
+    --shadow-glow: 0 0 20px rgba(var(--color-secondary-rgb), 0.4);
+    --shadow-glow-lg: 0 0 40px rgba(var(--color-secondary-rgb), 0.25);
 
     /* Transitions */
     --transition-fast: 150ms ease;
@@ -206,7 +215,7 @@ ol {
     font-size: var(--text-7xl);
     font-weight: 800;
     line-height: 1.05;
-    letter-spacing: -0.03em;
+    letter-spacing: 0.05em;
 }
 
 .display-2 {
@@ -214,7 +223,7 @@ ol {
     font-size: var(--text-6xl);
     font-weight: 800;
     line-height: 1.08;
-    letter-spacing: -0.025em;
+    letter-spacing: 0.05em;
 }
 
 .display-3 {
@@ -222,7 +231,7 @@ ol {
     font-size: var(--text-5xl);
     font-weight: 700;
     line-height: 1.1;
-    letter-spacing: -0.02em;
+    letter-spacing: 0.05em;
 }
 
 h1,
@@ -231,7 +240,7 @@ h1,
     font-size: var(--text-4xl);
     font-weight: 700;
     line-height: 1.15;
-    letter-spacing: -0.015em;
+    letter-spacing: 0.05em;
 }
 
 h2,
@@ -240,7 +249,7 @@ h2,
     font-size: var(--text-3xl);
     font-weight: 700;
     line-height: 1.2;
-    letter-spacing: -0.01em;
+    letter-spacing: 0.05em;
 }
 
 h3,
@@ -249,6 +258,7 @@ h3,
     font-size: var(--text-2xl);
     font-weight: 600;
     line-height: 1.25;
+    letter-spacing: 0.05em;
 }
 
 h4,
@@ -257,6 +267,7 @@ h4,
     font-size: var(--text-xl);
     font-weight: 600;
     line-height: 1.3;
+    letter-spacing: 0.05em;
 }
 
 h5,
@@ -264,6 +275,7 @@ h5,
     font-size: var(--text-lg);
     font-weight: 600;
     line-height: 1.4;
+    letter-spacing: 0.05em;
 }
 
 h6,
@@ -271,10 +283,11 @@ h6,
     font-size: var(--text-base);
     font-weight: 600;
     line-height: 1.4;
+    letter-spacing: 0.05em;
 }
 
 .text-primary {
-    color: var(--color-primary);
+    color: var(--color-text-primary);
 }
 
 .text-accent {
@@ -290,7 +303,7 @@ h6,
 }
 
 .text-gradient {
-    background: linear-gradient(135deg, #A8893A 0%, #E8D48A 40%, #C9A84C 70%, #E8D48A 100%);
+    background: linear-gradient(135deg, var(--color-secondary-dark) 0%, var(--color-accent) 40%, var(--color-secondary) 70%, var(--color-accent) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -334,38 +347,40 @@ h6,
 }
 
 .btn--primary {
-    background: linear-gradient(135deg, #C9A84C 0%, #E8D48A 50%, #C9A84C 100%);
+    background: linear-gradient(135deg, var(--color-secondary) 0%, var(--color-accent) 50%, var(--color-secondary) 100%);
     background-size: 200% auto;
-    color: #06070C;
+    color: var(--color-text-primary);
     font-weight: 700;
-    letter-spacing: 0.04em;
-    box-shadow: 0 4px 24px rgba(201, 168, 76, 0.4), inset 0 1px 0 rgba(255,255,255,0.2);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    box-shadow: 0 4px 24px rgba(var(--color-secondary-rgb), 0.4), inset 0 1px 0 rgba(255,255,255,0.4), inset 0 -1px 0 rgba(0,0,0,0.2);
+    border: 1px solid rgba(255,255,255,0.2);
 }
 
 .btn--primary:hover {
     background-position: right center;
-    box-shadow: 0 8px 40px rgba(201, 168, 76, 0.6), inset 0 1px 0 rgba(255,255,255,0.25);
+    box-shadow: 0 8px 40px rgba(var(--color-secondary-rgb), 0.6), inset 0 1px 0 rgba(255,255,255,0.5);
     transform: translateY(-1px);
-    color: #06070C;
+    color: var(--color-text-primary);
 }
 
 .btn--secondary {
     background: transparent;
-    color: var(--color-primary);
-    border: 1.5px solid rgba(201, 168, 76, 0.6);
+    color: var(--color-secondary);
+    border: 1.5px solid rgba(var(--color-secondary-rgb), 0.6);
 }
 
 .btn--secondary:hover {
-    background: rgba(201, 168, 76, 0.08);
-    color: var(--color-primary-light);
-    border-color: var(--color-primary);
-    box-shadow: 0 0 20px rgba(201, 168, 76, 0.15);
+    background: rgba(var(--color-secondary-rgb), 0.08);
+    color: var(--color-secondary);
+    border-color: var(--color-secondary);
+    box-shadow: 0 0 20px rgba(var(--color-secondary-rgb), 0.15);
 }
 
 .btn--accent {
     background: var(--color-accent);
-    color: var(--color-text-inverse);
-    font-weight: 700;
+    color: var(--color-bg); /* Dark text for contrast against gold */
+    font-weight: 800;
 }
 
 .btn--accent:hover {
@@ -374,14 +389,14 @@ h6,
 }
 
 .btn--ghost {
-    background: rgba(201, 168, 76, 0.05);
+    background: rgba(var(--color-secondary-rgb), 0.05);
     color: var(--color-text-secondary);
     border: 1px solid transparent;
 }
 
 .btn--ghost:hover {
-    background: rgba(201, 168, 76, 0.1);
-    color: var(--color-primary-light);
+    background: rgba(var(--color-secondary-rgb), 0.1);
+    color: var(--color-secondary);
     border-color: var(--color-border-light);
 }
 
@@ -431,9 +446,9 @@ h6,
 }
 
 .badge--primary {
-    background: rgba(201, 168, 76, 0.12);
-    color: var(--color-primary-light);
-    border: 1px solid rgba(201, 168, 76, 0.2);
+    background: rgba(var(--color-secondary-rgb), 0.12);
+    color: var(--color-secondary);
+    border: 1px solid rgba(var(--color-secondary-rgb), 0.2);
 }
 
 .badge--success {
@@ -442,8 +457,8 @@ h6,
 }
 
 .badge--warning {
-    background: rgba(201, 168, 76, 0.12);
-    color: var(--color-primary);
+    background: rgba(var(--color-secondary-rgb), 0.12);
+    color: var(--color-text-primary);
 }
 
 .badge--error {
@@ -522,9 +537,9 @@ h6,
 }
 
 .form-control:focus {
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(27, 46, 38, 0.1);
-    background: #FFFFFF;
+    border-color: var(--color-secondary);
+    box-shadow: 0 0 0 3px rgba(var(--color-secondary-rgb), 0.15);
+    background: var(--color-bg-input);
 }
 
 .form-control::placeholder {
@@ -549,8 +564,8 @@ h6,
 .tag {
     display: inline-block;
     padding: var(--space-1) var(--space-3);
-    background: rgba(201, 168, 76, 0.06);
-    border: 1px solid rgba(201, 168, 76, 0.15);
+    background: rgba(var(--color-secondary-rgb), 0.06);
+    border: 1px solid rgba(var(--color-secondary-rgb), 0.15);
     border-radius: var(--radius-full);
     font-size: var(--text-xs);
     font-weight: 500;
@@ -602,7 +617,7 @@ h6,
     font-weight: 700;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: var(--color-primary);
+    color: var(--color-text-primary);
     margin-bottom: var(--space-4);
 }
 
@@ -611,7 +626,7 @@ h6,
     display: block;
     width: 20px;
     height: 2px;
-    background: linear-gradient(90deg, var(--color-primary), transparent);
+    background: linear-gradient(90deg, var(--color-secondary), transparent);
     border-radius: 2px;
 }
 
@@ -644,8 +659,8 @@ h6,
 .spinner {
     width: 20px;
     height: 20px;
-    border: 2px solid rgba(201, 168, 76, 0.15);
-    border-top-color: var(--color-primary);
+    border: 2px solid rgba(var(--color-secondary-rgb), 0.15);
+    border-top-color: var(--color-secondary);
     border-radius: 50%;
     animation: spin 700ms linear infinite;
 }
@@ -711,7 +726,7 @@ h6,
 .modal {
     background: var(--color-bg-card);
     border: 1px solid var(--color-border-light);
-    border-top: 1px solid rgba(201, 168, 76, 0.25);
+    border-top: 1px solid rgba(var(--color-secondary-rgb), 0.25);
     border-radius: var(--radius-2xl);
     width: 100%;
     max-width: 560px;
@@ -914,6 +929,47 @@ h6,
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite;
     border-radius: var(--radius-sm);
+}
+
+/* ─── Antigravity Premium 3D Tickets ─────────────────────── */
+.ticket-3d {
+    position: relative;
+    background: rgba(var(--color-primary-rgb), 0.85); /* Deep charcoal */
+    backdrop-filter: blur(24px);
+    border: 1px solid rgba(212, 175, 55, 0.2); /* Ultra-thin gold border */
+    border-radius: var(--radius-2xl);
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.8), 0 0 1px 1px rgba(212, 175, 55, 0.15) inset;
+    overflow: hidden;
+    transform-style: preserve-3d;
+    transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.ticket-3d:hover {
+    transform: translateY(-8px) rotateX(2deg) rotateY(2deg);
+    box-shadow: 0 32px 80px rgba(0, 0, 0, 0.9), 0 0 8px 1px rgba(212, 175, 55, 0.25) inset, var(--shadow-glow);
+}
+
+.ticket-holo {
+    position: absolute;
+    top: 0;
+    right: 24px;
+    width: 12px;
+    height: 100%;
+    background: linear-gradient(180deg, 
+        rgba(212, 175, 55, 0.8), 
+        rgba(232, 212, 138, 0.9), 
+        rgba(255, 69, 0, 0.8), 
+        rgba(212, 175, 55, 0.8));
+    background-size: 100% 200%;
+    animation: holoScroll 4s linear infinite;
+    mix-blend-mode: color-dodge;
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+    z-index: 10;
+}
+
+@keyframes holoScroll {
+    0% { background-position: 0% 0%; }
+    100% { background-position: 0% 200%; }
 }
 
 /* ─── Responsive ─────────────────────────────────────────── */

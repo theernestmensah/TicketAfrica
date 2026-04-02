@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>My Account & Ticket Wallet — Ticket Africa</title>
     <script type="module" src="/assets/js/db.js"></script>
+    <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
     <link rel="stylesheet" href="assets/css/core.css" />
     <link rel="stylesheet" href="assets/css/nav-footer.css" />
     <style>
@@ -28,6 +29,7 @@
             border: 1px solid var(--color-border);
             border-radius: var(--radius-xl);
             overflow: hidden;
+            box-shadow: var(--shadow-sm);
         }
 
         .account-nav__user {
@@ -36,28 +38,32 @@
             align-items: center;
             gap: var(--space-3);
             border-bottom: 1px solid var(--color-border);
+            background: var(--color-bg-elevated);
         }
 
         .account-nav__avatar {
             width: 48px;
             height: 48px;
             border-radius: 50%;
-            background: rgba(139, 92, 246, 0.15);
+            background: var(--color-primary);
+            color: var(--color-text-primary);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.25rem;
             flex-shrink: 0;
+            border: 2px solid var(--color-secondary);
         }
 
         .account-nav__name {
             font-weight: 700;
             font-size: var(--text-sm);
+            color: var(--color-text-primary);
         }
 
         .account-nav__email {
             font-size: var(--text-xs);
-            color: var(--color-text-muted);
+            color: var(--color-text-secondary);
         }
 
         .account-nav__links {
@@ -72,7 +78,7 @@
             border-radius: var(--radius-md);
             font-size: var(--text-sm);
             font-weight: 500;
-            color: var(--color-text-muted);
+            color: var(--color-text-secondary);
             cursor: pointer;
             transition: all var(--transition-fast);
             text-decoration: none;
@@ -80,18 +86,18 @@
         }
 
         .account-nav__link:hover {
-            background: rgba(255, 255, 255, 0.05);
+            background: var(--color-bg-elevated);
             color: var(--color-text-primary);
         }
 
         .account-nav__link.active {
-            background: rgba(139, 92, 246, 0.1);
-            color: var(--color-primary-light);
+            background: var(--color-secondary);
+            color: var(--color-text-primary);
+            font-weight: 700;
         }
 
-        .account-nav__link svg {
-            width: 16px;
-            height: 16px;
+        .account-nav__link iconify-icon {
+            font-size: 18px;
             flex-shrink: 0;
         }
 
@@ -113,57 +119,53 @@
 
         /* Ticket card */
         .ticket-card {
-            background: var(--color-bg-card);
-            border: 1px solid var(--color-border);
-            border-radius: var(--radius-xl);
+            background: rgba(var(--color-primary-rgb), 0.85); /* Deep charcoal */
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(212, 175, 55, 0.2); /* Ultra-thin gold border */
+            border-radius: var(--radius-2xl);
             overflow: hidden;
             position: relative;
-            transition: all var(--transition-base);
+            transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.8), 0 0 1px 1px rgba(212, 175, 55, 0.15) inset;
+            transform-style: preserve-3d;
         }
 
         .ticket-card:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
-            border-color: var(--color-border-light);
+            transform: translateY(-8px) rotateX(2deg) rotateY(2deg);
+            box-shadow: 0 32px 80px rgba(0, 0, 0, 0.9), 0 0 8px 1px rgba(212, 175, 55, 0.25) inset, var(--shadow-glow);
+            border-color: rgba(212, 175, 55, 0.4);
         }
 
         .ticket-card--upcoming {
-            border-color: rgba(139, 92, 246, 0.25);
+            border-color: var(--color-text-primary);
         }
 
         .ticket-card--used {
-            opacity: 0.6;
+            opacity: 0.7;
         }
 
         .ticket-card__top {
             padding: var(--space-5);
-            background: linear-gradient(135deg, #1a0540, #3d0f80);
+            background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
             position: relative;
             min-height: 100px;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
-        }
-
-        .ticket-card__top--sports {
-            background: linear-gradient(135deg, #0a1a30, #0d3060);
-        }
-
-        .ticket-card__top--conf {
-            background: linear-gradient(135deg, #0d1f0d, #1a4020);
+            color: var(--color-text-primary);
         }
 
         .ticket-card__event-name {
             font-family: var(--font-display);
             font-size: var(--text-base);
             font-weight: 800;
-            color: white;
+            color: var(--color-text-primary);
             line-height: 1.3;
         }
 
         .ticket-card__venue {
             font-size: var(--text-xs);
-            color: rgba(255, 255, 255, 0.6);
+            color: rgba(255, 255, 255, 0.7);
             margin-top: 4px;
         }
 
@@ -175,6 +177,7 @@
 
         .ticket-card__bottom {
             padding: var(--space-4) var(--space-5);
+            background: var(--color-bg-card);
         }
 
         .ticket-card__divider {
@@ -202,7 +205,7 @@
             width: 6px;
             height: 6px;
             border-radius: 50%;
-            background: var(--color-border-light);
+            background: var(--color-border);
         }
 
         .ticket-info-row {
@@ -216,11 +219,11 @@
         }
 
         .ticket-info-row span:first-child {
-            color: var(--color-text-muted);
+            color: var(--color-text-secondary);
         }
 
         .ticket-info-row span:last-child {
-            font-weight: 600;
+            font-weight: 700;
             color: var(--color-text-primary);
         }
 
@@ -228,24 +231,28 @@
             display: flex;
             justify-content: center;
             padding: var(--space-5);
+            background: var(--color-bg-card);
         }
 
         .ticket-qr-box {
             width: 100px;
             height: 100px;
-            background: white;
+            background: var(--color-bg-input);
+            border: 1px solid var(--color-border);
             border-radius: var(--radius-md);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 3.5rem;
             padding: 6px;
+            color: var(--color-text-primary);
         }
 
         .ticket-card__actions {
             display: flex;
             gap: var(--space-2);
-            padding: 0 var(--space-5) var(--space-4);
+            padding: 0 var(--space-5) var(--space-5);
+            background: var(--color-bg-card);
         }
 
         /* Page sections */
@@ -263,7 +270,8 @@
         .page-section__title {
             font-family: var(--font-display);
             font-size: var(--text-xl);
-            font-weight: 700;
+            font-weight: 800;
+            color: var(--color-text-primary);
         }
 
         /* Order history */
@@ -271,8 +279,13 @@
             display: flex;
             align-items: center;
             gap: var(--space-4);
-            padding: var(--space-4) 0;
+            padding: var(--space-5);
             border-bottom: 1px solid var(--color-border);
+            transition: background 150ms;
+        }
+
+        .order-row:hover {
+            background: var(--color-bg-elevated);
         }
 
         .order-row:last-child {
@@ -280,26 +293,29 @@
         }
 
         .order-row__img {
-            width: 48px;
-            height: 48px;
-            border-radius: var(--radius-md);
+            width: 52px;
+            height: 52px;
+            border-radius: var(--radius-lg);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.5rem;
             flex-shrink: 0;
-            background: linear-gradient(135deg, #1a0540, #3d0f80);
+            background: var(--color-primary);
+            color: var(--color-text-primary);
+            border: 1px solid var(--color-primary-dark);
         }
 
         .order-row__name {
             font-size: var(--text-sm);
             font-weight: 700;
-            margin-bottom: 2px;
+            margin-bottom: 4px;
+            color: var(--color-text-primary);
         }
 
         .order-row__meta {
             font-size: var(--text-xs);
-            color: var(--color-text-muted);
+            color: var(--color-text-secondary);
         }
 
         .order-row__amount {
@@ -308,6 +324,7 @@
             font-weight: 800;
             text-align: right;
             white-space: nowrap;
+            color: var(--color-text-primary);
         }
 
         .order-row__ref {
@@ -316,12 +333,13 @@
             text-align: right;
         }
 
-        /* Transfer modal */
+        /* Panel override */
         .panel {
             background: var(--color-bg-card);
             border: 1px solid var(--color-border);
             border-radius: var(--radius-xl);
-            padding: var(--space-6);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
         }
 
         @media(max-width:1024px) {
@@ -333,12 +351,6 @@
                 position: static;
             }
 
-            .wallet-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media(max-width:640px) {
             .wallet-grid {
                 grid-template-columns: 1fr;
             }
@@ -413,6 +425,7 @@
                     <div class="wallet-grid">
                         <!-- Upcoming ticket -->
                         <div class="ticket-card ticket-card--upcoming" id="ticket-card-1">
+                            <div class="ticket-holo"></div>
                             <div class="ticket-card__top">
                                 <div class="ticket-card__status-badge"><span
                                         class="badge badge--success">Upcoming</span></div>
@@ -447,7 +460,8 @@
 
                         <!-- Another upcoming -->
                         <div class="ticket-card ticket-card--upcoming" id="ticket-card-2">
-                            <div class="ticket-card__top ticket-card__top--sports">
+                            <div class="ticket-holo"></div>
+                            <div class="ticket-card__top">
                                 <div class="ticket-card__status-badge"><span class="badge badge--info">Upcoming</span>
                                 </div>
                                 <div class="ticket-card__event-name">CAF Champions League Q-Final</div>
@@ -478,108 +492,46 @@
                                 <button class="btn btn--ghost btn--sm" id="resell-ticket-2">Resell</button>
                             </div>
                         </div>
-
-                        <!-- Used ticket -->
-                        <div class="ticket-card ticket-card--used" id="ticket-card-3">
-                            <div class="ticket-card__top ticket-card__top--conf">
-                                <div class="ticket-card__status-badge"><span class="badge badge--neutral">Used</span>
-                                </div>
-                                <div class="ticket-card__event-name">Ghana Business Leaders Summit</div>
-                                <div class="ticket-card__venue">Kempinski Hotel, Accra</div>
-                            </div>
-                            <div class="ticket-card__divider">
-                                <div class="ticket-card__divider-dots">
-                                    <div class="ticket-card__divider-dot"></div>
-                                    <div class="ticket-card__divider-dot"></div>
-                                    <div class="ticket-card__divider-dot"></div>
-                                </div>
-                            </div>
-                            <div class="ticket-card__bottom">
-                                <div class="ticket-info-row"><span>Date</span><span>Mon, 3 Feb 2026</span></div>
-                                <div class="ticket-info-row"><span>Ticket Type</span><span>Full Conference Pass</span>
-                                </div>
-                                <div class="ticket-info-row"><span>Used at</span><span>09:14 AM, Gate B</span></div>
-                            </div>
-                            <div class="ticket-card__qr" style="opacity:0.4;">
-                                <div class="ticket-qr-box">▦</div>
-                            </div>
-                            <div class="ticket-card__actions">
-                                <button class="btn btn--ghost btn--sm btn--full" id="view-history-3"
-                                    style="color:var(--color-text-muted);">View Details</button>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
                 <!-- Purchase History -->
                 <div class="page-section" id="history">
                     <div class="page-section__header">
-                        <h2 class="page-section__title" style="font-size:var(--text-xl);">Purchase History</h2>
+                        <h2 class="page-section__title">Purchase History</h2>
                         <button class="btn btn--secondary btn--sm" id="download-history-btn">Export CSV</button>
                     </div>
                     <div class="panel">
                         <div class="order-row">
-                            <div class="order-row__img"><iconify-icon icon="hugeicons:music-note-01" style="vertical-align:middle;"></iconify-icon></div>
+                            <div class="order-row__img"><iconify-icon icon="hugeicons:music-note-01"></iconify-icon></div>
                             <div style="flex:1;min-width:0;">
                                 <div class="order-row__name">Afrobeats Night: Grand Finale (VIP × 2)</div>
                                 <div class="order-row__meta">15 Mar 2026 · Mobile Money · Ref: TKA-2026-83921</div>
                             </div>
                             <div style="text-align:right;">
                                 <div class="order-row__amount">GH₵ 736</div>
-                                <div style="font-size:var(--text-xs);color:var(--color-success);font-weight:600;">✓
-                                    Confirmed</div>
+                                <div style="font-size:var(--text-xs);color:var(--color-success);font-weight:700;">✓ Confirmed</div>
                             </div>
                         </div>
                         <div class="order-row">
-                            <div class="order-row__img" style="background:linear-gradient(135deg,#0a1a30,#0d3060);"><iconify-icon icon="hugeicons:football" style="vertical-align:middle;"></iconify-icon>
-                            </div>
+                            <div class="order-row__img"><iconify-icon icon="hugeicons:football"></iconify-icon></div>
                             <div style="flex:1;min-width:0;">
                                 <div class="order-row__name">CAF Champions League Q-Final (× 1)</div>
                                 <div class="order-row__meta">19 Mar 2026 · Visa card · Ref: TKA-2026-94122</div>
                             </div>
                             <div style="text-align:right;">
                                 <div class="order-row__amount">R 92</div>
-                                <div style="font-size:var(--text-xs);color:var(--color-success);font-weight:600;">✓
-                                    Confirmed</div>
-                            </div>
-                        </div>
-                        <div class="order-row">
-                            <div class="order-row__img" style="background:linear-gradient(135deg,#0d1f0d,#1a4020);"><iconify-icon icon="hugeicons:briefcase-01" style="vertical-align:middle;"></iconify-icon>
-                            </div>
-                            <div style="flex:1;min-width:0;">
-                                <div class="order-row__name">Ghana Business Leaders Summit (× 1)</div>
-                                <div class="order-row__meta">3 Feb 2026 · Mobile Money · Ref: TKA-2026-71043</div>
-                            </div>
-                            <div style="text-align:right;">
-                                <div class="order-row__amount">GH₵ 105</div>
-                                <div style="font-size:var(--text-xs);color:var(--color-text-muted);font-weight:600;">✓
-                                    Used</div>
-                            </div>
-                        </div>
-                        <div class="order-row">
-                            <div class="order-row__img" style="background:linear-gradient(135deg,#1a0a20,#3d1060);"><iconify-icon icon="hugeicons:tent-01" style="vertical-align:middle;"></iconify-icon>
-                            </div>
-                            <div style="flex:1;min-width:0;">
-                                <div class="order-row__name">Chale Wote Festival (GA × 2)</div>
-                                <div class="order-row__meta">21 Aug 2025 · Mobile Money · Ref: TKA-2025-44812</div>
-                            </div>
-                            <div style="text-align:right;">
-                                <div class="order-row__amount">GH₵ 200</div>
-                                <div style="font-size:var(--text-xs);color:var(--color-text-muted);font-weight:600;">✓
-                                    Used</div>
+                                <div style="font-size:var(--text-xs);color:var(--color-success);font-weight:700;">✓ Confirmed</div>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Transfer modal trigger area -->
-                <div style="padding:var(--space-6);background:var(--color-bg-elevated);border:1px solid var(--color-border);border-radius:var(--radius-xl);margin-bottom:var(--space-8);"
-                    id="transfer-section">
-                    <h3 style="margin-bottom:var(--space-4);">Transfer a Ticket</h3>
-                    <p
-                        style="font-size:var(--text-sm);color:var(--color-text-muted);margin-bottom:var(--space-5);line-height:1.7;">
-                        Transfer a ticket to another person by entering their phone number or email. The original QR
-                        code will be invalidated and a new one issued to the recipient.</p>
+                <div style="padding:var(--space-8); background:var(--color-bg-card); border:1px solid var(--color-border); border-radius:var(--radius-xl); margin-bottom:var(--space-8); box-shadow: var(--shadow-sm);" id="transfer-section">
+                    <h3 style="margin-bottom:var(--space-4); color: var(--color-text-primary);">Transfer a Ticket</h3>
+                    <p style="font-size:var(--text-sm); color:var(--color-text-secondary); margin-bottom:var(--space-6); line-height:1.7;">
+                        Transfer a ticket to another person by entering their phone number or email. The original QR code will be invalidated and a new one issued to the recipient.</p>
                     <div style="display:flex;flex-direction:column;gap:var(--space-4);">
                         <div class="form-group">
                             <label class="form-label" for="transfer-ticket-select">Select Ticket to Transfer</label>
@@ -591,17 +543,10 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="transfer-recipient">Recipient Phone or Email</label>
-                            <input type="text" class="form-control" id="transfer-recipient"
-                                placeholder="0244 000 000 or recipient@email.com" />
+                            <input type="text" class="form-control" id="transfer-recipient" placeholder="0244 000 000 or recipient@email.com" />
                         </div>
-                        <div class="form-group">
-                            <label class="form-label" for="transfer-message">Optional Message</label>
-                            <input type="text" class="form-control" id="transfer-message"
-                                placeholder="Enjoy the show!" />
-                        </div>
-                        <button class="btn btn--primary" id="submit-transfer-btn" style="max-width:200px;">
-                            <iconify-icon icon="hugeicons:sent" style="width:16px;height:16px;"></iconify-icon>
-                            Send Transfer
+                        <button class="btn btn--primary" id="submit-transfer-btn" style="max-width:240px;">
+                            <iconify-icon icon="hugeicons:sent" style="margin-right:8px;"></iconify-icon> Send Transfer
                         </button>
                     </div>
                 </div>
@@ -626,7 +571,7 @@
             // Download ticket
             document.querySelectorAll('[id^="download-ticket"]').forEach(function (btn) {
                 btn.addEventListener('click', function () {
-                    TA.toast('Preparing PDF ticket for download…', 'success');
+                    if(window.TA) TA.toast('Preparing PDF ticket for download…', 'success');
                 });
             });
 
@@ -634,29 +579,23 @@
             document.getElementById('submit-transfer-btn').addEventListener('click', function () {
                 const ticket = document.getElementById('transfer-ticket-select').value;
                 const recipient = document.getElementById('transfer-recipient').value.trim();
-                if (!ticket) { TA.toast('Please select a ticket to transfer', 'warning'); return; }
-                if (!recipient) { TA.toast('Please enter the recipient phone or email', 'warning'); return; }
+                if (!ticket) { if(window.TA) TA.toast('Please select a ticket to transfer', 'warning'); return; }
+                if (!recipient) { if(window.TA) TA.toast('Please enter the recipient phone or email', 'warning'); return; }
                 this.disabled = true;
+                const oldContent = this.innerHTML;
                 this.textContent = 'Sending…';
                 setTimeout(() => {
-                    TA.toast('Ticket transferred — recipient will receive their QR via SMS and email', 'success');
+                    if(window.TA) TA.toast('Ticket transferred — recipient will receive their QR via SMS and email', 'success');
                     this.disabled = false;
-                    this.innerHTML = '<iconify-icon icon="hugeicons:sent" style="width:16px;height:16px;"></iconify-icon> Send Transfer';
+                    this.innerHTML = oldContent;
                     document.getElementById('transfer-recipient').value = '';
                     document.getElementById('transfer-ticket-select').value = '';
                 }, 2000);
             });
 
-            // Resell buttons
-            document.querySelectorAll('[id^="resell-ticket"]').forEach(function (btn) {
-                btn.addEventListener('click', function () {
-                    TA.toast('Resale listing — navigate to resale.html to complete', 'info');
-                });
-            });
-
-            // Export history
+            // Support/Other
             document.getElementById('download-history-btn').addEventListener('click', function () {
-                TA.toast('Exporting purchase history as CSV…', 'success');
+                if(window.TA) TA.toast('Exporting purchase history as CSV…', 'success');
             });
         });
     </script>

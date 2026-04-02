@@ -91,8 +91,8 @@
         }
 
         .country-tab.active {
-            color: var(--color-primary);
-            border-bottom-color: var(--color-primary);
+            color: var(--color-text-primary);
+            border-bottom-color: var(--color-text-primary);
         }
 
         .country-tab__flag {
@@ -110,8 +110,8 @@
         }
 
         .country-tab.active .country-tab__currency {
-            background: rgba(139, 92, 246, 0.15);
-            color: var(--color-primary-light);
+            background: var(--color-secondary);
+            color: var(--color-text-primary);
         }
 
         /* ── Main Layout ── */
@@ -151,7 +151,7 @@
 
         .filter-clear {
             font-size: var(--text-xs);
-            color: var(--color-primary);
+            color: var(--color-text-primary);
             font-weight: 600;
             cursor: pointer;
             background: none;
@@ -204,7 +204,7 @@
         .filter-option input[type="radio"] {
             width: 16px;
             height: 16px;
-            accent-color: var(--color-primary);
+            accent-color: var(--color-text-primary);
             cursor: pointer;
             flex-shrink: 0;
         }
@@ -228,12 +228,12 @@
             gap: var(--space-2);
             margin-bottom: var(--space-3);
             padding: var(--space-2) var(--space-3);
-            background: rgba(139, 92, 246, 0.08);
-            border: 1px solid rgba(139, 92, 246, 0.2);
+            background: var(--color-bg-elevated);
+            border: 1px solid var(--color-border);
             border-radius: var(--radius-md);
             font-size: var(--text-xs);
-            color: var(--color-primary-light);
-            font-weight: 500;
+            color: var(--color-text-primary);
+            font-weight: 700;
         }
 
         .filter-price-range {
@@ -254,7 +254,7 @@
         }
 
         .filter-price-range input:focus {
-            border-color: var(--color-primary);
+            border-color: var(--color-text-primary);
         }
 
         /* ── Events Main Panel ── */
@@ -281,7 +281,7 @@
         }
 
         .search-bar:focus-within {
-            border-color: var(--color-primary);
+            border-color: var(--color-text-primary);
         }
 
         .search-bar svg {
@@ -316,7 +316,7 @@
         }
 
         .sort-select:focus {
-            border-color: var(--color-primary);
+            border-color: var(--color-text-primary);
         }
 
         .results-count {
@@ -358,7 +358,7 @@
         .country-context-banner__currency {
             font-size: var(--text-xs);
             font-weight: 700;
-            color: var(--color-primary-light);
+            color: var(--color-secondary);
             background: rgba(139, 92, 246, 0.15);
             padding: 4px 10px;
             border-radius: var(--radius-full);
@@ -387,7 +387,7 @@
         .quick-filter:hover,
         .quick-filter.active {
             background: var(--color-primary);
-            border-color: var(--color-primary);
+            border-color: var(--color-text-primary);
             color: white;
         }
 
@@ -471,8 +471,8 @@
 
         .event-card__save:hover {
             background: rgba(139, 92, 246, 0.2);
-            border-color: var(--color-primary);
-            color: var(--color-primary);
+            border-color: var(--color-text-primary);
+            color: var(--color-text-primary);
         }
 
         .event-card__save svg {
@@ -492,7 +492,7 @@
             font-weight: 600;
             letter-spacing: 0.08em;
             text-transform: uppercase;
-            color: var(--color-primary);
+            color: var(--color-text-primary);
             margin-bottom: var(--space-2);
         }
 
@@ -606,7 +606,7 @@
         .page-btn:hover,
         .page-btn.active {
             background: var(--color-primary);
-            border-color: var(--color-primary);
+            border-color: var(--color-text-primary);
             color: white;
         }
 

@@ -9,7 +9,7 @@
   <meta property="og:title" content="Ticket Africa — Events Across Africa" />
   <meta property="og:description"
     content="Buy tickets for the biggest events across Africa. Secure payments, QR tickets, mobile money and USSD support." />
-  <meta name="theme-color" content="#07070f" />
+  <meta name="theme-color" content="#11131A" />
   <title>Ticket Africa — Africa's Event Ticketing Platform</title>
   <script type="module" src="/assets/js/db.js"></script>
   <link rel="stylesheet" href="assets/css/core.css" />
@@ -76,38 +76,18 @@
       font-family: var(--font-display);
       font-size: var(--text-xl);
       font-weight: 800;
-      color: var(--color-primary);
+      color: var(--color-text-primary);
       padding-bottom: 12px;
     }
 
-    /* Hero category colors */
-    .cat-concerts {
-      background: rgba(139, 92, 246, 0.15);
-    }
-
-    .cat-sports {
-      background: rgba(59, 130, 246, 0.15);
-    }
-
-    .cat-festivals {
-      background: rgba(236, 72, 153, 0.15);
-    }
-
-    .cat-church {
-      background: rgba(139, 92, 246, 0.15);
-    }
-
-    .cat-conf {
-      background: rgba(34, 197, 94, 0.15);
-    }
-
-    .cat-nightlife {
-      background: rgba(236, 72, 153, 0.15);
-    }
-
-    .cat-culture {
-      background: rgba(20, 184, 166, 0.15);
-    }
+    /* Hero category color    .cat-concerts { background: var(--color-bg-elevated); }
+    .cat-sports { background: var(--color-bg-elevated); }
+    .cat-festivals { background: var(--color-bg-elevated); }
+    .cat-church { background: var(--color-bg-elevated); }
+    .cat-conf { background: var(--color-bg-elevated); }
+    .cat-nightlife { background: var(--color-bg-elevated); }
+    .cat-culture { background: var(--color-bg-elevated); }
+   }
 
     /* Live badge pulse */
     .live-badge {
@@ -502,21 +482,26 @@
         </div>
         <div class="how-visual">
           <div style="text-align:center;">
-            <div style="font-size:4rem;margin-bottom:var(--space-4);"><iconify-icon icon="hugeicons:ticket-01"
-                style="vertical-align:middle;"></iconify-icon></div>
-            <div
-              style="font-family:var(--font-display);font-size:var(--text-xl);font-weight:700;margin-bottom:var(--space-2);">
-              Your Ticket</div>
-            <div
-              style="background:var(--color-bg);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:var(--space-4);display:inline-block;margin-bottom:var(--space-4);">
-              <div
-                style="width:120px;height:120px;background:linear-gradient(135deg,var(--color-bg-card),var(--color-border));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:3rem;">
-                ▦</div>
-            </div>
-            <div style="font-size:var(--text-sm);color:var(--color-text-muted);">Scan QR at gate</div>
-            <div
-              style="margin-top:var(--space-4);padding:var(--space-3) var(--space-4);background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);border-radius:var(--radius-md);font-size:var(--text-sm);color:var(--color-success);font-weight:600;">
-              ✓ Ticket Verified — Valid Entry
+            <div class="ticket-3d" style="padding:var(--space-8); display:inline-block; position:relative;">
+              <div class="ticket-holo"></div>
+              <div style="position:relative; z-index:2;">
+                <div style="font-size:4rem;margin-bottom:var(--space-4);color:var(--color-secondary);"><iconify-icon icon="hugeicons:ticket-01"
+                    style="vertical-align:middle;"></iconify-icon></div>
+                <div
+                  style="font-family:var(--font-display);font-size:var(--text-xl);font-weight:700;margin-bottom:var(--space-2);color:var(--color-text-primary);">
+                  Your Ticket</div>
+                <div
+                  style="background:rgba(255,255,255,0.05);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:var(--space-4);display:inline-block;margin-bottom:var(--space-4);">
+                  <div
+                    style="width:120px;height:120px;background:linear-gradient(135deg,rgba(0,0,0,0.5),rgba(212,175,55,0.1));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:3rem;color:var(--color-secondary);">
+                    ▦</div>
+                </div>
+                <div style="font-size:var(--text-sm);color:var(--color-text-muted);">Scan QR at gate</div>
+                <div
+                  style="margin-top:var(--space-4);padding:var(--space-3) var(--space-4);background:rgba(var(--color-success-rgb), 0.1);border:1px solid rgba(var(--color-success-rgb), 0.3);border-radius:var(--radius-md);font-size:var(--text-sm);color:var(--color-success);font-weight:600;box-shadow: 0 0 10px rgba(var(--color-success-rgb), 0.2);">
+                  ✓ Ticket Verified — Valid Entry
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -567,7 +552,7 @@
                 Reply with option:
               </div>
               <div class="ussd-phone__input-line">
-                <span style="color:#888;font-size:11px;">&gt;</span>
+                <span style="color: var(--color-text-muted);font-size:11px;">&gt;</span>
                 <span class="ussd-phone__cursor"></span>
               </div>
             </div>
@@ -652,7 +637,7 @@
           </p>
           <div class="payment-methods">
             <div class="payment-method-card">
-              <div class="payment-method-icon" style="background:rgba(255,204,0,0.15);"><iconify-icon
+              <div class="payment-method-icon" style="background:rgba(var(--color-secondary-rgb), 0.15);"><iconify-icon
                   icon="hugeicons:smart-phone-01" style="vertical-align:middle;"></iconify-icon></div>
               <div>
                 <div class="payment-method-name">MTN MoMo</div>
@@ -660,7 +645,7 @@
               </div>
             </div>
             <div class="payment-method-card">
-              <div class="payment-method-icon" style="background:rgba(139, 92, 246,0.15);"><iconify-icon
+              <div class="payment-method-icon" style="background:rgba(var(--color-secondary-rgb), 0.15);"><iconify-icon
                   icon="hugeicons:smart-phone-01" style="vertical-align:middle;"></iconify-icon></div>
               <div>
                 <div class="payment-method-name">Airtel Money</div>
@@ -668,7 +653,7 @@
               </div>
             </div>
             <div class="payment-method-card">
-              <div class="payment-method-icon" style="background:rgba(0,120,212,0.15);"><iconify-icon
+              <div class="payment-method-icon" style="background:rgba(var(--color-secondary-rgb), 0.15);"><iconify-icon
                   icon="hugeicons:smart-phone-01" style="vertical-align:middle;"></iconify-icon></div>
               <div>
                 <div class="payment-method-name">M-Pesa</div>
@@ -676,7 +661,7 @@
               </div>
             </div>
             <div class="payment-method-card">
-              <div class="payment-method-icon" style="background:rgba(34,197,94,0.15);"><iconify-icon
+              <div class="payment-method-icon" style="background:rgba(var(--color-secondary-rgb), 0.15);"><iconify-icon
                   icon="hugeicons:smart-phone-01" style="vertical-align:middle;"></iconify-icon></div>
               <div>
                 <div class="payment-method-name">Vodafone Cash</div>
@@ -684,7 +669,7 @@
               </div>
             </div>
             <div class="payment-method-card">
-              <div class="payment-method-icon" style="background:rgba(59,130,246,0.15);"><iconify-icon
+              <div class="payment-method-icon" style="background:rgba(var(--color-secondary-rgb), 0.15);"><iconify-icon
                   icon="hugeicons:credit-card" style="vertical-align:middle;"></iconify-icon></div>
               <div>
                 <div class="payment-method-name">Visa / Mastercard</div>
@@ -692,7 +677,7 @@
               </div>
             </div>
             <div class="payment-method-card">
-              <div class="payment-method-icon" style="background:rgba(236, 72, 153,0.15);"><iconify-icon
+              <div class="payment-method-icon" style="background:rgba(var(--color-secondary-rgb), 0.15);"><iconify-icon
                   icon="hugeicons:bank" style="vertical-align:middle;"></iconify-icon></div>
               <div>
                 <div class="payment-method-name">Bank Transfer</div>
@@ -880,7 +865,7 @@
       <p style="color:rgba(255,255,255,0.8);font-size:var(--text-lg);max-width:480px;margin:0 auto var(--space-8);">Join
         over 2 million Africans buying tickets on the platform built for our continent.</p>
       <div style="display:flex;gap:var(--space-4);justify-content:center;flex-wrap:wrap;">
-        <a href="events.html" class="btn btn--lg" style="background:white;color:var(--color-primary);font-weight:700;"
+        <a href="events.html" class="btn btn--lg" style="background:white;color: var(--color-bg);font-weight:700;"
           id="final-cta-browse">Browse Events</a>
         <a href="signup.html" class="btn btn--lg"
           style="background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3);"
