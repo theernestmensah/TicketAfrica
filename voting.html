@@ -313,17 +313,18 @@
     </footer>
 
     <!-- Scripts -->
+    <script src="assets/js/env.js"></script>
     <script src="https://unpkg.com/convex@1.8.0/dist/browser.bundle.js"></script>
     <script type="module">
         import { Clerk } from 'https://cdn.jsdelivr.net/npm/@clerk/clerk-js@4/dist/index.mjs';
         
-        window.Clerk = new Clerk('pk_test_Y29yZGlhbC1sb2N1c3QtNzkuY2xlcmsuYWNjb3VudHMuZGV2JA');
+        window.Clerk = new Clerk(window.ENV.CLERK_PUBLISHABLE_KEY);
         
         async function init() {
             await window.Clerk.load();
             
             // Sync with Convex
-            window.ConvexDB = new convex.ConvexClient("https://nimble-puffin-896.convex.cloud");
+            window.ConvexDB = new convex.ConvexClient(window.ENV.CONVEX_URL);
             
             // Load polls
             loadAllPolls();

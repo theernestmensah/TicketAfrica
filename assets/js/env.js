@@ -1,0 +1,1 @@
+window.ENV = { CLERK_PUBLISHABLE_KEY: "pk_test_ZGl2aW5lLWZyb2ctMjUuY2xlcmsuYWNjb3VudHMuZGV2JA", CONVEX_URL: "https://nimble-puffin-896.convex.cloud", PAYSTACK_PUBLIC_KEY: "pk_test_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" };

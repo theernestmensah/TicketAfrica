@@ -1005,7 +1005,7 @@
         </div>
     </div>
 
-    <script src="assets/js/core.js"></script>
+    <script src="assets/js/env.js"></script><script src="assets/js/core.js"></script>
     <script>
         /* =============================================================
            Ticket Africa — Sign Up Page Logic
@@ -1212,8 +1212,15 @@
                 await window.Clerk.load();
             }
         });
+
+        // Inject Clerk script
+        const clerkScript = document.createElement('script');
+        clerkScript.src = 'https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js';
+        clerkScript.setAttribute('data-clerk-publishable-key', window.ENV.CLERK_PUBLISHABLE_KEY);
+        clerkScript.async = true;
+        clerkScript.crossOrigin = 'anonymous';
+        document.body.appendChild(clerkScript);
     </script>
-    <script async crossorigin="anonymous" data-clerk-publishable-key="pk_test_ZGl2aW5lLWZyb2ctMjUuY2xlcmsuYWNjb3VudHMuZGV2JA" src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"></script>
 </body>
 
 </html>

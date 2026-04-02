@@ -670,6 +670,7 @@
     </div>
 
     <div id="footer-root"></div>
+    <script src="assets/js/env.js"></script>
     <script src="assets/js/core.js"></script>
     <script src="assets/js/nav.js"></script>
     <script src="assets/js/layout.js"></script>
@@ -803,7 +804,7 @@
                     else if (selectedMethod === 'bank') paystackChannels = ['bank', 'eft'];
 
                     let handler = PaystackPop.setup({
-                        key: 'pk_test_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', // Use your test/live public key
+                        key: window.ENV.PAYSTACK_PUBLIC_KEY, // Secretly injected key
                         email: email,
                         amount: Math.round(total * 100), // Amount in pesewas
                         currency: 'GHS', // Ghanaian Cedi
