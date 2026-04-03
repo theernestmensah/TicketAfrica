@@ -854,8 +854,8 @@
 
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
-            const alert = document.getElementById('auth-alert');
-            alert.classList.remove('show');
+            const alertEl = document.getElementById('auth-alert');
+            alertEl.classList.remove('show');
 
             let valid = true;
             if (!validateEmail(email)) {
@@ -874,15 +874,36 @@
 
             try {
                 if (window.Clerk) {
-                    await window.Clerk.openSignIn({ forceRedirectUrl: '/account.html' });
+                    // Ensure Clerk is loaded
+                    if (!window.Clerk.client) await window.Clerk.load();
+
+                    // 1. Create a sign-in attempt with email + password
+                    const signInAttempt = await window.Clerk.client.signIn.create({
+                        identifier: email,
+                        password,
+                    });
+
+                    // 2. If complete, set the active session and redirect
+                    if (signInAttempt.status === 'complete') {
+                        await window.Clerk.setActive({ session: signInAttempt.createdSessionId });
+                        window.location.href = 'account.html';
+                    } else {
+                        // Multi-factor or other step required
+                        alertEl.classList.add('show');
+                        document.getElementById('auth-alert-msg').textContent =
+                            'Additional verification required. Please complete the sign-in flow.';
+                        btn.classList.remove('loading');
+                        btn.disabled = false;
+                    }
                 } else {
-                    // Demo fallback
+                    // Clerk not loaded — demo fallback
                     await new Promise(r => setTimeout(r, 1200));
                     window.location.href = 'account.html';
                 }
             } catch (err) {
-                alert.classList.add('show');
-                document.getElementById('auth-alert-msg').textContent = err?.message || 'Invalid email or password.';
+                alertEl.classList.add('show');
+                const msg = err?.errors?.[0]?.message || err?.message || 'Invalid email or password. Please try again.';
+                document.getElementById('auth-alert-msg').textContent = msg;
                 btn.classList.remove('loading');
                 btn.disabled = false;
             }
@@ -943,6 +964,10 @@
         window.addEventListener('load', async () => {
             if (window.Clerk) {
                 await window.Clerk.load();
+                // If already signed in, go straight to account
+                if (window.Clerk.user) {
+                    window.location.replace('account.html');
+                }
             }
         });
 
