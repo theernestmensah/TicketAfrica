@@ -931,7 +931,7 @@
                 </form>
 
                 <p style="text-align:center;font-size:var(--text-xs);color:var(--color-text-muted);">
-                    🔒 Your data is encrypted and never shared with third parties.
+                    <iconify-icon inline icon="ph:lock-fill"></iconify-icon> Your data is encrypted and never shared with third parties.
                 </p>
             </div>
         </div>
@@ -960,21 +960,21 @@
                         </div>
                     </div>
                     <div class="benefit">
-                        <div class="benefit__icon benefit__icon--pink">💰</div>
+                        <div class="benefit__icon benefit__icon--pink"><iconify-icon inline icon="ph:money-fill"></iconify-icon></div>
                         <div>
                             <div class="benefit__title">Local Currency Pricing</div>
                             <div class="benefit__desc">Pay in GH₵, ₦, KSh, ZAR and more. No hidden conversion fees.</div>
                         </div>
                     </div>
                     <div class="benefit">
-                        <div class="benefit__icon benefit__icon--blue">🔔</div>
+                        <div class="benefit__icon benefit__icon--blue"><iconify-icon inline icon="ph:bell-fill"></iconify-icon></div>
                         <div>
                             <div class="benefit__title">Smart Notifications</div>
                             <div class="benefit__desc">Get alerts for events near you, price drops, and early-bird tickets.</div>
                         </div>
                     </div>
                     <div class="benefit">
-                        <div class="benefit__icon benefit__icon--green">🛡️</div>
+                        <div class="benefit__icon benefit__icon--green"><iconify-icon inline icon="ph:shield-check-fill"></iconify-icon></div>
                         <div>
                             <div class="benefit__title">Buyer Guarantee</div>
                             <div class="benefit__desc">Full refund if an event is cancelled. Your purchase is always protected.</div>
@@ -994,7 +994,7 @@
                         "I've booked tickets to 6 events across 3 countries on Ticket Africa. The experience is seamless and I love being able to pay in Ghana cedis!"
                     </div>
                     <div class="visual-testimonial__author">
-                        <div class="visual-testimonial__avatar">✨</div>
+                        <div class="visual-testimonial__avatar"><iconify-icon inline icon="ph:sparkle-fill"></iconify-icon></div>
                         <div>
                             <div class="visual-testimonial__name">Ama Serwaa</div>
                             <div class="visual-testimonial__role">Event Goer · Accra, Ghana</div>
@@ -1057,7 +1057,7 @@
             const score = [hasLen, hasUpper, hasNum, hasSym].filter(Boolean).length;
 
             const levels = ['', 'weak', 'weak', 'medium', 'strong'];
-            const labels = ['', '⚠️ Too weak', '⚠️ Weak', '✓ Good', '✓✓ Strong'];
+            const labels = ['', '<iconify-icon inline icon="ph:warning-fill"></iconify-icon> Too weak', '<iconify-icon inline icon="ph:warning-fill"></iconify-icon> Weak', '<iconify-icon inline icon="ph:check-bold"></iconify-icon> Good', '<iconify-icon inline icon="ph:check-bold"></iconify-icon><iconify-icon inline icon="ph:check-bold"></iconify-icon> Strong'];
             const colors = ['', 'var(--color-error)', 'var(--color-warning)', 'var(--color-warning)', 'var(--color-success)'];
 
             segments.forEach((seg, i) => {
@@ -1153,7 +1153,7 @@
 
             try {
                 if (window.Clerk) {
-                    await window.Clerk.openSignUp({ redirectUrl: '/account.html' });
+                    await window.Clerk.openSignUp({ forceRedirectUrl: '/account.html' });
                 } else {
                     // Demo flow
                     await new Promise(r => setTimeout(r, 1400));

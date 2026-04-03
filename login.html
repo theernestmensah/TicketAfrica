@@ -874,7 +874,7 @@
 
             try {
                 if (window.Clerk) {
-                    await window.Clerk.openSignIn({ redirectUrl: '/account.html' });
+                    await window.Clerk.openSignIn({ forceRedirectUrl: '/account.html' });
                 } else {
                     // Demo fallback
                     await new Promise(r => setTimeout(r, 1200));

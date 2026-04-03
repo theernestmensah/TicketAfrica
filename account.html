@@ -127,9 +127,11 @@
 
         /* Ticket card */
         .ticket-card {
-            background: rgba(var(--color-primary-rgb), 0.85); /* Deep charcoal */
+            background: rgba(var(--color-primary-rgb), 0.85);
+            /* Deep charcoal */
             backdrop-filter: blur(24px);
-            border: 1px solid rgba(212, 175, 55, 0.2); /* Ultra-thin gold border */
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            /* Ultra-thin gold border */
             border-radius: var(--radius-2xl);
             overflow: hidden;
             position: relative;
@@ -376,7 +378,8 @@
             <aside class="account-sidebar">
                 <div class="account-nav">
                     <div class="account-nav__user">
-                        <div class="account-nav__avatar"><iconify-icon icon="ph:user-circle" style="font-size: 1.5em;"></iconify-icon></div>
+                        <div class="account-nav__avatar"><iconify-icon icon="ph:user-circle"
+                                style="font-size: 1.5em;"></iconify-icon></div>
                         <div>
                             <div class="account-nav__name" id="user-display-name">Loading...</div>
                             <div class="account-nav__email" id="user-display-email">...</div>
@@ -453,7 +456,8 @@
                                 <div class="ticket-info-row"><span>Ticket Type</span><span>VIP Section</span></div>
                                 <div class="ticket-info-row"><span>Ticket No.</span><span
                                         style="font-family:var(--font-mono);font-size:11px;">TKA-2026-83921</span></div>
-                                <div class="ticket-info-row"><span>Owner</span><span class="user-display-owner">Ernest Mensah</span></div>
+                                <div class="ticket-info-row"><span>Owner</span><span class="user-display-owner">Ernest
+                                        Mensah</span></div>
                             </div>
                             <div class="ticket-card__qr">
                                 <div class="ticket-qr-box"><iconify-icon icon="ph:qr-code"></iconify-icon></div>
@@ -511,14 +515,16 @@
                     </div>
                     <div class="panel">
                         <div class="order-row">
-                            <div class="order-row__img"><iconify-icon icon="hugeicons:music-note-01"></iconify-icon></div>
+                            <div class="order-row__img"><iconify-icon icon="hugeicons:music-note-01"></iconify-icon>
+                            </div>
                             <div style="flex:1;min-width:0;">
                                 <div class="order-row__name">Afrobeats Night: Grand Finale (VIP × 2)</div>
                                 <div class="order-row__meta">15 Mar 2026 · Mobile Money · Ref: TKA-2026-83921</div>
                             </div>
                             <div style="text-align:right;">
                                 <div class="order-row__amount">GH₵ 736</div>
-                                <div style="font-size:var(--text-xs);color:var(--color-success);font-weight:700;"><iconify-icon inline icon="ph:check-bold"></iconify-icon> Confirmed</div>
+                                <div style="font-size:var(--text-xs);color:var(--color-success);font-weight:700;">
+                                    <iconify-icon inline icon="ph:check-bold"></iconify-icon> Confirmed</div>
                             </div>
                         </div>
                         <div class="order-row">
@@ -529,17 +535,21 @@
                             </div>
                             <div style="text-align:right;">
                                 <div class="order-row__amount">R 92</div>
-                                <div style="font-size:var(--text-xs);color:var(--color-success);font-weight:700;"><iconify-icon inline icon="ph:check-bold"></iconify-icon> Confirmed</div>
+                                <div style="font-size:var(--text-xs);color:var(--color-success);font-weight:700;">
+                                    <iconify-icon inline icon="ph:check-bold"></iconify-icon> Confirmed</div>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Transfer modal trigger area -->
-                <div style="padding:var(--space-8); background:var(--color-bg-card); border:1px solid var(--color-border); border-radius:var(--radius-xl); margin-bottom:var(--space-8); box-shadow: var(--shadow-sm);" id="transfer-section">
+                <div style="padding:var(--space-8); background:var(--color-bg-card); border:1px solid var(--color-border); border-radius:var(--radius-xl); margin-bottom:var(--space-8); box-shadow: var(--shadow-sm);"
+                    id="transfer-section">
                     <h3 style="margin-bottom:var(--space-4); color: var(--color-text-primary);">Transfer a Ticket</h3>
-                    <p style="font-size:var(--text-sm); color:var(--color-text-secondary); margin-bottom:var(--space-6); line-height:1.7;">
-                        Transfer a ticket to another person by entering their phone number or email. The original QR code will be invalidated and a new one issued to the recipient.</p>
+                    <p
+                        style="font-size:var(--text-sm); color:var(--color-text-secondary); margin-bottom:var(--space-6); line-height:1.7;">
+                        Transfer a ticket to another person by entering their phone number or email. The original QR
+                        code will be invalidated and a new one issued to the recipient.</p>
                     <div style="display:flex;flex-direction:column;gap:var(--space-4);">
                         <div class="form-group">
                             <label class="form-label" for="transfer-ticket-select">Select Ticket to Transfer</label>
@@ -551,7 +561,8 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="transfer-recipient">Recipient Phone or Email</label>
-                            <input type="text" class="form-control" id="transfer-recipient" placeholder="0244 000 000 or recipient@email.com" />
+                            <input type="text" class="form-control" id="transfer-recipient"
+                                placeholder="0244 000 000 or recipient@email.com" />
                         </div>
                         <button class="btn btn--primary" id="submit-transfer-btn" style="max-width:240px;">
                             <iconify-icon icon="hugeicons:sent" style="margin-right:8px;"></iconify-icon> Send Transfer
@@ -565,16 +576,20 @@
                     </div>
                     <div class="panel" style="padding:var(--space-6);">
                         <div style="display:flex;align-items:center;gap:var(--space-5);margin-bottom:var(--space-8);">
-                            <div style="width:80px;height:80px;border-radius:50%;background:var(--color-primary);color:var(--color-text-primary);border:2px solid var(--color-secondary);font-size:32px;display:flex;align-items:center;justify-content:center;">
+                            <div
+                                style="width:80px;height:80px;border-radius:50%;background:var(--color-primary);color:var(--color-text-primary);border:2px solid var(--color-secondary);font-size:32px;display:flex;align-items:center;justify-content:center;">
                                 <iconify-icon icon="ph:user-circle"></iconify-icon>
                             </div>
                             <div>
-                                <button class="btn btn--secondary btn--sm" style="margin-bottom:var(--space-2);">Change Avatar</button>
-                                <div style="font-size:var(--text-xs);color:var(--color-text-muted);">JPG or PNG, max 2MB.</div>
+                                <button class="btn btn--secondary btn--sm" style="margin-bottom:var(--space-2);">Change
+                                    Avatar</button>
+                                <div style="font-size:var(--text-xs);color:var(--color-text-muted);">JPG or PNG, max
+                                    2MB.</div>
                             </div>
                         </div>
 
-                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-5);margin-bottom:var(--space-5);">
+                        <div
+                            style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-5);margin-bottom:var(--space-5);">
                             <div class="form-group">
                                 <label class="form-label">First Name</label>
                                 <input type="text" class="form-control" id="profile-first-name" />
@@ -593,9 +608,11 @@
                             <label class="form-label">Phone Number</label>
                             <input type="tel" class="form-control" value="+233 244 000 000" />
                         </div>
-                        
-                        <div style="border-top:1px solid var(--color-border);padding-top:var(--space-5);display:flex;justify-content:flex-end;">
-                            <button class="btn btn--primary" id="btn-save-profile" onclick="TA.toast('Profile updated successfully', 'success')">Save Changes</button>
+
+                        <div
+                            style="border-top:1px solid var(--color-border);padding-top:var(--space-5);display:flex;justify-content:flex-end;">
+                            <button class="btn btn--primary" id="btn-save-profile"
+                                onclick="TA.toast('Profile updated successfully', 'success')">Save Changes</button>
                         </div>
                     </div>
                 </div>
@@ -607,34 +624,45 @@
                     </div>
                     <div class="panel" style="padding:var(--space-6);">
                         <div style="display:flex;flex-direction:column;gap:var(--space-5);">
-                            
-                            <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--color-border);padding-bottom:var(--space-4);">
+
+                            <div
+                                style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--color-border);padding-bottom:var(--space-4);">
                                 <div>
-                                    <div style="font-weight:700;color:var(--color-text-primary);margin-bottom:4px;">SMS Ticket Delivery</div>
-                                    <div style="font-size:var(--text-sm);color:var(--color-text-secondary);">Receive a backup link to your tickets via SMS.</div>
+                                    <div style="font-weight:700;color:var(--color-text-primary);margin-bottom:4px;">SMS
+                                        Ticket Delivery</div>
+                                    <div style="font-size:var(--text-sm);color:var(--color-text-secondary);">Receive a
+                                        backup link to your tickets via SMS.</div>
                                 </div>
                                 <label style="display:flex;align-items:center;cursor:pointer;">
-                                    <input type="checkbox" checked style="width:20px;height:20px;accent-color:var(--color-secondary);" />
+                                    <input type="checkbox" checked
+                                        style="width:20px;height:20px;accent-color:var(--color-secondary);" />
                                 </label>
                             </div>
-                            
-                            <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--color-border);padding-bottom:var(--space-4);">
+
+                            <div
+                                style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--color-border);padding-bottom:var(--space-4);">
                                 <div>
-                                    <div style="font-weight:700;color:var(--color-text-primary);margin-bottom:4px;">Upcoming Event Reminders</div>
-                                    <div style="font-size:var(--text-sm);color:var(--color-text-secondary);">Get notified 24 hours before your events start.</div>
+                                    <div style="font-weight:700;color:var(--color-text-primary);margin-bottom:4px;">
+                                        Upcoming Event Reminders</div>
+                                    <div style="font-size:var(--text-sm);color:var(--color-text-secondary);">Get
+                                        notified 24 hours before your events start.</div>
                                 </div>
                                 <label style="display:flex;align-items:center;cursor:pointer;">
-                                    <input type="checkbox" checked style="width:20px;height:20px;accent-color:var(--color-secondary);" />
+                                    <input type="checkbox" checked
+                                        style="width:20px;height:20px;accent-color:var(--color-secondary);" />
                                 </label>
                             </div>
-                            
+
                             <div style="display:flex;justify-content:space-between;align-items:center;">
                                 <div>
-                                    <div style="font-weight:700;color:var(--color-text-primary);margin-bottom:4px;">Promotional Emails</div>
-                                    <div style="font-size:var(--text-sm);color:var(--color-text-secondary);">Receive updates about new events tailored to your interests.</div>
+                                    <div style="font-weight:700;color:var(--color-text-primary);margin-bottom:4px;">
+                                        Promotional Emails</div>
+                                    <div style="font-size:var(--text-sm);color:var(--color-text-secondary);">Receive
+                                        updates about new events tailored to your interests.</div>
                                 </div>
                                 <label style="display:flex;align-items:center;cursor:pointer;">
-                                    <input type="checkbox" style="width:20px;height:20px;accent-color:var(--color-secondary);" />
+                                    <input type="checkbox"
+                                        style="width:20px;height:20px;accent-color:var(--color-secondary);" />
                                 </label>
                             </div>
 
@@ -648,8 +676,10 @@
                         <h2 class="page-section__title">Help & Support</h2>
                     </div>
                     <div class="panel" style="padding:var(--space-6);">
-                        <p style="color:var(--color-text-secondary);margin-bottom:var(--space-6);line-height:1.6;">Experiencing an issue with your ticket? Reach out to our 24/7 dedicated support team. Please select the event you need help with to speed up the process.</p>
-                        
+                        <p style="color:var(--color-text-secondary);margin-bottom:var(--space-6);line-height:1.6;">
+                            Experiencing an issue with your ticket? Reach out to our 24/7 dedicated support team. Please
+                            select the event you need help with to speed up the process.</p>
+
                         <div class="form-group">
                             <label class="form-label">Related Event (Optional)</label>
                             <select class="form-control">
@@ -667,7 +697,9 @@
                             <textarea class="form-control" rows="5" placeholder="Describe your issue..."></textarea>
                         </div>
                         <div style="display:flex;justify-content:flex-end;">
-                            <button class="btn btn--primary" onclick="TA.toast('Support ticket submitted successfully.', 'success')">Submit Request</button>
+                            <button class="btn btn--primary"
+                                onclick="TA.toast('Support ticket submitted successfully.', 'success')">Submit
+                                Request</button>
                         </div>
                     </div>
                 </div>
@@ -690,24 +722,24 @@
                     // Set active link visually
                     document.querySelectorAll('.account-nav__link').forEach(l => l.classList.remove('active'));
                     this.classList.add('active');
-                    
+
                     // Route to target section
                     const targetId = this.getAttribute('href').replace('#', '');
-                    if(!targetId) return;
+                    if (!targetId) return;
 
                     // Determine if we show a specific subpage, or the main wallet roll
                     const isSubpage = ['profile', 'notifications', 'support'].includes(targetId);
-                    
-                    if(isSubpage) {
+
+                    if (isSubpage) {
                         e.preventDefault();
                         // Hide main wallet widgets
                         document.getElementById('wallet').style.display = 'none';
                         document.getElementById('history').style.display = 'none';
                         document.getElementById('transfer-section').style.display = 'none';
-                        
+
                         // Hide all subpages
                         document.querySelectorAll('.subpage-section').forEach(s => s.style.display = 'none');
-                        
+
                         // Show target
                         document.getElementById(targetId).style.display = 'block';
                     } else {
@@ -724,7 +756,7 @@
             // Download ticket
             document.querySelectorAll('[id^="download-ticket"]').forEach(function (btn) {
                 btn.addEventListener('click', function () {
-                    if(window.TA) TA.toast('Preparing PDF ticket for download…', 'success');
+                    if (window.TA) TA.toast('Preparing PDF ticket for download…', 'success');
                 });
             });
 
@@ -732,13 +764,13 @@
             document.getElementById('submit-transfer-btn').addEventListener('click', function () {
                 const ticket = document.getElementById('transfer-ticket-select').value;
                 const recipient = document.getElementById('transfer-recipient').value.trim();
-                if (!ticket) { if(window.TA) TA.toast('Please select a ticket to transfer', 'warning'); return; }
-                if (!recipient) { if(window.TA) TA.toast('Please enter the recipient phone or email', 'warning'); return; }
+                if (!ticket) { if (window.TA) TA.toast('Please select a ticket to transfer', 'warning'); return; }
+                if (!recipient) { if (window.TA) TA.toast('Please enter the recipient phone or email', 'warning'); return; }
                 this.disabled = true;
                 const oldContent = this.innerHTML;
                 this.textContent = 'Sending…';
                 setTimeout(() => {
-                    if(window.TA) TA.toast('Ticket transferred — recipient will receive their QR via SMS and email', 'success');
+                    if (window.TA) TA.toast('Ticket transferred — recipient will receive their QR via SMS and email', 'success');
                     this.disabled = false;
                     this.innerHTML = oldContent;
                     document.getElementById('transfer-recipient').value = '';
@@ -748,7 +780,7 @@
 
             // Support/Other
             document.getElementById('download-history-btn').addEventListener('click', function () {
-                if(window.TA) TA.toast('Exporting purchase history as CSV…', 'success');
+                if (window.TA) TA.toast('Exporting purchase history as CSV…', 'success');
             });
 
             // Clerk dynamic population logic
@@ -768,11 +800,11 @@
                         document.querySelectorAll('.user-display-owner').forEach(el => el.textContent = name);
 
                         const pFirst = document.getElementById('profile-first-name');
-                        if(pFirst) pFirst.value = firstName;
+                        if (pFirst) pFirst.value = firstName;
                         const pLast = document.getElementById('profile-last-name');
-                        if(pLast) pLast.value = lastName;
+                        if (pLast) pLast.value = lastName;
                         const pEmail = document.getElementById('profile-email');
-                        if(pEmail) pEmail.value = email;
+                        if (pEmail) pEmail.value = email;
                     } else {
                         // User not logged in, redirect to login
                         window.location.href = 'login.html';

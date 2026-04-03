@@ -174,13 +174,13 @@
             <!-- Trust signals -->
             <div class="trust-list">
                 <div class="trust-item">
-                    <div class="trust-item__icon">🔐</div>
+                    <div class="trust-item__icon"><iconify-icon inline icon="ph:lock-key-fill"></iconify-icon></div>
                     <div class="trust-item__title">Dynamic QR Codes</div>
                     <div class="trust-item__desc">Each ticket's QR code is unique and encrypted. Duplication or
                         screenshot scanning is detected and rejected at the gate.</div>
                 </div>
                 <div class="trust-item">
-                    <div class="trust-item__icon">⚡</div>
+                    <div class="trust-item__icon"><iconify-icon inline icon="ph:lightning-fill"></iconify-icon></div>
                     <div class="trust-item__title">Real-Time Validation</div>
                     <div class="trust-item__desc">Ticket status is checked against our live server every time it is
                         scanned. Used tickets are immediately flagged.</div>
@@ -209,7 +209,7 @@
             <div class="result-icon-large result-icon-large--valid">
               <iconify-icon icon="hugeicons:tick-01" style="width:40px;height:40px;"></iconify-icon>
             </div>
-            <h2 style="color:#22C55E;margin-bottom:8px;">✓ Authentic Ticket</h2>
+            <h2 style="color:#22C55E;margin-bottom:8px;"><iconify-icon inline icon="ph:check-bold"></iconify-icon> Authentic Ticket</h2>
             <p style="color:var(--color-text-muted);font-size:var(--text-sm);">This ticket is valid and was issued by Ticket Africa</p>
             <div class="ticket-detail-grid">
               <div class="ticket-detail-item"><div class="ticket-detail-item__label">Reference</div><div class="ticket-detail-item__value" style="font-family:var(--font-mono);">${ref.toUpperCase()}</div></div>
@@ -224,7 +224,7 @@
             <div class="result-icon-large result-icon-large--invalid">
               <iconify-icon icon="hugeicons:cancel-01" style="width:40px;height:40px;"></iconify-icon>
             </div>
-            <h2 style="color:#EF4444;margin-bottom:8px;">✗ Ticket Not Found</h2>
+            <h2 style="color:#EF4444;margin-bottom:8px;"><iconify-icon inline icon="ph:x-bold"></iconify-icon> Ticket Not Found</h2>
             <p style="color:var(--color-text-muted);font-size:var(--text-sm);max-width:360px;margin:0 auto;line-height:1.7;">No ticket matching <strong style="font-family:var(--font-mono);">${ref}</strong> was found in our system. This ticket may be counterfeit, or the reference may be misspelled.</p>
             <div style="margin-top:var(--space-6);padding:var(--space-4);background:rgba(239,68,68,0.06);border-radius:var(--radius-lg);text-align:left;">
               <p style="font-size:var(--text-sm);font-weight:600;color:#EF4444;margin-bottom:8px;">What to do:</p>
