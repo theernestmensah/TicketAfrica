@@ -127,6 +127,34 @@
     --z-toast: 3000;
 }
 
+[data-theme="light"] {
+    --color-primary: #F4F5F7;          /* Premium off-white */
+    --color-primary-dark: #E2E4E9;
+    --color-primary-light: #FFFFFF;
+    --color-primary-rgb: 244, 245, 247;
+
+    --color-bg: #F8F9FA;               /* Light Base */
+    --color-bg-elevated: #FFFFFF;      /* Clean White */
+    --color-bg-card: #FFFFFF;
+    --color-bg-input: rgba(0, 0, 0, 0.03);
+    
+    /* Stronger border in light mode */
+    --color-border: rgba(212, 175, 55, 0.3);
+    --color-border-light: rgba(212, 175, 55, 0.15);
+
+    /* Text Scale Inverted */
+    --color-text-primary: #191919;
+    --color-text-secondary: rgba(25, 25, 25, 0.75);
+    --color-text-muted: rgba(25, 25, 25, 0.5);
+    --color-text-inverse: #FFFFFF;
+    
+    /* Slightly adjusted shadows for light mode */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05), 0 0 1px 1px rgba(212, 175, 55, 0.2) inset;
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04), 0 0 1px 1px rgba(212, 175, 55, 0.3) inset;
+}
+
 /* ─── CSS Reset ──────────────────────────────────────────── */
 *,
 *::before,
@@ -207,6 +235,10 @@ ol {
 
 .section--sm {
     padding: var(--space-12) 0;
+}
+
+.bg-elevated {
+    background-color: var(--color-bg-elevated);
 }
 
 /* ─── Typography ─────────────────────────────────────────── */

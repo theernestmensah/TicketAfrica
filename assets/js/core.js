@@ -177,6 +177,35 @@
         return d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
     };
 
+    /* ── Theme Toggle ───────────────────────────────────── */
+    TA.initTheme = function () {
+        const savedTheme = localStorage.getItem('ta-theme');
+        const systemPrefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+        const theme = savedTheme || (systemPrefersLight ? 'light' : 'dark');
+        document.documentElement.setAttribute('data-theme', theme);
+        TA.updateThemeUI(theme);
+    };
+
+    TA.toggleTheme = function () {
+        const current = document.documentElement.getAttribute('data-theme') || 'dark';
+        const next = current === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('ta-theme', next);
+        TA.updateThemeUI(next);
+    };
+
+    TA.updateThemeUI = function (theme) {
+        document.querySelectorAll('.theme-toggle-icon').forEach(icon => {
+            if (theme === 'light') {
+                icon.setAttribute('icon', 'ph:moon-bold');
+            } else {
+                icon.setAttribute('icon', 'ph:sun-bold');
+            }
+        });
+    };
+
+    TA.initTheme();
+
     /* ── Init ───────────────────────────────────────────── */
     document.addEventListener('DOMContentLoaded', function () {
         TA.initTabs();
