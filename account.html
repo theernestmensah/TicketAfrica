@@ -433,77 +433,23 @@
                         <a href="events.html" class="btn btn--primary btn--sm" id="browse-more-btn">+ Browse Events</a>
                     </div>
 
-                    <div class="wallet-grid">
-                        <!-- Upcoming ticket -->
-                        <div class="ticket-card ticket-card--upcoming" id="ticket-card-1">
-                            <div class="ticket-holo"></div>
-                            <div class="ticket-card__top">
-                                <div class="ticket-card__status-badge"><span
-                                        class="badge badge--success">Upcoming</span></div>
-                                <div class="ticket-card__event-name">Afrobeats Night: Grand Finale</div>
-                                <div class="ticket-card__venue">Accra Sports Stadium, Accra</div>
-                            </div>
-                            <div class="ticket-card__divider">
-                                <div class="ticket-card__divider-dots">
-                                    <div class="ticket-card__divider-dot"></div>
-                                    <div class="ticket-card__divider-dot"></div>
-                                    <div class="ticket-card__divider-dot"></div>
-                                </div>
-                            </div>
-                            <div class="ticket-card__bottom">
-                                <div class="ticket-info-row"><span>Date</span><span>Sat, 15 Mar 2026 · 8:00 PM</span>
-                                </div>
-                                <div class="ticket-info-row"><span>Ticket Type</span><span>VIP Section</span></div>
-                                <div class="ticket-info-row"><span>Ticket No.</span><span
-                                        style="font-family:var(--font-mono);font-size:11px;">TKA-2026-83921</span></div>
-                                <div class="ticket-info-row"><span>Owner</span><span class="user-display-owner">Ernest
-                                        Mensah</span></div>
-                            </div>
-                            <div class="ticket-card__qr">
-                                <div class="ticket-qr-box"><iconify-icon icon="ph:qr-code"></iconify-icon></div>
-                            </div>
-                            <div class="ticket-card__actions">
-                                <button class="btn btn--primary btn--sm" style="flex:1;" id="download-ticket-1">Download
-                                    PDF</button>
-                                <button class="btn btn--secondary btn--sm" id="transfer-ticket-1">Transfer</button>
-                                <button class="btn btn--ghost btn--sm" id="resell-ticket-1">Resell</button>
-                            </div>
-                        </div>
+                    <div class="wallet-grid" id="wallet-grid">
+                        <!-- Tickets will be populated dynamically from Convex/Clerk -->
+                    </div>
 
-                        <!-- Another upcoming -->
-                        <div class="ticket-card ticket-card--upcoming" id="ticket-card-2">
-                            <div class="ticket-holo"></div>
-                            <div class="ticket-card__top">
-                                <div class="ticket-card__status-badge"><span class="badge badge--info">Upcoming</span>
-                                </div>
-                                <div class="ticket-card__event-name">CAF Champions League Q-Final</div>
-                                <div class="ticket-card__venue">FNB Stadium, Johannesburg</div>
-                            </div>
-                            <div class="ticket-card__divider">
-                                <div class="ticket-card__divider-dots">
-                                    <div class="ticket-card__divider-dot"></div>
-                                    <div class="ticket-card__divider-dot"></div>
-                                    <div class="ticket-card__divider-dot"></div>
-                                </div>
-                            </div>
-                            <div class="ticket-card__bottom">
-                                <div class="ticket-info-row"><span>Date</span><span>Wed, 19 Mar 2026 · 7:00 PM</span>
-                                </div>
-                                <div class="ticket-info-row"><span>Ticket Type</span><span>West Stand Lower</span></div>
-                                <div class="ticket-info-row"><span>Ticket No.</span><span
-                                        style="font-family:var(--font-mono);font-size:11px;">TKA-2026-94122</span></div>
-                                <div class="ticket-info-row"><span>Seat</span><span>Block C, Row 12, Seat 7</span></div>
-                            </div>
-                            <div class="ticket-card__qr">
-                                <div class="ticket-qr-box"><iconify-icon icon="ph:qr-code"></iconify-icon></div>
-                            </div>
-                            <div class="ticket-card__actions">
-                                <button class="btn btn--primary btn--sm" style="flex:1;" id="download-ticket-2">Download
-                                    PDF</button>
-                                <button class="btn btn--secondary btn--sm" id="transfer-ticket-2">Transfer</button>
-                                <button class="btn btn--ghost btn--sm" id="resell-ticket-2">Resell</button>
-                            </div>
+                    <!-- Empty state: shown when no tickets -->
+                    <div id="wallet-empty" style="text-align:center; padding: var(--space-16) var(--space-8); border: 1px dashed var(--color-border); border-radius: var(--radius-xl); background: var(--color-bg-card);">
+                        <div style="font-size: 4rem; margin-bottom: var(--space-4); opacity: 0.3;">
+                            <iconify-icon icon="ph:ticket-bold"></iconify-icon>
                         </div>
+                        <h3 style="font-family: var(--font-display); font-weight: 700; margin-bottom: var(--space-2); color: var(--color-text-primary);">No tickets yet</h3>
+                        <p style="color: var(--color-text-muted); font-size: var(--text-sm); margin-bottom: var(--space-6); max-width: 320px; margin-left: auto; margin-right: auto;">
+                            Your purchased tickets will appear here. Start exploring events across Africa.
+                        </p>
+                        <a href="events.html" class="btn btn--primary" id="empty-browse-btn">
+                            <iconify-icon icon="ph:magnifying-glass-bold" style="margin-right: 8px;"></iconify-icon>
+                            Browse Events
+                        </a>
                     </div>
                 </div>
 
@@ -513,36 +459,18 @@
                         <h2 class="page-section__title">Purchase History</h2>
                         <button class="btn btn--secondary btn--sm" id="download-history-btn">Export CSV</button>
                     </div>
-                    <div class="panel">
-                        <div class="order-row">
-                            <div class="order-row__img"><iconify-icon icon="hugeicons:music-note-01"></iconify-icon>
+                    <div class="panel" id="history-panel">
+                        <!-- Empty state -->
+                        <div id="history-empty" style="padding: var(--space-10); text-align: center;">
+                            <div style="font-size: 2.5rem; opacity: 0.25; margin-bottom: var(--space-3);">
+                                <iconify-icon icon="ph:receipt-bold"></iconify-icon>
                             </div>
-                            <div style="flex:1;min-width:0;">
-                                <div class="order-row__name">Afrobeats Night: Grand Finale (VIP × 2)</div>
-                                <div class="order-row__meta">15 Mar 2026 · Mobile Money · Ref: TKA-2026-83921</div>
-                            </div>
-                            <div style="text-align:right;">
-                                <div class="order-row__amount">GH₵ 736</div>
-                                <div style="font-size:var(--text-xs);color:var(--color-success);font-weight:700;">
-                                    <iconify-icon inline icon="ph:check-bold"></iconify-icon> Confirmed</div>
-                            </div>
-                        </div>
-                        <div class="order-row">
-                            <div class="order-row__img"><iconify-icon icon="hugeicons:football"></iconify-icon></div>
-                            <div style="flex:1;min-width:0;">
-                                <div class="order-row__name">CAF Champions League Q-Final (× 1)</div>
-                                <div class="order-row__meta">19 Mar 2026 · Visa card · Ref: TKA-2026-94122</div>
-                            </div>
-                            <div style="text-align:right;">
-                                <div class="order-row__amount">R 92</div>
-                                <div style="font-size:var(--text-xs);color:var(--color-success);font-weight:700;">
-                                    <iconify-icon inline icon="ph:check-bold"></iconify-icon> Confirmed</div>
-                            </div>
+                            <p style="color: var(--color-text-muted); font-size: var(--text-sm);">No purchase history yet. Orders will appear here after your first ticket purchase.</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Transfer modal trigger area -->
+                <!-- Transfer Section -->
                 <div style="padding:var(--space-8); background:var(--color-bg-card); border:1px solid var(--color-border); border-radius:var(--radius-xl); margin-bottom:var(--space-8); box-shadow: var(--shadow-sm);"
                     id="transfer-section">
                     <h3 style="margin-bottom:var(--space-4); color: var(--color-text-primary);">Transfer a Ticket</h3>
@@ -554,9 +482,7 @@
                         <div class="form-group">
                             <label class="form-label" for="transfer-ticket-select">Select Ticket to Transfer</label>
                             <select class="form-control" id="transfer-ticket-select">
-                                <option value="">Choose a ticket…</option>
-                                <option value="1">Afrobeats Night — VIP Section (TKA-2026-83921)</option>
-                                <option value="2">CAF Champions League — West Stand (TKA-2026-94122)</option>
+                                <option value="">No tickets available to transfer</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -606,7 +532,7 @@
                         </div>
                         <div class="form-group" style="margin-bottom:var(--space-6);">
                             <label class="form-label">Phone Number</label>
-                            <input type="tel" class="form-control" value="+233 244 000 000" />
+                            <input type="tel" class="form-control" id="profile-phone" placeholder="e.g. +233 244 000 000" />
                         </div>
 
                         <div
@@ -682,10 +608,9 @@
 
                         <div class="form-group">
                             <label class="form-label">Related Event (Optional)</label>
-                            <select class="form-control">
-                                <option value="">None</option>
-                                <option value="1">Afrobeats Night: Grand Finale</option>
-                                <option value="2">CAF Champions League Q-Final</option>
+                            <select class="form-control" id="support-event-select">
+                                <option value="">None — General enquiry</option>
+                                <!-- Populated dynamically when tickets are loaded -->
                             </select>
                         </div>
                         <div class="form-group">
@@ -753,18 +678,11 @@
                 });
             });
 
-            // Download ticket
-            document.querySelectorAll('[id^="download-ticket"]').forEach(function (btn) {
-                btn.addEventListener('click', function () {
-                    if (window.TA) TA.toast('Preparing PDF ticket for download…', 'success');
-                });
-            });
-
             // Transfer
             document.getElementById('submit-transfer-btn').addEventListener('click', function () {
                 const ticket = document.getElementById('transfer-ticket-select').value;
                 const recipient = document.getElementById('transfer-recipient').value.trim();
-                if (!ticket) { if (window.TA) TA.toast('Please select a ticket to transfer', 'warning'); return; }
+                if (!ticket) { if (window.TA) TA.toast('You have no tickets available to transfer yet.', 'warning'); return; }
                 if (!recipient) { if (window.TA) TA.toast('Please enter the recipient phone or email', 'warning'); return; }
                 this.disabled = true;
                 const oldContent = this.innerHTML;
@@ -778,9 +696,9 @@
                 }, 2000);
             });
 
-            // Support/Other
+            // Export CSV
             document.getElementById('download-history-btn').addEventListener('click', function () {
-                if (window.TA) TA.toast('Exporting purchase history as CSV…', 'success');
+                if (window.TA) TA.toast('No purchase history to export yet.', 'info');
             });
 
             // Clerk dynamic population logic

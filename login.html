@@ -960,23 +960,28 @@
             }
         });
 
-        // ── Auth Init ─────────────────────────────────────────
-        window.addEventListener('load', async () => {
-            if (window.Clerk) {
-                await window.Clerk.load();
-                // If already signed in, go straight to account
-                if (window.Clerk.user) {
-                    window.location.replace('account.html');
-                }
-            }
-        });
-
-        // Inject Clerk script
+        // Inject Clerk & initialize
         const clerkScript = document.createElement('script');
         clerkScript.src = 'https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js';
         clerkScript.setAttribute('data-clerk-publishable-key', window.ENV.CLERK_PUBLISHABLE_KEY);
         clerkScript.async = true;
         clerkScript.crossOrigin = 'anonymous';
+        clerkScript.onload = async function () {
+            try {
+                await window.Clerk.load();
+                // Already signed in — send straight to dashboard
+                if (window.Clerk.user) {
+                    window.location.replace('account.html');
+                    return;
+                }
+                // Listen for sign-in completion (e.g. after setActive)
+                window.Clerk.addListener(({ user }) => {
+                    if (user) window.location.replace('account.html');
+                });
+            } catch (e) {
+                console.warn('Clerk init error:', e);
+            }
+        };
         document.body.appendChild(clerkScript);
     </script>
 </body>

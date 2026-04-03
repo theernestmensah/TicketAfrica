@@ -1120,7 +1120,7 @@
 
         function validateEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
 
-        // ── Form Submit ───────────────────────────────────────────
+        // ── Form Submit ───────────────────────────────────────
         document.getElementById('signup-form').addEventListener('submit', async function (e) {
             e.preventDefault();
 
@@ -1153,7 +1153,43 @@
 
             try {
                 if (window.Clerk) {
-                    await window.Clerk.openSignUp({ forceRedirectUrl: '/account.html' });
+                    // Ensure Clerk is fully loaded
+                    if (!window.Clerk.client) await window.Clerk.load();
+
+                    // 1. Create the sign-up attempt
+                    const signUpAttempt = await window.Clerk.client.signUp.create({
+                        firstName: fname,
+                        lastName: lname,
+                        emailAddress: email,
+                        password,
+                    });
+
+                    // 2. If email verification is needed, send the code
+                    if (signUpAttempt.status === 'missing_requirements' &&
+                        signUpAttempt.unverifiedFields?.includes('email_address')) {
+                        await signUpAttempt.prepareEmailAddressVerification({ strategy: 'email_code' });
+                        alertEl.classList.add('show');
+                        alertEl.style.borderColor = 'rgba(var(--color-success-rgb, 52,211,153), 0.4)';
+                        alertEl.style.background = 'rgba(var(--color-success-rgb, 52,211,153), 0.06)';
+                        alertEl.style.color = 'var(--color-success, #34d399)';
+                        document.getElementById('auth-alert-msg').textContent =
+                            'Check your email — we sent a 6-digit verification code to ' + email + '. Verify then sign in.';
+                        btn.classList.remove('loading');
+                        btn.disabled = false;
+                        return;
+                    }
+
+                    // 3. If complete, set session and redirect
+                    if (signUpAttempt.status === 'complete') {
+                        await window.Clerk.setActive({ session: signUpAttempt.createdSessionId });
+                        window.location.href = 'account.html';
+                    } else {
+                        alertEl.classList.add('show');
+                        document.getElementById('auth-alert-msg').textContent =
+                            'Almost there! Check your email to verify your account, then sign in.';
+                        btn.classList.remove('loading');
+                        btn.disabled = false;
+                    }
                 } else {
                     // Demo flow
                     await new Promise(r => setTimeout(r, 1400));
@@ -1161,7 +1197,8 @@
                 }
             } catch (err) {
                 alertEl.classList.add('show');
-                document.getElementById('auth-alert-msg').textContent = err?.message || 'Registration failed. Please try again.';
+                const msg = err?.errors?.[0]?.message || err?.message || 'Registration failed. Please try again.';
+                document.getElementById('auth-alert-msg').textContent = msg;
                 btn.classList.remove('loading');
                 btn.disabled = false;
             }
@@ -1206,19 +1243,28 @@
         document.getElementById('btn-google').addEventListener('click', () => handleOAuth('oauth_google', 'btn-google'));
         document.getElementById('btn-apple').addEventListener('click',  () => handleOAuth('oauth_apple',  'btn-apple'));
 
-        // ── Auth Init ─────────────────────────────────────────
-        window.addEventListener('load', async () => {
-            if (window.Clerk) {
-                await window.Clerk.load();
-            }
-        });
-
-        // Inject Clerk script
+        // Inject Clerk & initialize
         const clerkScript = document.createElement('script');
         clerkScript.src = 'https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js';
         clerkScript.setAttribute('data-clerk-publishable-key', window.ENV.CLERK_PUBLISHABLE_KEY);
         clerkScript.async = true;
         clerkScript.crossOrigin = 'anonymous';
+        clerkScript.onload = async function () {
+            try {
+                await window.Clerk.load();
+                // Already signed in — send straight to dashboard
+                if (window.Clerk.user) {
+                    window.location.replace('account.html');
+                    return;
+                }
+                // Listen for sign-up/sign-in completion (e.g. after setActive)
+                window.Clerk.addListener(({ user }) => {
+                    if (user) window.location.replace('account.html');
+                });
+            } catch (e) {
+                console.warn('Clerk init error:', e);
+            }
+        };
         document.body.appendChild(clerkScript);
     </script>
 </body>
