@@ -6,6 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>My Account & Ticket Wallet — Ticket Africa</title>
     <script type="module" src="/assets/js/db.js"></script>
+    <script src="assets/js/env.js"></script>
+    <script>
+        const clerkScript = document.createElement("script");
+        clerkScript.setAttribute("data-clerk-publishable-key", window.ENV.CLERK_PUBLISHABLE_KEY);
+        clerkScript.async = true;
+        clerkScript.src = "https://cdn.jsdelivr.net/npm/@clerk/clerk-js@4/dist/clerk.browser.js";
+        document.head.appendChild(clerkScript);
+    </script>
     <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
     <link rel="stylesheet" href="assets/css/core.css" />
     <link rel="stylesheet" href="assets/css/nav-footer.css" />
@@ -368,10 +376,10 @@
             <aside class="account-sidebar">
                 <div class="account-nav">
                     <div class="account-nav__user">
-                        <div class="account-nav__avatar">😊</div>
+                        <div class="account-nav__avatar"><iconify-icon icon="ph:user-circle" style="font-size: 1.5em;"></iconify-icon></div>
                         <div>
-                            <div class="account-nav__name">Ernest Mensah</div>
-                            <div class="account-nav__email">ernest@example.com</div>
+                            <div class="account-nav__name" id="user-display-name">Loading...</div>
+                            <div class="account-nav__email" id="user-display-email">...</div>
                         </div>
                     </div>
                     <div class="account-nav__links">
@@ -445,10 +453,10 @@
                                 <div class="ticket-info-row"><span>Ticket Type</span><span>VIP Section</span></div>
                                 <div class="ticket-info-row"><span>Ticket No.</span><span
                                         style="font-family:var(--font-mono);font-size:11px;">TKA-2026-83921</span></div>
-                                <div class="ticket-info-row"><span>Owner</span><span>Ernest Mensah</span></div>
+                                <div class="ticket-info-row"><span>Owner</span><span class="user-display-owner">Ernest Mensah</span></div>
                             </div>
                             <div class="ticket-card__qr">
-                                <div class="ticket-qr-box">▦</div>
+                                <div class="ticket-qr-box"><iconify-icon icon="ph:qr-code"></iconify-icon></div>
                             </div>
                             <div class="ticket-card__actions">
                                 <button class="btn btn--primary btn--sm" style="flex:1;" id="download-ticket-1">Download
@@ -483,7 +491,7 @@
                                 <div class="ticket-info-row"><span>Seat</span><span>Block C, Row 12, Seat 7</span></div>
                             </div>
                             <div class="ticket-card__qr">
-                                <div class="ticket-qr-box">▦</div>
+                                <div class="ticket-qr-box"><iconify-icon icon="ph:qr-code"></iconify-icon></div>
                             </div>
                             <div class="ticket-card__actions">
                                 <button class="btn btn--primary btn--sm" style="flex:1;" id="download-ticket-2">Download
@@ -510,7 +518,7 @@
                             </div>
                             <div style="text-align:right;">
                                 <div class="order-row__amount">GH₵ 736</div>
-                                <div style="font-size:var(--text-xs);color:var(--color-success);font-weight:700;">✓ Confirmed</div>
+                                <div style="font-size:var(--text-xs);color:var(--color-success);font-weight:700;"><iconify-icon inline icon="ph:check-bold"></iconify-icon> Confirmed</div>
                             </div>
                         </div>
                         <div class="order-row">
@@ -521,7 +529,7 @@
                             </div>
                             <div style="text-align:right;">
                                 <div class="order-row__amount">R 92</div>
-                                <div style="font-size:var(--text-xs);color:var(--color-success);font-weight:700;">✓ Confirmed</div>
+                                <div style="font-size:var(--text-xs);color:var(--color-success);font-weight:700;"><iconify-icon inline icon="ph:check-bold"></iconify-icon> Confirmed</div>
                             </div>
                         </div>
                     </div>
@@ -558,7 +566,7 @@
                     <div class="panel" style="padding:var(--space-6);">
                         <div style="display:flex;align-items:center;gap:var(--space-5);margin-bottom:var(--space-8);">
                             <div style="width:80px;height:80px;border-radius:50%;background:var(--color-primary);color:var(--color-text-primary);border:2px solid var(--color-secondary);font-size:32px;display:flex;align-items:center;justify-content:center;">
-                                😊
+                                <iconify-icon icon="ph:user-circle"></iconify-icon>
                             </div>
                             <div>
                                 <button class="btn btn--secondary btn--sm" style="margin-bottom:var(--space-2);">Change Avatar</button>
@@ -569,16 +577,16 @@
                         <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-5);margin-bottom:var(--space-5);">
                             <div class="form-group">
                                 <label class="form-label">First Name</label>
-                                <input type="text" class="form-control" value="Ernest" />
+                                <input type="text" class="form-control" id="profile-first-name" />
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Last Name</label>
-                                <input type="text" class="form-control" value="Mensah" />
+                                <input type="text" class="form-control" id="profile-last-name" />
                             </div>
                         </div>
                         <div class="form-group" style="margin-bottom:var(--space-5);">
                             <label class="form-label">Email Address</label>
-                            <input type="email" class="form-control" value="ernest@example.com" disabled />
+                            <input type="email" class="form-control" id="profile-email" disabled />
                             <span class="form-hint">Contact support to change your email address.</span>
                         </div>
                         <div class="form-group" style="margin-bottom:var(--space-6);">
@@ -587,7 +595,7 @@
                         </div>
                         
                         <div style="border-top:1px solid var(--color-border);padding-top:var(--space-5);display:flex;justify-content:flex-end;">
-                            <button class="btn btn--primary" onclick="TA.toast('Profile updated successfully', 'success')">Save Changes</button>
+                            <button class="btn btn--primary" id="btn-save-profile" onclick="TA.toast('Profile updated successfully', 'success')">Save Changes</button>
                         </div>
                     </div>
                 </div>
@@ -742,6 +750,35 @@
             document.getElementById('download-history-btn').addEventListener('click', function () {
                 if(window.TA) TA.toast('Exporting purchase history as CSV…', 'success');
             });
+
+            // Clerk dynamic population logic
+            const checkClerk = setInterval(() => {
+                if (window.Clerk && window.Clerk.isReady) {
+                    clearInterval(checkClerk);
+                    const user = window.Clerk.user;
+                    if (user) {
+                        const firstName = user.firstName || '';
+                        const lastName = user.lastName || '';
+                        const name = `${firstName} ${lastName}`.trim() || user.username || 'User';
+                        const email = user.primaryEmailAddress ? user.primaryEmailAddress.emailAddress : '';
+
+                        document.getElementById('user-display-name').textContent = name;
+                        document.getElementById('user-display-email').textContent = email;
+
+                        document.querySelectorAll('.user-display-owner').forEach(el => el.textContent = name);
+
+                        const pFirst = document.getElementById('profile-first-name');
+                        if(pFirst) pFirst.value = firstName;
+                        const pLast = document.getElementById('profile-last-name');
+                        if(pLast) pLast.value = lastName;
+                        const pEmail = document.getElementById('profile-email');
+                        if(pEmail) pEmail.value = email;
+                    } else {
+                        // User not logged in, redirect to login
+                        window.location.href = 'login.html';
+                    }
+                }
+            }, 100);
         });
     </script>
 </body>
