@@ -7,13 +7,6 @@
     <title>My Account & Ticket Wallet — Ticket Africa</title>
     <script type="module" src="/assets/js/db.js"></script>
     <script src="assets/js/env.js"></script>
-    <script>
-        const clerkScript = document.createElement("script");
-        clerkScript.setAttribute("data-clerk-publishable-key", window.ENV.CLERK_PUBLISHABLE_KEY);
-        clerkScript.async = true;
-        clerkScript.src = "https://cdn.jsdelivr.net/npm/@clerk/clerk-js@4/dist/clerk.browser.js";
-        document.head.appendChild(clerkScript);
-    </script>
     <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
     <link rel="stylesheet" href="assets/css/core.css" />
     <link rel="stylesheet" href="assets/css/nav-footer.css" />
@@ -700,36 +693,57 @@
             document.getElementById('download-history-btn').addEventListener('click', function () {
                 if (window.TA) TA.toast('No purchase history to export yet.', 'info');
             });
+        }); // end DOMContentLoaded
 
-            // Clerk dynamic population logic
-            const checkClerk = setInterval(() => {
-                if (window.Clerk && window.Clerk.isReady) {
-                    clearInterval(checkClerk);
-                    const user = window.Clerk.user;
-                    if (user) {
-                        const firstName = user.firstName || '';
-                        const lastName = user.lastName || '';
-                        const name = `${firstName} ${lastName}`.trim() || user.username || 'User';
-                        const email = user.primaryEmailAddress ? user.primaryEmailAddress.emailAddress : '';
+        // ── Clerk: inject and initialize ──────────────────────────
+        const clerkScript = document.createElement('script');
+        clerkScript.src = 'https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js';
+        clerkScript.setAttribute('data-clerk-publishable-key', window.ENV.CLERK_PUBLISHABLE_KEY);
+        clerkScript.async = true;
+        clerkScript.crossOrigin = 'anonymous';
+        clerkScript.onload = async function () {
+            try {
+                await window.Clerk.load();
+                const user = window.Clerk.user;
 
-                        document.getElementById('user-display-name').textContent = name;
-                        document.getElementById('user-display-email').textContent = email;
-
-                        document.querySelectorAll('.user-display-owner').forEach(el => el.textContent = name);
-
-                        const pFirst = document.getElementById('profile-first-name');
-                        if (pFirst) pFirst.value = firstName;
-                        const pLast = document.getElementById('profile-last-name');
-                        if (pLast) pLast.value = lastName;
-                        const pEmail = document.getElementById('profile-email');
-                        if (pEmail) pEmail.value = email;
-                    } else {
-                        // User not logged in, redirect to login
-                        window.location.href = 'login.html';
-                    }
+                if (!user) {
+                    // Not signed in — go to login
+                    window.location.replace('login.html');
+                    return;
                 }
-            }, 100);
-        });
+
+                // Populate user info
+                const firstName = user.firstName || '';
+                const lastName  = user.lastName  || '';
+                const name  = `${firstName} ${lastName}`.trim() || user.username || 'User';
+                const email = user.primaryEmailAddress?.emailAddress || '';
+
+                document.getElementById('user-display-name').textContent  = name;
+                document.getElementById('user-display-email').textContent = email;
+
+                document.querySelectorAll('.user-display-owner').forEach(el => el.textContent = name);
+
+                const pFirst = document.getElementById('profile-first-name');
+                if (pFirst) pFirst.value = firstName;
+                const pLast = document.getElementById('profile-last-name');
+                if (pLast) pLast.value = lastName;
+                const pEmail = document.getElementById('profile-email');
+                if (pEmail) pEmail.value = email;
+
+                // Wire sign-out button to Clerk
+                const signOutBtn = document.getElementById('nav-signout');
+                if (signOutBtn) {
+                    signOutBtn.addEventListener('click', async function (e) {
+                        e.preventDefault();
+                        await window.Clerk.signOut();
+                        window.location.replace('login.html');
+                    });
+                }
+            } catch (e) {
+                console.error('Clerk init error on account page:', e);
+            }
+        };
+        document.body.appendChild(clerkScript);
     </script>
 </body>
 
