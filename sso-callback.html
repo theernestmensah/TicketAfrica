@@ -6,20 +6,23 @@
     <title>Authenticating...</title>
     <style>
         body {
-            background-color: #07070f;
-            color: #C9A84C;
+            background-color: #191919;
+            color: #D4AF37;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
+            gap: 16px;
             height: 100vh;
             margin: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-size: 14px;
         }
         .spinner {
             width: 40px;
             height: 40px;
-            border: 3px solid rgba(201, 168, 76, 0.2);
-            border-top-color: #C9A84C;
+            border: 3px solid rgba(212, 175, 55, 0.2);
+            border-top-color: #D4AF37;
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
@@ -30,28 +33,38 @@
 </head>
 <body>
     <div class="spinner"></div>
+    <span>Verifying your account…</span>
 
-    <script src="assets/js/core.js"></script>
+    <script src="assets/js/env.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
+            // Determine where to land after OAuth based on a `redirect` param
+            // e.g. redirectUrl: `.../sso-callback.html?redirect=organizer`
+            const params = new URLSearchParams(window.location.search);
+            const dest = params.get('redirect') === 'organizer'
+                ? '/organizer-dashboard.html'
+                : '/account.html';
+
             try {
-                if (!window.Clerk) {
-                    await new Promise(resolve => {
-                        const check = setInterval(() => {
-                            if (window.Clerk) {
-                                clearInterval(check);
-                                resolve();
-                            }
-                        }, 100);
-                    });
-                }
+                // Inject and wait for Clerk
+                const clerkScript = document.createElement('script');
+                clerkScript.src = 'https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js';
+                clerkScript.setAttribute('data-clerk-publishable-key', window.ENV.CLERK_PUBLISHABLE_KEY);
+                clerkScript.crossOrigin = 'anonymous';
+                document.head.appendChild(clerkScript);
+
+                await new Promise((resolve, reject) => {
+                    clerkScript.onload = resolve;
+                    clerkScript.onerror = () => reject(new Error('Clerk failed to load'));
+                });
+
                 await window.Clerk.load();
                 await window.Clerk.handleRedirectCallback({
-                    redirectUrl: `${window.location.origin}/account.html`,
+                    redirectUrl: `${window.location.origin}${dest}`,
                 });
             } catch (err) {
-                console.error('Error handling SSO redirect:', err);
-                window.location.href = '/login.html';
+                console.error('SSO callback error:', err);
+                window.location.href = dest;
             }
         });
     </script>

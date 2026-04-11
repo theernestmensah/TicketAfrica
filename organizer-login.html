@@ -115,7 +115,7 @@
             font-family: var(--font-display);
             font-size: 1.25rem;
             font-weight: 800;
-            color: white;
+            color: var(--color-text-primary);
             text-decoration: none;
         }
 
@@ -144,7 +144,7 @@
         }
 
         .visual-desc {
-            color: rgba(255, 255, 255, 0.55);
+            color: var(--color-text-muted);
             font-size: var(--text-base);
             line-height: 1.7;
             max-width: 340px;
@@ -161,13 +161,13 @@
             font-family: var(--font-display);
             font-size: 1.75rem;
             font-weight: 800;
-            color: white;
+            color: var(--color-text-primary);
             line-height: 1;
         }
 
         .visual-stat__label {
             font-size: var(--text-xs);
-            color: rgba(255, 255, 255, 0.4);
+            color: var(--color-text-muted);
             margin-top: 4px;
             text-transform: uppercase;
             letter-spacing: 0.06em;
@@ -177,9 +177,9 @@
         .floating-card {
             position: relative;
             z-index: 2;
-            background: rgba(255, 255, 255, 0.06);
+            background: var(--color-bg-input);
             backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--color-border-light);
             border-radius: var(--radius-2xl);
             padding: var(--space-5);
             max-width: 300px;
@@ -212,17 +212,17 @@
             font-family: var(--font-display);
             font-weight: 700;
             font-size: var(--text-sm);
-            color: white;
+            color: var(--color-text-primary);
         }
 
         .floating-card__sub {
             font-size: var(--text-xs);
-            color: rgba(255, 255, 255, 0.4);
+            color: var(--color-text-muted);
         }
 
         .floating-card__divider {
             height: 1px;
-            background: rgba(255, 255, 255, 0.08);
+            background: var(--color-border-light);
             margin-bottom: var(--space-4);
         }
 
@@ -236,7 +236,7 @@
             font-family: var(--font-display);
             font-weight: 800;
             font-size: var(--text-lg);
-            color: white;
+            color: var(--color-text-primary);
         }
 
         .floating-card__badge {
@@ -325,8 +325,8 @@
             justify-content: center;
             gap: var(--space-2);
             padding: 13px var(--space-4);
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.10);
+            background: var(--color-bg-input);
+            border: 1px solid var(--color-border-light);
             border-radius: var(--radius-xl);
             color: var(--color-text-primary);
             font-size: var(--text-sm);
@@ -351,11 +351,11 @@
         }
 
         .social-btn--apple::before {
-            background: rgba(255,255,255,0.04);
+            background: var(--color-bg-input);
         }
 
         .social-btn:hover {
-            border-color: rgba(255, 255, 255, 0.18);
+            border-color: var(--color-border);
             transform: translateY(-1px);
             box-shadow: 0 4px 16px rgba(0,0,0,0.3);
         }
@@ -484,7 +484,7 @@
             right: 14px;
             background: none;
             border: none;
-            color: rgba(255, 255, 255, 0.3);
+            color: var(--color-text-muted);
             cursor: pointer;
             font-size: 18px;
             display: flex;
@@ -679,7 +679,7 @@
             <!-- Logo -->
             <a href="index.html" class="auth-visual__logo">
                 <div class="auth-visual__logo-icon">
-                    <iconify-icon icon="hugeicons:ticket-01" style="color:white;font-size:20px;"></iconify-icon>
+                    <iconify-icon icon="hugeicons:ticket-01" style="color: var(--color-text-primary);font-size:20px;"></iconify-icon>
                 </div>
                 TicketAfrica
             </a>
@@ -725,7 +725,7 @@
             </div>
 
             <!-- Bottom brand -->
-            <div style="position:relative;z-index:2;font-size:var(--text-xs);color:rgba(255,255,255,0.25);">
+            <div style="position:relative;z-index:2;font-size:var(--text-xs);color: var(--color-text-muted);">
                 © 2026 Ticket Africa. All rights reserved.
             </div>
         </div>
@@ -933,7 +933,7 @@
 
                 await window.Clerk.client.signIn.authenticateWithRedirect({
                     strategy,
-                    redirectUrl: `${window.location.origin}/sso-callback.html`,
+                    redirectUrl: `${window.location.origin}/sso-callback.html?redirect=organizer`,
                     redirectUrlComplete: `${window.location.origin}/organizer-dashboard.html`,
                 });
             } catch (err) {
