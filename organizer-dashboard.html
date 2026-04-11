@@ -8,6 +8,7 @@
         content="Organizer Dashboard — Manage your events, track sales, and pay out on Ticket Africa." />
     <title>Organizer Dashboard — Ticket Africa</title>
     <script type="module" src="/assets/js/db.js"></script>
+    <script src="assets/js/env.js"></script>
     <link rel="stylesheet" href="assets/css/core.css" />
     <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
     <link rel="stylesheet" href="assets/css/dashboard.css" />
@@ -23,7 +24,7 @@
             </div>
             <h2>Organizer Access Only</h2>
             <p>You need to sign in with your Ticket Africa organizer account to access this dashboard.</p>
-            <button class="btn btn--primary btn--full" id="auth-gate-signin" style="margin-bottom:12px;">
+            <button class="btn btn--primary btn--full" id="auth-gate-signin" onclick="window.location.href='organizer-login.html'" style="margin-bottom:12px;">
                 Sign In
             </button>
             <a href="/index.html" class="btn btn--full"
@@ -626,38 +627,54 @@
                     <div class="panel__body">
                         <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
                             <div>
-                                <label style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.4);display:block;margin-bottom:5px;">Poll Title *</label>
-                                <input id="poll-title" type="text" placeholder="e.g. Best Artist of the Year" 
+                                <label
+                                    style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.4);display:block;margin-bottom:5px;">Poll
+                                    Title *</label>
+                                <input id="poll-title" type="text" placeholder="e.g. Best Artist of the Year"
                                     style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 12px;color:#f0f0f5;font-size:13px;outline:none;">
                             </div>
                             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
                                 <div>
-                                    <label style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.4);display:block;margin-bottom:5px;">Start Date</label>
-                                    <input id="poll-start" type="datetime-local" 
+                                    <label
+                                        style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.4);display:block;margin-bottom:5px;">Start
+                                        Date</label>
+                                    <input id="poll-start" type="datetime-local"
                                         style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 12px;color:#f0f0f5;font-size:13px;outline:none;">
                                 </div>
                                 <div>
-                                    <label style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.4);display:block;margin-bottom:5px;">End Date</label>
-                                    <input id="poll-end" type="datetime-local" 
+                                    <label
+                                        style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.4);display:block;margin-bottom:5px;">End
+                                        Date</label>
+                                    <input id="poll-end" type="datetime-local"
                                         style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 12px;color:#f0f0f5;font-size:13px;outline:none;">
                                 </div>
                             </div>
                         </div>
                         <div style="margin-bottom:16px;">
-                            <label style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.4);display:block;margin-bottom:5px;">Description / Instructions</label>
-                            <textarea id="poll-desc" placeholder="Explain what people are voting for..." 
+                            <label
+                                style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.4);display:block;margin-bottom:5px;">Description
+                                / Instructions</label>
+                            <textarea id="poll-desc" placeholder="Explain what people are voting for..."
                                 style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 12px;color:#f0f0f5;font-size:13px;outline:none;height:60px;resize:none;"></textarea>
                         </div>
                         <div style="margin-bottom:16px;">
-                            <label style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.4);display:block;margin-bottom:5px;">Options (At least 2)</label>
-                            <div id="poll-options-list" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
-                                <input type="text" class="poll-option-input" placeholder="Option 1" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 12px;color:#f0f0f5;font-size:13px;outline:none;">
-                                <input type="text" class="poll-option-input" placeholder="Option 2" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 12px;color:#f0f0f5;font-size:13px;outline:none;">
+                            <label
+                                style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.4);display:block;margin-bottom:5px;">Options
+                                (At least 2)</label>
+                            <div id="poll-options-list"
+                                style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+                                <input type="text" class="poll-option-input" placeholder="Option 1"
+                                    style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 12px;color:#f0f0f5;font-size:13px;outline:none;">
+                                <input type="text" class="poll-option-input" placeholder="Option 2"
+                                    style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 12px;color:#f0f0f5;font-size:13px;outline:none;">
                             </div>
-                            <button class="btn btn--sm" onclick="addPollOptionRow()" style="background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.6);border:1px dashed rgba(255,255,255,0.2);">+ Add Option</button>
+                            <button class="btn btn--sm" onclick="addPollOptionRow()"
+                                style="background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.6);border:1px dashed rgba(255,255,255,0.2);">+
+                                Add Option</button>
                         </div>
                         <button onclick="submitPoll()" class="btn btn--primary">Create Poll</button>
-                        <button onclick="togglePollForm()" class="btn btn--sm" style="margin-left:8px;background:none;border:none;color:rgba(255,255,255,0.4);">Cancel</button>
+                        <button onclick="togglePollForm()" class="btn btn--sm"
+                            style="margin-left:8px;background:none;border:none;color:rgba(255,255,255,0.4);">Cancel</button>
                     </div>
                 </div>
 
@@ -667,7 +684,8 @@
                     </div>
                     <div id="polls-container">
                         <div class="empty-state">
-                            <div class="empty-state__icon"><iconify-icon icon="hugeicons:loading-03"></iconify-icon></div>
+                            <div class="empty-state__icon"><iconify-icon icon="hugeicons:loading-03"></iconify-icon>
+                            </div>
                             <div class="empty-state__title">Loading polls…</div>
                         </div>
                     </div>
@@ -1404,68 +1422,97 @@
             renderEventsTable(events, 'my-events-container', null);
         }
 
-        /* ── Wait for Clerk ── */
-        window.addEventListener('clerk-ready', () => {
-            const clerk = window.Clerk;
-            if (!clerk.user) {
-                document.getElementById('auth-gate').classList.add('show');
-                document.getElementById('auth-gate-signin').addEventListener('click', () => {
-                    clerk.openSignIn({ redirectUrl: window.location.href });
-                });
-                return;
-            }
-            const clerkUser = clerk.user;
-            const clerkUserData = { first_name: clerkUser.firstName, last_name: clerkUser.lastName, image_url: clerkUser.imageUrl };
+        /* ── Clerk: inject and initialize ── */
+        const clerkScript = document.createElement('script');
+        clerkScript.src = 'https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js';
+        clerkScript.setAttribute('data-clerk-publishable-key', window.ENV.CLERK_PUBLISHABLE_KEY);
+        clerkScript.async = true;
+        clerkScript.crossOrigin = 'anonymous';
+        clerkScript.onload = async function () {
+            try {
+                await window.Clerk.load();
+                const clerkUser = window.Clerk.user;
 
-            async function loadData() {
-                if (!window.ConvexDB) return;
-                try {
-                    // 1. Upsert user into Convex
-                    const userId = await window.ConvexDB.upsertUser({
-                        clerk_id: clerkUser.id,
-                        email: clerkUser.primaryEmailAddress?.emailAddress || '',
-                        first_name: clerkUser.firstName || '',
-                        last_name: clerkUser.lastName || '',
-                    });
-
-                    // 2. Get or create the organizer's org
-                    const org = await window.ConvexDB.getOrCreateOrg({
-                        owner_id: userId,
-                        name: (clerkUser.firstName || 'My') + ' Events',
-                        email: clerkUser.primaryEmailAddress?.emailAddress || '',
-                    });
-
-                    const orgId = org?._id;
-                    _currentOrgId = orgId;
-
-                    // 3. Load events that belong to this org
-                    const events = orgId ? (await window.ConvexDB.listEventsByOrg(orgId)) || [] : [];
-
-                    // 4. Boot dashboard
-                    initDashboard(clerkUserData, events);
-
-                    // 5. Share with feature modules
-                    if (orgId) {
-                        window.__setOrgId(orgId);
-                        window.__setEvents(events);
-                    }
-                } catch (e) {
-                    console.error('[Dashboard] load error', e);
-                    initDashboard(clerkUserData, []);
+                if (!clerkUser) {
+                    // Not signed in — send to login
+                    window.location.replace('organizer-login.html');
+                    return;
                 }
-            }
 
-            window.addEventListener('convex-ready', loadData);
-            if (window.ConvexDB) loadData();
-        });
+                // Hide auth gate, show dashboard
+                const gate = document.getElementById('auth-gate');
+                if (gate) gate.style.display = 'none';
 
-        setTimeout(() => {
-            if (!window.Clerk) {
-                console.warn('[Dashboard] Clerk not detected. Running in dev mode.');
-                document.getElementById('dash-user-name').textContent = 'Dev Mode';
-                initDashboard({ first_name: 'Developer', last_name: '' }, []);
+                // Populate sidebar user card
+                document.getElementById('dash-user-name').textContent =
+                    ((clerkUser.firstName || '') + ' ' + (clerkUser.lastName || '')).trim() || 'Organizer';
+
+                const clerkUserData = {
+                    first_name: clerkUser.firstName || '',
+                    last_name: clerkUser.lastName || '',
+                    image_url: clerkUser.imageUrl || ''
+                };
+
+                // Wire sign-out link
+                const signOutLink = document.querySelector('.dash-nav-link[href="/index.html"]');
+                if (signOutLink && signOutLink.textContent.includes('Back')) {
+                    // Keep the back link as-is; add a separate sign-out if desired
+                }
+                // Add sign-out to sidebar bottom
+                const sidebarBottom = document.querySelector('.dash-sidebar__bottom');
+                if (sidebarBottom && !document.getElementById('dash-signout-btn')) {
+                    const soBtn = document.createElement('button');
+                    soBtn.id = 'dash-signout-btn';
+                    soBtn.textContent = 'Sign Out';
+                    soBtn.style.cssText = 'margin-top:10px;width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:9px 12px;color:rgba(255,255,255,0.45);font-size:12px;cursor:pointer;';
+                    soBtn.addEventListener('click', async () => {
+                        await window.Clerk.signOut();
+                        window.location.replace('organizer-login.html');
+                    });
+                    sidebarBottom.appendChild(soBtn);
+                }
+
+                async function loadData() {
+                    if (!window.ConvexDB) return;
+                    try {
+                        const userId = await window.ConvexDB.upsertUser({
+                            clerk_id: clerkUser.id,
+                            email: clerkUser.primaryEmailAddress?.emailAddress || '',
+                            first_name: clerkUser.firstName || '',
+                            last_name: clerkUser.lastName || '',
+                        });
+
+                        const org = await window.ConvexDB.getOrCreateOrg({
+                            owner_id: userId,
+                            name: (clerkUser.firstName || 'My') + ' Events',
+                            email: clerkUser.primaryEmailAddress?.emailAddress || '',
+                        });
+
+                        const orgId = org?._id;
+                        _currentOrgId = orgId;
+
+                        const events = orgId ? (await window.ConvexDB.listEventsByOrg(orgId)) || [] : [];
+
+                        initDashboard(clerkUserData, events);
+
+                        if (orgId) {
+                            window.__setOrgId(orgId);
+                            window.__setEvents(events);
+                        }
+                    } catch (e) {
+                        console.error('[Dashboard] load error', e);
+                        initDashboard(clerkUserData, []);
+                    }
+                }
+
+                window.addEventListener('convex-ready', loadData);
+                if (window.ConvexDB) loadData();
+
+            } catch (e) {
+                console.error('[Dashboard] Clerk init error:', e);
             }
-        }, 4000);
+        };
+        document.body.appendChild(clerkScript);
     </script>
 
 </body>
