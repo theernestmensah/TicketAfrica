@@ -20,39 +20,14 @@
         <div class="nav-menu" id="nav-menu">
           <a href="/events.html" class="nav-link" id="nav-events">Discover Events</a>
           <a href="/voting.html" class="nav-link" id="nav-voting">Voting & Polls</a>
-          <div class="nav-dropdown" id="nav-dd-org">
-            <span class="nav-link nav-dropdown__trigger" style="cursor:pointer;">
-              For Organizers
-              <iconify-icon icon="hugeicons:arrow-down-01"></iconify-icon>
-            </span>
-            <div class="nav-dropdown__panel">
-              <a href="/organizer-dashboard.html" class="nav-dropdown__item" id="nav-dd-dashboard">
-                <div class="nav-dropdown__item-icon">
-                  <iconify-icon icon="hugeicons:grid"></iconify-icon>
-                </div>
-                <div class="nav-dropdown__item-content">
-                  <span class="nav-dropdown__item-title">Dashboard</span>
-                  <span class="nav-dropdown__item-desc">Manage events & sales</span>
-                </div>
-              </a>
-              <a href="/for-organizers.html" class="nav-dropdown__item" id="nav-dd-features">
-                <div class="nav-dropdown__item-icon">
-                  <iconify-icon icon="hugeicons:activity-01"></iconify-icon>
-                </div>
-                <div class="nav-dropdown__item-content">
-                  <span class="nav-dropdown__item-title">Features & Pricing</span>
-                  <span class="nav-dropdown__item-desc">Tools for event professionals</span>
-                </div>
-              </a>
-            </div>
-          </div>
+          <a href="/for-organizers.html" class="nav-link" id="nav-organizers">For Organizers</a>
           <a href="/for-organizers.html#pricing" class="nav-link" id="nav-pricing">Pricing</a>
           <a href="/help.html" class="nav-link" id="nav-help">Help</a>
         </div>
 
         <div class="nav-actions">
           <div class="nav-dropdown" id="nav-dd-currency" style="margin-right: 8px;">
-            <button class="nav-country-selector nav-dropdown__trigger" style="cursor:pointer; display: flex; align-items: center; gap: 4px; padding: 6px 12px; border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-full); background: rgba(255,255,255,0.04); color: white;">
+            <button class="nav-country-selector nav-dropdown__trigger" style="cursor:pointer; display: flex; align-items: center; gap: 4px; padding: 6px 12px; border: 1px solid var(--color-border); border-radius: var(--radius-full); background: var(--color-bg-input); color: var(--color-text-primary);">
               <span id="nav-currency-label" style="font-weight: 600; font-size: 13px;">GH₵</span>
               <iconify-icon icon="hugeicons:arrow-down-01" style="width:12px;font-size:12px;"></iconify-icon>
             </button>
@@ -68,7 +43,32 @@
             <iconify-icon icon="ph:sun-bold" class="theme-toggle-icon"></iconify-icon>
           </button>
           <a href="/login.html" class="btn btn--secondary btn--sm" id="nav-login">Sign in</a>
-          <a href="/signup.html" class="btn btn--primary btn--sm" id="nav-signup">Get Started</a>
+          <div class="nav-dropdown" id="nav-signup-dd">
+            <button class="btn btn--primary btn--sm nav-dropdown__trigger" id="nav-signup" style="display:inline-flex;align-items:center;gap:6px;">
+              Get Started
+              <iconify-icon icon="hugeicons:arrow-down-01" style="font-size:12px;"></iconify-icon>
+            </button>
+            <div class="nav-dropdown__panel" style="min-width:220px;right:0;left:auto;padding:8px;">
+              <a href="/signup.html" class="nav-dropdown__item" id="nav-signup-attendee">
+                <div class="nav-dropdown__item-icon">
+                  <iconify-icon icon="hugeicons:user-circle"></iconify-icon>
+                </div>
+                <div class="nav-dropdown__item-content">
+                  <span class="nav-dropdown__item-title">As an Attendee</span>
+                  <span class="nav-dropdown__item-desc">Browse & buy event tickets</span>
+                </div>
+              </a>
+              <a href="/organizer-signup.html" class="nav-dropdown__item" id="nav-signup-organizer">
+                <div class="nav-dropdown__item-icon">
+                  <iconify-icon icon="hugeicons:calendar-add-02"></iconify-icon>
+                </div>
+                <div class="nav-dropdown__item-content">
+                  <span class="nav-dropdown__item-title">As an Organizer</span>
+                  <span class="nav-dropdown__item-desc">Create & manage events</span>
+                </div>
+              </a>
+            </div>
+          </div>
           <div id="clerk-user-button" style="margin-left: 8px;"></div>
           <button class="nav-mobile-toggle" id="nav-mobile-toggle" aria-label="Open menu">
             <span></span><span></span><span></span>
@@ -119,7 +119,14 @@
     </div>
     <div class="nav-mobile-actions">
       <a href="/login.html" class="btn btn--secondary btn--full" id="mob-login">Sign in</a>
-      <a href="/signup.html" class="btn btn--primary btn--full" id="mob-signup">Create Account</a>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <a href="/signup.html" class="btn btn--primary btn--full" id="mob-signup-attendee" style="display:flex;align-items:center;justify-content:center;gap:8px;">
+          <iconify-icon icon="hugeicons:user-circle"></iconify-icon> Attendee Sign Up
+        </a>
+        <a href="/organizer-signup.html" class="btn btn--secondary btn--full" id="mob-signup-organizer" style="display:flex;align-items:center;justify-content:center;gap:8px;">
+          <iconify-icon icon="hugeicons:calendar-add-02"></iconify-icon> Organizer Sign Up
+        </a>
+      </div>
     </div>
   </div>`;
 
@@ -286,12 +293,10 @@
   window.addEventListener('convex-ready', async () => {
     try {
       const events = await window.ConvexDB.listEvents();
-      console.log("Convex Backend Hooked! Events:", events);
+      console.log('[TicketAfrica] Backend connected! Events:', events);
 
       if (events && events.length === 0) {
-        if (window.TA?.toast) window.TA.toast('Database empty. Seeding UI with Convex mock events...', 'info');
-        await window.ConvexDB.client.mutation(window.ConvexDB.api.events.seed);
-        setTimeout(() => window.location.reload(), 2000);
+        if (window.TA?.toast) window.TA.toast('No events found. Add some events in the organizer dashboard!', 'info');
       } else if (events && events.length > 0) {
         if (window.TA?.toast && (window.location.pathname.endsWith('index.html') || window.location.pathname === '/')) {
           window.TA.toast(`Backend Connected! ${events.length} live events loaded.`, 'success');
@@ -304,7 +309,7 @@
         events.forEach(ev => {
           const cat = (ev.category || '').toLowerCase();
           if (catMap.hasOwnProperty(cat)) catMap[cat]++;
-          const city = (ev.location?.city || '').toLowerCase();
+          const city = (ev.city || ev.location?.city || '').toLowerCase();
           Object.keys(cityMap).forEach(c => { if (city.includes(c)) cityMap[c]++; });
         });
 
@@ -366,7 +371,7 @@
                 const totalVotes = poll.options?.reduce((sum, opt) => sum + (opt.voteCount || 0), 0) || 0;
                 return `
                   <div class="poll-card" style="background:var(--color-bg-card);border:1px solid var(--color-border);border-radius:var(--radius-xl);padding:var(--space-6);display:flex;flex-direction:column;gap:var(--space-4);" data-reveal>
-                    <div style="font-size:var(--text-xs);font-weight:700;color:var(--color-primary);text-transform:uppercase;letter-spacing:0.06em;">Active Poll</div>
+                    <div style="font-size:var(--text-xs);font-weight:700;color:var(--color-secondary);text-transform:uppercase;letter-spacing:0.06em;">Active Poll</div>
                     <h3 style="font-family:var(--font-display);font-size:var(--text-lg);font-weight:700;">${poll.title}</h3>
                     <p style="font-size:var(--text-sm);color:var(--color-text-muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;flex:1;">${poll.description}</p>
                     <div style="display:flex;align-items:center;justify-content:space-between;padding-top:var(--space-4);border-top:1px solid var(--color-border);">
@@ -426,10 +431,7 @@
         }
         if (signupBtn) {
           signupBtn.style.display = 'inline-flex';
-          signupBtn.onclick = (e) => {
-            e.preventDefault();
-            clerk.openSignUp();
-          };
+          // Dropdown trigger — no clerk modal hijack; links handle navigation
         }
         if (userBtnDiv) userBtnDiv.style.display = 'none';
       }

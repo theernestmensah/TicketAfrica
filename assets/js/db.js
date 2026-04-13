@@ -1,143 +1,187 @@
-import { ConvexHttpClient } from "convex/browser";
-import { api } from "../../convex/_generated/api.js";
-import "./auth.js";
+/**
+ * @file db.js
+ * @description Ticket Africa — Convex Backend Layer.
+ *
+ * This file has been updated to fully ditch Supabase and connect directly
+ * to Convex using ConvexHttpClient from npm/esm cache.
+ */
 
-// Initialize the Convex HTTP client
-const client = new ConvexHttpClient(import.meta.env.VITE_CONVEX_URL);
+import { ConvexHttpClient } from "https://esm.sh/convex@1.32.0/browser";
 
-// Expose a global database wrapper so vanilla JS scripts can query easily
-window.ConvexDB = {
-    client,
-    api,
+// ─── Inject Clerk CDN script (once, idempotent) ────────────────────────────
+(function injectClerk() {
+    if (document.getElementById('clerk-sdk')) return;
+    const s = document.createElement('script');
+    s.id = 'clerk-sdk';
+    s.async = true;
+    s.src = 'https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js';
+    s.setAttribute('data-clerk-publishable-key', 'pk_test_ZGl2aW5lLWZyb2ctMjUuY2xlcmsuYWNjb3VudHMuZGV2JA');
+    document.head.appendChild(s);
+})();
 
-    // Core Event Queries
-    listEvents: async () => await client.query(api.events.listEvents),
-    listEventsByOrg: async (org_id) => await client.query(api.events.listEventsByOrg, { org_id }),
-    getUpcomingEvents: async (limit) => await client.query(api.events.getUpcomingEvents, { limit }),
-    getEventBySlug: async (slug) => await client.query(api.events.getEventBySlug, { slug }),
-    getTicketTiers: async (event_id) => await client.query(api.events.getTicketTiers, { event_id }),
-    searchEvents: async (query) => await client.query(api.events.searchEvents, { query }),
+// ─── Convex Config ────────────────────────────────────────────────────────
+const CONVEX_URL = 'https://gallant-greyhound-48.convex.cloud';
+const convex = new ConvexHttpClient(CONVEX_URL);
 
-    // User / Auth
-    upsertUser: async (args) => await client.mutation(api.users.upsertUser, args),
-    getByClerkId: async (clerk_id) => await client.query(api.users.getByClerkId, { clerk_id }),
-    getOrgByOwner: async (owner_id) => await client.query(api.users.getOrgByOwner, { owner_id }),
-    getOrCreateOrg: async (args) => await client.mutation(api.users.getOrCreateOrg, args),
+// ─── Event card renderer (kept API-compatible) ─────────────────────────────
+function renderEventCard(event) {
+    const d = new Date(event.start_date || event.starts_at || Date.now());
+    const dateStr =
+        d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }) +
+        ', ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
 
-    // Promo code validation (for checkout)
-    validatePromoCode: async (code, org_id) => await client.query(api.users.validatePromoCode, { code, org_id }),
-    redeemPromoCode: async (code) => await client.mutation(api.users.redeemPromoCode, { code }),
+    let icon = 'hugeicons:music-note-01';
+    let bg   = 'linear-gradient(135deg,#1a0540,#3d0f80)';
+    const cat = (event.category || '').toLowerCase();
+    if (cat.includes('sport'))  { icon = 'hugeicons:football';    bg = 'linear-gradient(135deg,#0a1a30,#0d3060)'; }
+    else if (cat.includes('fest'))  { icon = 'hugeicons:tent-01';     bg = 'linear-gradient(135deg,#1a0a20,#3d1060)'; }
+    else if (cat.includes('conf'))  { icon = 'hugeicons:briefcase-01'; bg = 'linear-gradient(135deg,#0d1f0d,#1a4020)'; }
 
-    // Core Event Mutations
-    createEvent: async (args) => await client.mutation(api.events.createEvent, args),
-    updateEvent: async (args) => await client.mutation(api.events.updateEvent, args),
-    publishEvent: async (event_id) => await client.mutation(api.events.publishEvent, { event_id }),
-    cancelEvent: async (event_id) => await client.mutation(api.events.cancelEvent, { event_id }),
-    deleteEvent: async (event_id) => await client.mutation(api.events.deleteEvent, { event_id }),
+    const venueName = event.location?.venue_name || event.venue?.name || '';
+    const city      = event.location?.city || event.city || '';
+    const minPrice  = event.min_price ?? 0;
+    const priceStr  = minPrice > 0 ? `${event.currency || 'GH₵'} ${minPrice}` : 'Free';
 
-    // Ticket Tier Mutations
-    addTicketTier: async (args) => await client.mutation(api.events.addTicketTier, args),
-    removeTicketTier: async (tier_id) => await client.mutation(api.events.removeTicketTier, { tier_id }),
+    // Using transparent color to support light/dark modes
+    const themeBg = 'var(--color-bg-card)';
+    const themeShadow = 'box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06)';
 
-    // Orders & Payments
-    listOrdersByOrg: async (org_id) => await client.query(api.organizer.listOrdersByOrg, { org_id }),
-    listOrdersByEvent: async (event_id) => await client.query(api.organizer.listOrdersByEvent, { event_id }),
-    createOrder: async (args) => await client.mutation(api.organizer.createOrder, args),
-    createCheckout: async (args) => await client.mutation(api.payments.createCheckout, args),
-    completeOrder: async (args) => await client.mutation(api.payments.completeOrder, args),
-
-    // Promo Codes
-    listPromosByOrg: async (org_id) => await client.query(api.organizer.listPromosByOrg, { org_id }),
-    createPromoCode: async (args) => await client.mutation(api.organizer.createPromoCode, args),
-    deactivatePromoCode: async (promo_id) => await client.mutation(api.organizer.deactivatePromoCode, { promo_id }),
-    deletePromoCode: async (promo_id) => await client.mutation(api.organizer.deletePromoCode, { promo_id }),
-
-    // Staff
-    listStaffByOrg: async (org_id) => await client.query(api.organizer.listStaffByOrg, { org_id }),
-    inviteStaff: async (args) => await client.mutation(api.organizer.inviteStaff, args),
-    revokeStaff: async (staff_id) => await client.mutation(api.organizer.revokeStaff, { staff_id }),
-    removeStaff: async (staff_id) => await client.mutation(api.organizer.removeStaff, { staff_id }),
-
-    // Payouts
-    listPayoutsByOrg: async (org_id) => await client.query(api.organizer.listPayoutsByOrg, { org_id }),
-    requestPayout: async (args) => await client.mutation(api.organizer.requestPayout, args),
-
-    // Attendee Messages
-    listMessagesByOrg: async (org_id) => await client.query(api.organizer.listMessagesByOrg, { org_id }),
-    sendAttendeeMessage: async (args) => await client.mutation(api.organizer.sendAttendeeMessage, args),
-
-    // Analytics
-    getOrgAnalytics: async (org_id) => await client.query(api.organizer.getOrgAnalytics, { org_id }),
-
-    // Tickets
-    checkInTicket: async (args) => await client.mutation(api.organizer.checkInTicket, args),
-
-    // Voting
-    listPollsByOrg: async (org_id) => await client.query(api.events.listPollsByOrg, { org_id }),
-    createPoll: async (args) => await client.mutation(api.events.createPoll, args),
-    castVote: async (args) => await client.mutation(api.events.castVote, args),
-    getPollDetails: async (poll_id) => await client.query(api.events.getPollDetails, { poll_id }),
-    listPublicPolls: async () => await client.query(api.events.listPublicPolls),
-    updatePollStatus: async (args) => await client.mutation(api.events.updatePollStatus, args),
-    deletePoll: async (poll_id) => await client.mutation(api.events.deletePoll, { poll_id }),
-
-    // Utility to render an event card into an HTML string
-    renderEventCard: (event) => {
-        // Format date: "Sat 15 Mar 2026, 8:00 PM"
-        const d = new Date(event.start_date);
-        const dateStr = d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }) + ', ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-
-        // Pick an icon/color based on category
-        let icon = "hugeicons:music-note-01";
-        let bg = "linear-gradient(135deg,#1a0540,#3d0f80)";
-
-        if (event.category.toLowerCase().includes('sport')) {
-            icon = "hugeicons:football";
-            bg = "linear-gradient(135deg,#0a1a30,#0d3060)";
-        } else if (event.category.toLowerCase().includes('fest')) {
-            icon = "hugeicons:tent-01";
-            bg = "linear-gradient(135deg,#1a0a20,#3d1060)";
-        } else if (event.category.toLowerCase().includes('conf')) {
-            icon = "hugeicons:briefcase-01";
-            bg = "linear-gradient(135deg,#0d1f0d,#1a4020)";
+    return `
+    <a href="event-detail.html?slug=${event.slug}" class="event-card" data-reveal style="background:${themeBg}; border-radius: var(--radius-lg); overflow:hidden; border: 1px solid var(--color-border); display:flex; flex-direction:column; text-decoration:none; ${themeShadow}">
+      <div class="event-card__image" style="position:relative; width:100%; height:160px;">
+        ${event.cover_image 
+            ? \`<img src="\${event.cover_image}" alt="\${event.title}" style="width:100%; height:100%; object-fit:cover;" />\`
+            : \`<div class="event-card__image-placeholder" style="background:\${bg}; width:100%; height:100%; display:flex; align-items:center; justify-content:center;">
+                <iconify-icon icon="\${icon}" style="font-size:3em; color:rgba(255,255,255,0.8);"></iconify-icon>
+              </div>\`
         }
+        <div class="event-card__badges" style="position:absolute; top:8px; left:8px; display:flex; gap:4px;">
+          ${event.status === 'published' ? '<span class="badge badge--success" style="background:rgba(46, 204, 113, 0.9); color:white; padding:2px 8px; border-radius:12px; font-size:10px; font-weight:bold;">Live</span>' : ''}
+        </div>
+      </div>
+      <div class="event-card__body" style="padding:16px; display:flex; flex-direction:column; flex:1;">
+        <div class="event-card__category" style="font-size:12px; font-weight:700; color:var(--color-secondary); text-transform:uppercase; margin-bottom:8px;">${event.category}</div>
+        <div class="event-card__title" style="font-family:var(--font-display); font-size:16px; font-weight:700; color:var(--color-text-primary); margin-bottom:12px; line-height:1.3; display:-webkit-box; -webkit-line-clamp:2; line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${event.title}</div>
+        <div class="event-card__details" style="display:flex; flex-direction:column; gap:8px; margin-bottom:16px; flex:1;">
+          <div style="font-size:13px; color:var(--color-text-muted); display:flex; align-items:center; gap:6px;">
+            <iconify-icon icon="hugeicons:calendar-01"></iconify-icon> ${dateStr}
+          </div>
+          <div style="font-size:13px; color:var(--color-text-muted); display:flex; align-items:center; gap:6px;">
+            <iconify-icon icon="hugeicons:location-01"></iconify-icon> ${venueName ? venueName + ', ' : ''}${city}
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; justify-content:space-between; padding-top:16px; border-top:1px solid var(--color-border); margin-top:auto;">
+          <div>
+            <div style="font-size:11px; color:var(--color-text-muted);">From</div>
+            <div style="font-family:var(--font-display); font-size:18px; font-weight:700; color:var(--color-text-primary);">${priceStr}</div>
+          </div>
+          <div style="font-size:12px; font-weight:600; color:var(--color-success);">✓ Available</div>
+        </div>
+      </div>
+    </a>`;
+}
 
-        return `
-        <a href="event-detail.html?slug=${event.slug}" class="event-card" data-reveal>
-            <div class="event-card__image">
-                <div class="event-card__image-placeholder" style="background:${bg};">
-                    <iconify-icon icon="${icon}" style="vertical-align:middle; font-size: 2em; color: rgba(255,255,255,0.8);"></iconify-icon>
-                </div>
-                <div class="event-card__badges">
-                    ${event.status === 'published' ? '<span class="badge badge--success">Live</span>' : ''}
-                </div>
-                <button class="event-card__save" aria-label="Save event">
-                    <iconify-icon icon="hugeicons:favourite"></iconify-icon>
-                </button>
-            </div>
-            <div class="event-card__body">
-                <div class="event-card__category" style="font-size:12px;font-weight:700;color:var(--color-primary);text-transform:uppercase;margin-bottom:8px;">${event.category}</div>
-                <div class="event-card__title" style="font-family:var(--font-display);font-size:16px;font-weight:700;color:white;margin-bottom:12px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${event.title}</div>
-                <div class="event-card__details" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;flex:1;">
-                    <div style="font-size:13px;color:rgba(255,255,255,0.6);display:flex;align-items:center;gap:6px;">
-                        <iconify-icon icon="hugeicons:calendar-01"></iconify-icon> ${dateStr}
-                    </div>
-                    <div style="font-size:13px;color:rgba(255,255,255,0.6);display:flex;align-items:center;gap:6px;">
-                        <iconify-icon icon="hugeicons:location-01"></iconify-icon> ${event.location.venue_name}, ${event.location.city}
-                    </div>
-                </div>
-                <div style="display:flex;align-items:center;justify-content:space-between;padding-top:16px;border-top:1px solid rgba(255,255,255,0.1);margin-top:auto;">
-                    <div>
-                        <div style="font-size:11px;color:rgba(255,255,255,0.5);">From</div>
-                        <div style="font-family:var(--font-display);font-size:18px;font-weight:700;">${event.currency || 'GH₵'} 150 <span style="font-size:12px;font-weight:400;color:rgba(255,255,255,0.5);">/ ticket</span></div>
-                    </div>
-                    <div style="font-size:12px;font-weight:600;color:var(--color-success);">✓ Available</div>
-                </div>
-            </div>
-        </a>
-        `;
-    }
+// ─── window.ConvexDB ────────────────────────────────────────────────────────
+window.ConvexDB = {
+    client: convex,
+
+    // Generic wrappers for dynamic requests (used by voting.js etc.)
+    query: async (name, args = {}) => {
+        if (window.Clerk?.session) {
+            const token = await window.Clerk.session.getToken();
+            convex.setAuth(token);
+        } else {
+            convex.clearAuth();
+        }
+        return convex.query(name, args);
+    },
+    mutation: async (name, args = {}) => {
+        if (window.Clerk?.session) {
+            const token = await window.Clerk.session.getToken();
+            convex.setAuth(token);
+        } else {
+            convex.clearAuth();
+        }
+        return convex.mutation(name, args);
+    },
+
+    // ── Events ──
+    listEvents: () => window.ConvexDB.query("events:listEvents"),
+    listEventsByOrg: (org_id) => window.ConvexDB.query("events:listEventsByOrg", { org_id }),
+    getUpcomingEvents: (limit = 10) => window.ConvexDB.query("events:getUpcomingEvents", { limit }),
+    getEventBySlug: (slug) => window.ConvexDB.query("events:getEventBySlug", { slug }),
+    getTicketTiers: (event_id) => window.ConvexDB.query("events:getTicketTiers", { event_id }),
+    searchEvents: (query) => window.ConvexDB.query("events:searchEvents", { query }),
+
+    // ── Profiles/Users ──
+    upsertUser: (args) => window.ConvexDB.mutation("users:upsertUser", args),
+    getByClerkId: (clerk_id) => window.ConvexDB.query("users:getByClerkId", { clerk_id }),
+
+    // ── Organizers ──
+    getOrgByOwner: (owner_id) => window.ConvexDB.query("users:getOrgByOwner", { owner_id }),
+    getOrCreateOrg: (args) => window.ConvexDB.mutation("users:getOrCreateOrg", args),
+
+    // ── Promo Codes ──
+    validatePromoCode: (code, org_id) => window.ConvexDB.query("users:validatePromoCode", { code, org_id }),
+    redeemPromoCode: (code) => window.ConvexDB.mutation("users:redeemPromoCode", { code }),
+
+    // ── Event Mutations ──
+    createEvent: (args) => window.ConvexDB.mutation("events:createEvent", args),
+    updateEvent: (args) => window.ConvexDB.mutation("events:updateEvent", args),
+    publishEvent: (event_id) => window.ConvexDB.mutation("events:publishEvent", { event_id }),
+    cancelEvent: (event_id) => window.ConvexDB.mutation("events:cancelEvent", { event_id }),
+    deleteEvent: (event_id) => window.ConvexDB.mutation("events:deleteEvent", { event_id }),
+
+    // ── Ticket Tiers ──
+    addTicketTier: (args) => window.ConvexDB.mutation("events:addTicketTier", args),
+    removeTicketTier: (tier_id) => window.ConvexDB.mutation("events:removeTicketTier", { tier_id }),
+
+    // ── Orders & Payments ──
+    listOrdersByOrg: (org_id) => window.ConvexDB.query("organizer:listOrdersByOrg", { org_id }),
+    listOrdersByEvent: (event_id) => window.ConvexDB.query("organizer:listOrdersByEvent", { event_id }),
+    createOrder: (args) => window.ConvexDB.mutation("organizer:createOrder", args),
+    createCheckout: (args) => window.ConvexDB.mutation("payments:createCheckout", args),
+    completeOrder: (args) => window.ConvexDB.mutation("payments:completeOrder", args), // note order_id
+
+    // ── Organizer: Promos ──
+    listPromosByOrg: (org_id) => window.ConvexDB.query("organizer:listPromosByOrg", { org_id }),
+    createPromoCode: (args) => window.ConvexDB.mutation("organizer:createPromoCode", args),
+    deactivatePromoCode: (promo_id) => window.ConvexDB.mutation("organizer:deactivatePromoCode", { promo_id }),
+    deletePromoCode: (promo_id) => window.ConvexDB.mutation("organizer:deletePromoCode", { promo_id }),
+
+    // ── Staff ──
+    listStaffByOrg: (org_id) => window.ConvexDB.query("organizer:listStaffByOrg", { org_id }),
+    inviteStaff: (args) => window.ConvexDB.mutation("organizer:inviteStaff", args),
+    revokeStaff: (staff_id) => window.ConvexDB.mutation("organizer:revokeStaff", { staff_id }),
+    removeStaff: (staff_id) => window.ConvexDB.mutation("organizer:removeStaff", { staff_id }),
+
+    // ── Payouts ──
+    listPayoutsByOrg: (org_id) => window.ConvexDB.query("organizer:listPayoutsByOrg", { org_id }),
+    requestPayout: (args) => window.ConvexDB.mutation("organizer:requestPayout", args),
+
+    // ── Analytics ──
+    getOrgAnalytics: (org_id) => window.ConvexDB.query("organizer:getOrgAnalytics", { org_id }),
+
+    // ── Tickets ──
+    checkInTicket: (args) => window.ConvexDB.mutation("organizer:checkInTicket", args),
+
+    // ── Polls ──
+    listPollsByOrg: (org_id) => window.ConvexDB.query("events:listPollsByOrg", { org_id }),
+    createPoll: (args) => window.ConvexDB.mutation("events:createPoll", args),
+    castVote: (args) => window.ConvexDB.mutation("events:castVote", args),
+    getPollDetails: (poll_id) => window.ConvexDB.query("events:getPollDetails", { poll_id }),
+    listPublicPolls: () => window.ConvexDB.query("events:listPublicPolls", {}),
+    updatePollStatus: (args) => window.ConvexDB.mutation("events:updatePollStatus", args),
+    deletePoll: (poll_id) => window.ConvexDB.mutation("events:deletePoll", { poll_id }),
+
+    // ── Messages ──
+    listMessagesByOrg: (org_id) => window.ConvexDB.query("organizer:listMessagesByOrg", { org_id }),
+    sendAttendeeMessage: (args) => window.ConvexDB.mutation("organizer:sendAttendeeMessage", args),
+
+    // ── Render helper ──
+    renderEventCard,
 };
 
-// Dispatch an event so other scripts know Convex is ready
+// Notify the rest of the app that the database layer is ready
 window.dispatchEvent(new Event('convex-ready'));
+console.log('[TicketAfrica] Convex backend initialised ✓');

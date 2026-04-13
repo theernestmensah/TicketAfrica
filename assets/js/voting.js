@@ -74,7 +74,7 @@ function renderPollDetails(poll) {
                 <div style="margin-bottom:24px;">
                     <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:14px;">
                         <span style="font-weight:600;">${opt.label}</span>
-                        <span style="font-weight:700;color:var(--color-primary);">${pct}% (${opt.votes_count})</span>
+                        <span style="font-weight:700;color:var(--color-secondary);">${pct}% (${opt.votes_count})</span>
                     </div>
                     <div class="results-bar-wrap">
                         <div class="results-bar" style="width:${pct}%"></div>

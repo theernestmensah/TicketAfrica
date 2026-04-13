@@ -866,9 +866,34 @@
       <div style="display:flex;gap:var(--space-4);justify-content:center;flex-wrap:wrap;">
         <a href="events.html" class="btn btn--lg" style="background:white;color: var(--color-bg);font-weight:700;"
           id="final-cta-browse">Browse Events</a>
-        <a href="signup.html" class="btn btn--lg"
-          style="background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3);"
-          id="final-cta-signup">Create Free Account</a>
+        <div class="nav-dropdown" id="final-cta-signup-dd" style="position:relative;">
+          <button class="btn btn--lg nav-dropdown__trigger" id="final-cta-signup"
+            style="background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3);display:inline-flex;align-items:center;gap:8px;">
+            Create Free Account
+            <iconify-icon icon="hugeicons:arrow-down-01" style="font-size:14px;"></iconify-icon>
+          </button>
+          <div class="nav-dropdown__panel" id="final-cta-signup-panel"
+            style="min-width:240px;bottom:calc(100% + 10px);top:auto;left:50%;transform:translateX(-50%);padding:8px;background:var(--color-bg-elevated);border:1px solid var(--color-border);border-radius:var(--radius-xl);">
+            <a href="signup.html" class="nav-dropdown__item" id="final-cta-attendee">
+              <div class="nav-dropdown__item-icon">
+                <iconify-icon icon="hugeicons:user-circle"></iconify-icon>
+              </div>
+              <div class="nav-dropdown__item-content">
+                <span class="nav-dropdown__item-title">As an Attendee</span>
+                <span class="nav-dropdown__item-desc">Browse & buy event tickets</span>
+              </div>
+            </a>
+            <a href="organizer-signup.html" class="nav-dropdown__item" id="final-cta-organizer">
+              <div class="nav-dropdown__item-icon">
+                <iconify-icon icon="hugeicons:calendar-add-02"></iconify-icon>
+              </div>
+              <div class="nav-dropdown__item-content">
+                <span class="nav-dropdown__item-title">As an Organizer</span>
+                <span class="nav-dropdown__item-desc">Create & manage events</span>
+              </div>
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   </section>
