@@ -363,3 +363,63 @@ export const checkInTicket = mutation({
         };
     },
 });
+
+// ── Buyer-facing: Orders for a specific email (used by account.html) ─────────
+
+export const listOrdersByBuyer = query({
+    args: { buyer_email: v.string() },
+    handler: async (ctx, args) => {
+        const orders = await ctx.db
+            .query("orders")
+            .withIndex("by_email", (q) => q.eq("buyer_email", args.buyer_email))
+            .order("desc")
+            .collect();
+
+        const enriched = await Promise.all(orders.map(async (o) => {
+            const event = await ctx.db.get(o.event_id);
+            return {
+                ...o,
+                event_title: event?.title ?? "Unknown Event",
+                event_city: event?.location?.city ?? "",
+                event_date: event?.start_date ?? null,
+            };
+        }));
+        return enriched;
+    },
+});
+
+// ── Read-only ticket verification (used by verify.html) ──────────────────────
+
+export const verifyTicket = query({
+    args: { qr_code: v.string() },
+    handler: async (ctx, args) => {
+        const ticket = await ctx.db
+            .query("tickets")
+            .withIndex("by_qr", (q) => q.eq("qr_code", args.qr_code))
+            .first();
+
+        if (!ticket) {
+            return { valid: false, message: "No ticket found with that code." };
+        }
+
+        const owner = ticket.owner_id ? await ctx.db.get(ticket.owner_id) : null;
+        const tier  = await ctx.db.get(ticket.tier_id);
+        const event = await ctx.db.get(ticket.event_id);
+
+        return {
+            valid: ticket.status === "valid" || ticket.status === "scanned",
+            already_used: ticket.status === "scanned",
+            status: ticket.status,
+            attendee_name: owner ? `${owner.first_name} ${owner.last_name}` : "Guest",
+            ticket_type: (tier as any)?.name || "General Admission",
+            event_title: event?.title ?? "Unknown Event",
+            event_date: event?.start_date ?? null,
+            scanned_at: ticket.scanned_at ?? null,
+            message: ticket.status === "scanned"
+                ? "Ticket has already been used."
+                : ticket.status === "valid"
+                    ? "Ticket is authentic and valid."
+                    : "Ticket is not in a valid state.",
+        };
+    },
+});

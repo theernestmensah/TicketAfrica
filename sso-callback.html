@@ -62,6 +62,29 @@
                 await window.Clerk.handleRedirectCallback({
                     redirectUrl: `${window.location.origin}${dest}`,
                 });
+
+                // Sync Convex user record immediately after successful auth
+                const clerkUser = window.Clerk.user;
+                if (clerkUser) {
+                    try {
+                        // Lazy-load the Convex client to upsert the user
+                        const { ConvexHttpClient } = await import('https://esm.sh/convex@1.32.0/browser');
+                        const convex = new ConvexHttpClient('https://zealous-ptarmigan-734.convex.cloud');
+                        if (window.Clerk.session) {
+                            const token = await window.Clerk.session.getToken();
+                            convex.setAuth(token);
+                        }
+                        await convex.mutation('users:upsertUser', {
+                            clerk_id: clerkUser.id,
+                            email: clerkUser.primaryEmailAddress?.emailAddress || '',
+                            first_name: clerkUser.firstName || '',
+                            last_name: clerkUser.lastName || '',
+                        });
+                    } catch (syncErr) {
+                        console.warn('[SSO] Convex sync error (non-fatal):', syncErr);
+                    }
+                }
+
             } catch (err) {
                 console.error('SSO callback error:', err);
                 window.location.href = dest;

@@ -239,12 +239,76 @@
                 resultDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
 
-            document.getElementById('verify-btn').addEventListener('click', function () {
+            document.getElementById('verify-btn').addEventListener('click', async function () {
                 const ref = document.getElementById('ticket-ref-input').value.trim();
                 if (!ref) { TA.toast('Enter a ticket reference code', 'warning'); return; }
+
                 this.disabled = true;
                 this.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-color:rgba(255,255,255,0.3);border-top-color:white;"></div>';
-                setTimeout(() => { this.disabled = false; this.textContent = 'Verify'; showResult(ref); }, 1800);
+
+                try {
+                    await new Promise(r => window.ConvexDB ? r() : window.addEventListener('convex-ready', r, { once: true }));
+                    const result = await window.ConvexDB.verifyTicket(ref);
+
+                    const resultDiv = document.getElementById('verify-result');
+                    resultDiv.style.display = 'block';
+
+                    if (result.valid) {
+                        const dateStr = result.event_date
+                            ? new Date(result.event_date).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })
+                            : '—';
+                        const usedWarning = result.already_used
+                            ? `<div style="margin-top:var(--space-4);padding:var(--space-3);background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:var(--radius-md);font-size:var(--text-sm);color:#F59E0B;">
+                                ⚠ This ticket has already been scanned at ${result.scanned_at ? new Date(result.scanned_at).toLocaleString() : 'an earlier time'}.
+                              </div>` : '';
+                        resultDiv.innerHTML = `
+                        <div class="result-panel ${result.already_used ? 'result-panel--invalid' : 'result-panel--valid'}">
+                          <div class="result-icon-large ${result.already_used ? 'result-icon-large--invalid' : 'result-icon-large--valid'}">
+                            <iconify-icon icon="${result.already_used ? 'hugeicons:alert-02' : 'hugeicons:tick-01'}" style="width:40px;height:40px;"></iconify-icon>
+                          </div>
+                          <h2 style="color:${result.already_used ? '#F59E0B' : '#22C55E'};margin-bottom:8px;">
+                            ${result.already_used ? '⚠ Ticket Already Used' : '✓ Authentic Ticket'}
+                          </h2>
+                          <p style="color:var(--color-text-muted);font-size:var(--text-sm);">${result.message}</p>
+                          ${usedWarning}
+                          <div class="ticket-detail-grid">
+                            <div class="ticket-detail-item"><div class="ticket-detail-item__label">Reference</div><div class="ticket-detail-item__value" style="font-family:var(--font-mono);">${ref.toUpperCase()}</div></div>
+                            <div class="ticket-detail-item"><div class="ticket-detail-item__label">Status</div><div class="ticket-detail-item__value" style="color:${result.already_used ? '#F59E0B' : '#22C55E'};">${result.already_used ? 'Already Used' : 'Valid'}</div></div>
+                            <div class="ticket-detail-item"><div class="ticket-detail-item__label">Event</div><div class="ticket-detail-item__value">${result.event_title}</div></div>
+                            <div class="ticket-detail-item"><div class="ticket-detail-item__label">Ticket Type</div><div class="ticket-detail-item__value">${result.ticket_type}</div></div>
+                            <div class="ticket-detail-item"><div class="ticket-detail-item__label">Date</div><div class="ticket-detail-item__value">${dateStr}</div></div>
+                            <div class="ticket-detail-item"><div class="ticket-detail-item__label">Registered To</div><div class="ticket-detail-item__value">${result.attendee_name}</div></div>
+                          </div>
+                        </div>`;
+                    } else {
+                        resultDiv.innerHTML = `
+                        <div class="result-panel result-panel--invalid">
+                          <div class="result-icon-large result-icon-large--invalid">
+                            <iconify-icon icon="hugeicons:cancel-01" style="width:40px;height:40px;"></iconify-icon>
+                          </div>
+                          <h2 style="color:#EF4444;margin-bottom:8px;"><iconify-icon inline icon="ph:x-bold"></iconify-icon> Ticket Not Found</h2>
+                          <p style="color:var(--color-text-muted);font-size:var(--text-sm);max-width:360px;margin:0 auto;line-height:1.7;">No ticket matching <strong style="font-family:var(--font-mono);">${ref}</strong> was found in our system. This ticket may be counterfeit, or the reference may be misspelled.</p>
+                          <div style="margin-top:var(--space-6);padding:var(--space-4);background:rgba(239,68,68,0.06);border-radius:var(--radius-lg);text-align:left;">
+                            <p style="font-size:var(--text-sm);font-weight:600;color:#EF4444;margin-bottom:8px;">What to do:</p>
+                            <ul style="list-style:none;display:flex;flex-direction:column;gap:6px;">
+                              <li style="font-size:var(--text-sm);color:var(--color-text-muted);">→ Check your SMS or email for the correct reference</li>
+                              <li style="font-size:var(--text-sm);color:var(--color-text-muted);">→ Contact us via <a href="contact.html" style="color:var(--color-text-primary);">support</a> with your purchase receipt</li>
+                              <li style="font-size:var(--text-sm);color:var(--color-text-muted);">→ Do not use this ticket — it may be fraudulent</li>
+                            </ul>
+                          </div>
+                        </div>`;
+                    }
+
+                    resultDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+                } catch (e) {
+                    console.warn('[TA] Verify error:', e);
+                    // Local fallback: prefix check
+                    showResult(ref);
+                }
+
+                this.disabled = false;
+                this.textContent = 'Verify';
             });
 
             document.getElementById('ticket-ref-input').addEventListener('keydown', function (e) {

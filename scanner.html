@@ -730,6 +730,7 @@
     </div>
 
     <script src="assets/js/core.js"></script>
+    <script src="assets/js/page-connectors.js"></script>
     <script>
         const NAMES = ['Kwame Mensah', 'Abena Oti', 'Kofi Boateng', 'Ama Darko', 'Yaw Asante', 'Efua Mensah', 'Nana Akua', 'Kojo Baah', 'Adwoa Sarpong', 'Emmanuel Tetteh'];
         const TYPES = ['VIP Section', 'General Admission', 'VIP Table', 'GA Standing'];
@@ -816,14 +817,8 @@
             document.getElementById('demo-invalid').addEventListener('click', function () { simulateScan('invalid'); });
             document.getElementById('demo-used').addEventListener('click', function () { simulateScan('used'); });
 
-            document.getElementById('lookup-btn').addEventListener('click', function () {
-                const code = document.getElementById('lookup-input').value.trim();
-                if (!code) return;
-                const roll = Math.random();
-                const status = roll > 0.6 ? 'valid' : roll > 0.3 ? 'used' : 'invalid';
-                simulateScan(status);
-                document.getElementById('lookup-input').value = '';
-            });
+            // NOTE: lookup-btn Convex integration is handled by page-connectors.js
+            // Fallback: keydown still triggers the button (managed by connector)
 
             document.getElementById('lookup-input').addEventListener('keydown', function (e) {
                 if (e.key === 'Enter') document.getElementById('lookup-btn').click();

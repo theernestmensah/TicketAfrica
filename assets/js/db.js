@@ -20,7 +20,7 @@ import { ConvexHttpClient } from "https://esm.sh/convex@1.32.0/browser";
 })();
 
 // ─── Convex Config ────────────────────────────────────────────────────────
-const CONVEX_URL = 'https://gallant-greyhound-48.convex.cloud';
+const CONVEX_URL = 'https://zealous-ptarmigan-734.convex.cloud';
 const convex = new ConvexHttpClient(CONVEX_URL);
 
 // ─── Event card renderer (kept API-compatible) ─────────────────────────────
@@ -139,6 +139,7 @@ window.ConvexDB = {
     // ── Orders & Payments ──
     listOrdersByOrg: (org_id) => window.ConvexDB.query("organizer:listOrdersByOrg", { org_id }),
     listOrdersByEvent: (event_id) => window.ConvexDB.query("organizer:listOrdersByEvent", { event_id }),
+    listOrdersByBuyer: (buyer_email) => window.ConvexDB.query("organizer:listOrdersByBuyer", { buyer_email }),
     createOrder: (args) => window.ConvexDB.mutation("organizer:createOrder", args),
     createCheckout: (args) => window.ConvexDB.mutation("payments:createCheckout", args),
     completeOrder: (args) => window.ConvexDB.mutation("payments:completeOrder", args), // note order_id
@@ -164,6 +165,7 @@ window.ConvexDB = {
 
     // ── Tickets ──
     checkInTicket: (args) => window.ConvexDB.mutation("organizer:checkInTicket", args),
+    verifyTicket: (qr_code) => window.ConvexDB.query("organizer:verifyTicket", { qr_code }),
 
     // ── Polls ──
     listPollsByOrg: (org_id) => window.ConvexDB.query("events:listPollsByOrg", { org_id }),

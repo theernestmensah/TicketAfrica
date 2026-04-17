@@ -859,6 +859,7 @@
     <script src="assets/js/core.js"></script>
     <script src="assets/js/nav.js"></script>
     <script src="assets/js/layout.js"></script>
+    <script src="assets/js/page-connectors.js"></script>
     <script>
         /* =============================================================
            TICKET AFRICA — Events Discovery Page
@@ -1093,8 +1094,11 @@
         }
 
         // ── Filter Events ────────────────────────────────────────
+        // NOTE: page-connectors.js overrides window.filterAndRender with Convex-powered version
+        window.filterAndRender = filterAndRender;
         function filterAndRender() {
-            let filtered = [...DEMO_EVENTS];
+            // Use live Convex data if available, else fall back to DEMO_EVENTS
+            let filtered = [...(window._TA_ALL_EVENTS || DEMO_EVENTS)];
 
             // Country filter
             if (state.country) {
@@ -1153,8 +1157,10 @@
 
         // ── Init ─────────────────────────────────────────────────
         document.addEventListener('DOMContentLoaded', function () {
+            // Expose globally for page-connectors.js
+            window.filterAndRender = filterAndRender;
 
-            // Initial render
+            // Initial render (will show empty until Convex data arrives)
             renderCityFilters('');
             filterAndRender();
 
