@@ -20,7 +20,7 @@ import { ConvexHttpClient } from "https://esm.sh/convex@1.32.0/browser";
 })();
 
 // ─── Convex Config ────────────────────────────────────────────────────────
-const CONVEX_URL = 'https://zealous-ptarmigan-734.convex.cloud';
+const CONVEX_URL = 'https://gallant-greyhound-48.convex.cloud';
 const convex = new ConvexHttpClient(CONVEX_URL);
 
 // ─── Event card renderer (kept API-compatible) ─────────────────────────────

@@ -135,7 +135,7 @@
             </div>
             <div class="dash-topbar__actions">
                 <button class="btn btn--primary btn--sm" id="create-event-btn"
-                    onclick="window.TA?.toast('Create Event coming soon!','info')"
+                    onclick="openCreateModal()"
                     style="gap:6px;display:flex;align-items:center;">
                     <iconify-icon icon="hugeicons:add-01"></iconify-icon>
                     New Event
@@ -834,11 +834,10 @@
                     </td>
                     <td class="td-value">${ev.currency || 'GH₵'} ${((sold * (ev.base_price ?? 0)) / 100).toFixed(2)}</td>
                     <td>
-                        <button onclick="window.TA?.toast('Event management coming soon!','info')"
+                        <button onclick="openManagePanel('${ev._id}', '${(ev.title || '').replace(/'/g, "\\'")}')"
                             style="background:none;border:1px solid rgba(255,255,255,0.08);border-radius:7px;padding:5px 12px;color:rgba(255,255,255,0.5);font-size:12px;cursor:pointer;transition:all 150ms;"
                             onmouseover="this.style.borderColor='rgba(139,92,246,0.4)';this.style.color='#f0f0f5'"
-                            onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';this.style.color='rgba(255,255,255,0.5)'"
-                            onclick="openManagePanel('${ev._id}', '${(ev.title || '').replace(/'/g, "\\'")}')">Manage
+                            onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';this.style.color='rgba(255,255,255,0.5)'">Manage
                         </button>
                         ${ev.status === 'draft' ? `<button onclick="handlePublish('${ev._id}')"
                             style="background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);border-radius:7px;padding:5px 10px;color:#22c55e;font-size:12px;cursor:pointer;margin-left:4px;transition:all 150ms;"
@@ -901,12 +900,23 @@
             renderEventsTable(events, 'overview-events-container', 5);
             renderEventsTable(events, 'my-events-container', null);
 
-            // ── Share events & org_id with feature modules ──
-            if (events && events.length > 0) {
+            // Populate _currentOrgId from events as a fallback (if the new Clerk init hasn't run yet)
+            if (!_currentOrgId && events && events.length > 0 && events[0].org_id) {
+                _currentOrgId = events[0].org_id;
+            }
+
+            // Share events & org_id with feature modules (stubs — overridden by new init flow)
+            if (typeof window.__setOrgId === 'function' && events && events.length > 0) {
                 window.__setOrgId(events[0].org_id);
+            }
+            if (typeof window.__setEvents === 'function') {
                 window.__setEvents(events);
             }
         }
+
+        // Safety stubs so old event listeners don't throw ReferenceError
+        window.__setOrgId = window.__setOrgId || function(id) { if (id) _currentOrgId = id; };
+        window.__setEvents = window.__setEvents || function() {};
 
         /* ── Wait for Clerk ── */
         window.addEventListener('clerk-ready', () => {
@@ -929,21 +939,17 @@
                 image_url: clerkUser.imageUrl
             };
 
-            // Get events from Convex when ready
+            // Get events from Convex when ready — scoped to this organizer's org
             window.addEventListener('convex-ready', async () => {
                 try {
-                    const events = await window.ConvexDB.listEvents();
-                    initDashboard(clerkUserData, events || []);
-                } catch (e) {
-                    initDashboard(clerkUserData, []);
-                }
+                    // _currentOrgId may not be set yet if the new init hasn't run;
+                    // delegate to the new Clerk init block which handles upsertUser + getOrCreateOrg
+                } catch (e) { }
             });
 
-            // If convex is already ready
+            // If convex is already ready — defer to new init block
             if (window.ConvexDB) {
-                window.ConvexDB.listEvents().then(events => {
-                    initDashboard(clerkUserData, events || []);
-                }).catch(() => initDashboard(clerkUserData, []));
+                // new Clerk init block handles this
             } else {
                 // Clerk ready but no convex yet — still render user
                 setTimeout(() => {
@@ -965,6 +971,75 @@
         }, 4000);
 
     </script>
+
+    <!-- ── Manage / Edit Event Modal ── -->
+    <div id="manage-event-modal"
+        style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(12px);z-index:9999;align-items:center;justify-content:center;padding:20px;">
+        <div style="background:var(--color-bg-card);border:1px solid var(--color-border);border-radius:24px;width:100%;max-width:620px;max-height:92vh;overflow-y:auto;box-shadow:var(--shadow-2xl);color:var(--color-text-primary);">
+            <div style="padding:24px 28px;border-bottom:1px solid var(--color-border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--color-bg-card);z-index:10;">
+                <h2 id="me-modal-title" style="font-size:1.1rem;font-weight:700;">Edit Event</h2>
+                <button onclick="closeManageModal()" style="background:none;border:none;color:rgba(255,255,255,0.5);font-size:22px;cursor:pointer;line-height:1;">×</button>
+            </div>
+            <form id="manage-event-form" style="padding:28px;">
+                <input type="hidden" id="me-event-id" />
+                <div style="display:grid;gap:16px;margin-bottom:20px;">
+                    <div>
+                        <label style="font-size:12px;font-weight:600;color:rgba(255,255,255,0.5);display:block;margin-bottom:6px;">Event Title *</label>
+                        <input id="me-title" type="text" required placeholder="Event name"
+                            style="width:100%;background:var(--color-bg-elevated);border:1px solid var(--color-border);border-radius:10px;padding:12px 14px;color:var(--color-text-primary);font-size:14px;outline:none;" />
+                    </div>
+                    <div>
+                        <label style="font-size:12px;font-weight:600;color:rgba(255,255,255,0.5);display:block;margin-bottom:6px;">Description</label>
+                        <textarea id="me-description" rows="3" placeholder="Describe the event…"
+                            style="width:100%;background:var(--color-bg-elevated);border:1px solid var(--color-border);border-radius:10px;padding:12px 14px;color:var(--color-text-primary);font-size:14px;outline:none;resize:vertical;"></textarea>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                        <div>
+                            <label style="font-size:12px;font-weight:600;color:rgba(255,255,255,0.5);display:block;margin-bottom:6px;">Start Date & Time *</label>
+                            <input id="me-start" type="datetime-local" required
+                                style="width:100%;background:var(--color-bg-elevated);border:1px solid var(--color-border);border-radius:10px;padding:12px 14px;color:var(--color-text-primary);font-size:14px;outline:none;" />
+                        </div>
+                        <div>
+                            <label style="font-size:12px;font-weight:600;color:rgba(255,255,255,0.5);display:block;margin-bottom:6px;">End Date & Time *</label>
+                            <input id="me-end" type="datetime-local" required
+                                style="width:100%;background:var(--color-bg-elevated);border:1px solid var(--color-border);border-radius:10px;padding:12px 14px;color:var(--color-text-primary);font-size:14px;outline:none;" />
+                        </div>
+                    </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+                        <div>
+                            <label style="font-size:12px;font-weight:600;color:rgba(255,255,255,0.5);display:block;margin-bottom:6px;">Venue Name</label>
+                            <input id="me-venue" type="text" placeholder="e.g. Accra Sports Stadium"
+                                style="width:100%;background:var(--color-bg-elevated);border:1px solid var(--color-border);border-radius:10px;padding:12px 14px;color:var(--color-text-primary);font-size:14px;outline:none;" />
+                        </div>
+                        <div>
+                            <label style="font-size:12px;font-weight:600;color:rgba(255,255,255,0.5);display:block;margin-bottom:6px;">City *</label>
+                            <input id="me-city" type="text" required placeholder="e.g. Accra"
+                                style="width:100%;background:var(--color-bg-elevated);border:1px solid var(--color-border);border-radius:10px;padding:12px 14px;color:var(--color-text-primary);font-size:14px;outline:none;" />
+                        </div>
+                        <div>
+                            <label style="font-size:12px;font-weight:600;color:rgba(255,255,255,0.5);display:block;margin-bottom:6px;">Country *</label>
+                            <select id="me-country" required
+                                style="width:100%;background:var(--color-bg-elevated);border:1px solid var(--color-border);border-radius:10px;padding:12px 14px;color:var(--color-text-primary);font-size:14px;outline:none;">
+                                <option value="Ghana">Ghana</option>
+                                <option value="Nigeria">Nigeria</option>
+                                <option value="Kenya">Kenya</option>
+                                <option value="South Africa">South Africa</option>
+                                <option value="Rwanda">Rwanda</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div id="me-error" style="display:none;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:10px;padding:12px 14px;font-size:13px;color:#ef4444;margin-bottom:16px;"></div>
+                <div style="display:flex;gap:12px;">
+                    <button type="button" onclick="closeManageModal()"
+                        style="flex:1;padding:13px;border-radius:10px;border:1px solid var(--color-border);background:var(--color-bg-elevated);color:var(--color-text-secondary);font-size:14px;font-weight:600;cursor:pointer;">Cancel</button>
+                    <button type="submit" id="me-submit"
+                        style="flex:2;padding:13px;border-radius:10px;border:none;background:var(--color-primary);color:white;font-size:14px;font-weight:700;cursor:pointer;">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <!-- ── Create Event Modal ── -->
     <div id="create-event-modal"
@@ -1129,6 +1204,31 @@
 
     <script src="assets/js/core.js"></script>
     <script>
+        /* ── Date helpers ── */
+        function getNowMin() {
+            // Returns current local datetime string for use as datetime-local min
+            const now = new Date();
+            now.setSeconds(0, 0); // round to minute
+            return now.toISOString().slice(0, 16); // "YYYY-MM-DDTHH:MM"
+        }
+
+        // When start date changes, update end date min to match (end can't be before start)
+        document.addEventListener('DOMContentLoaded', function () {
+            ['ce-start', 'me-start', 'poll-start'].forEach(function (startId) {
+                const endId = startId.replace('start', 'end');
+                const startEl = document.getElementById(startId);
+                const endEl   = document.getElementById(endId);
+                if (!startEl || !endEl) return;
+                startEl.addEventListener('change', function () {
+                    if (this.value) {
+                        endEl.min = this.value;
+                        // If end is now before start, clear it
+                        if (endEl.value && endEl.value < this.value) endEl.value = '';
+                    }
+                });
+            });
+        });
+
         /* ── Globals ── */
         let _currentOrgId = null; // set after Convex loads
 
@@ -1142,6 +1242,11 @@
             document.getElementById('create-event-form').reset();
             tierCount = 0;
             addTierRow(); // start with one tier
+
+            // Prevent past dates
+            const nowMin = getNowMin();
+            document.getElementById('ce-start').min = nowMin;
+            document.getElementById('ce-end').min = nowMin;
         }
 
         function closeCreateModal() {
@@ -1183,11 +1288,27 @@
             const err = document.getElementById('ce-error');
             err.style.display = 'none';
             btn.disabled = true;
-            btn.textContent = 'Creating…';
+            btn.textContent = 'Connecting…';
 
             try {
-                if (!window.ConvexDB) throw new Error('Not connected to backend. Please wait and try again.');
-                if (!_currentOrgId) throw new Error('Organisation ID not loaded yet. Please refresh.');
+                // Wait up to 8 seconds for ConvexDB to be ready (it loads as a module)
+                if (!window.ConvexDB) {
+                    await new Promise((resolve, reject) => {
+                        const t = setTimeout(() => reject(new Error('Backend connection timed out. Please refresh the page.')), 8000);
+                        window.addEventListener('convex-ready', () => { clearTimeout(t); resolve(); }, { once: true });
+                    });
+                }
+
+                // Wait up to 8 seconds for org ID to be populated by Clerk+Convex init
+                if (!_currentOrgId) {
+                    btn.textContent = 'Loading your account…';
+                    await new Promise((resolve, reject) => {
+                        const t = setTimeout(() => reject(new Error('Could not load your organisation. Please refresh.')), 8000);
+                        const poll = setInterval(() => { if (_currentOrgId) { clearInterval(poll); clearTimeout(t); resolve(); } }, 200);
+                    });
+                }
+
+                btn.textContent = 'Creating…';
 
                 const startDt = new Date(document.getElementById('ce-start').value).toISOString();
                 const endDt = new Date(document.getElementById('ce-end').value).toISOString();
@@ -1228,10 +1349,13 @@
                 closeCreateModal();
                 window.TA?.toast('Event created as Draft! Publish it when ready.', 'success');
 
-                // Refresh table
-                const events = await window.ConvexDB.listEvents();
-                renderEventsTable(events || [], 'overview-events-container', 5);
-                renderEventsTable(events || [], 'my-events-container', null);
+                // Refresh table — scoped to this organizer's org
+                if (_currentOrgId) {
+                    const events = await window.ConvexDB.listEventsByOrg(_currentOrgId);
+                    renderEventsTable(events || [], 'overview-events-container', 5);
+                    renderEventsTable(events || [], 'my-events-container', null);
+                    window.__setEvents(events || []);
+                }
             } catch (ex) {
                 err.textContent = ex.message || 'Something went wrong. Please try again.';
                 err.style.display = 'block';
@@ -1277,22 +1401,101 @@
             }
         }
 
+        /* ── Manage / Edit Panel ── */
         function openManagePanel(eventId, title) {
-            window.TA?.toast(`Managing "${title}" — full edit panel coming soon!`, 'info');
+            // Find event object from the events already fetched by refreshEvents
+            // We'll fetch fresh from Convex to guarantee accuracy
+            const modal = document.getElementById('manage-event-modal');
+            if (!modal) return;
+            modal.style.display = 'flex';
+            document.getElementById('me-event-id').value = eventId;
+            document.getElementById('me-modal-title').textContent = `Edit: ${title}`;
+            document.getElementById('me-error').style.display = 'none';
+
+            // Apply min = now so new date picks can't be in the past
+            const nowMin = getNowMin();
+            document.getElementById('me-start').min = nowMin;
+            document.getElementById('me-end').min = nowMin;
+
+            // Fetch and pre-fill fields
+            (async () => {
+                try {
+                    const all = await window.ConvexDB.listEventsByOrg(_currentOrgId);
+                    const ev = (all || []).find(e => e._id === eventId);
+                    if (!ev) return;
+                    document.getElementById('me-title').value = ev.title || '';
+                    document.getElementById('me-description').value = ev.description || '';
+                    document.getElementById('me-venue').value = ev.location?.venue_name || ev.venue_name || '';
+                    document.getElementById('me-city').value = ev.location?.city || ev.city || '';
+                    document.getElementById('me-country').value = ev.location?.country || ev.country || '';
+                    if (ev.start_date) document.getElementById('me-start').value = new Date(ev.start_date).toISOString().slice(0, 16);
+                    if (ev.end_date) document.getElementById('me-end').value = new Date(ev.end_date).toISOString().slice(0, 16);
+                } catch (e) { console.warn('Could not prefill manage panel', e); }
+            })();
         }
 
+        function closeManageModal() {
+            const modal = document.getElementById('manage-event-modal');
+            if (modal) modal.style.display = 'none';
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const meForm = document.getElementById('manage-event-form');
+            if (meForm) {
+                meForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const btn = document.getElementById('me-submit');
+                    const err = document.getElementById('me-error');
+                    err.style.display = 'none';
+                    btn.disabled = true;
+                    btn.textContent = 'Saving…';
+                    try {
+                        const eventId = document.getElementById('me-event-id').value;
+                        await window.ConvexDB.updateEvent({
+                            event_id: eventId,
+                            title: document.getElementById('me-title').value.trim(),
+                            description: document.getElementById('me-description').value.trim(),
+                            venue_name: document.getElementById('me-venue').value.trim(),
+                            city: document.getElementById('me-city').value.trim(),
+                            country: document.getElementById('me-country').value,
+                            start_date: new Date(document.getElementById('me-start').value).toISOString(),
+                            end_date: new Date(document.getElementById('me-end').value).toISOString(),
+                        });
+                        closeManageModal();
+                        window.TA?.toast('Event updated successfully!', 'success');
+                        refreshEvents();
+                    } catch (ex) {
+                        err.textContent = ex.message || 'Failed to update event.';
+                        err.style.display = 'block';
+                    } finally {
+                        btn.disabled = false;
+                        btn.textContent = 'Save Changes';
+                    }
+                });
+            }
+        });
+
         async function refreshEvents() {
+            if (!_currentOrgId || !window.ConvexDB) return;
             try {
-                const events = await window.ConvexDB.listEvents();
+                const events = await window.ConvexDB.listEventsByOrg(_currentOrgId);
                 renderEventsTable(events || [], 'overview-events-container', 5);
                 renderEventsTable(events || [], 'my-events-container', null);
                 const totalSold = (events || []).reduce((s, e) => s + (e.tickets_sold ?? 0), 0);
+                const totalRev  = (events || []).reduce((s, e) => s + ((e.tickets_sold ?? 0) * (e.base_price ?? 0)), 0);
                 const activeEvents = (events || []).filter(e => e.status === 'published').length;
                 document.getElementById('stat-tickets').textContent = totalSold.toLocaleString();
+                document.getElementById('stat-revenue').textContent = 'GH₵ ' + (totalRev / 100).toLocaleString('en-GH', { minimumFractionDigits: 2 });
                 document.getElementById('stat-events').textContent = activeEvents;
                 document.getElementById('stat-attendees').textContent = totalSold.toLocaleString();
                 document.getElementById('sidebar-event-count').textContent = (events || []).length;
-            } catch (e) { console.error(e); }
+                // Update available payout balance card
+                const paidRev = (events || []).reduce((s, e) => s + ((e.tickets_sold ?? 0) * (e.base_price ?? 0)), 0);
+                const payoutEl = document.getElementById('payout-balance');
+                if (payoutEl) payoutEl.textContent = 'GH₵ ' + (paidRev / 100).toLocaleString('en-GH', { minimumFractionDigits: 2 });
+                // Keep organizer-features in sync
+                window.__setEvents(events || []);
+            } catch (e) { console.error('[refreshEvents]', e); }
         }
 
         /* ── Wire "New Event" buttons ── */
@@ -1473,7 +1676,10 @@
                 }
 
                 async function loadData() {
-                    if (!window.ConvexDB) return;
+                    // Wait for ConvexDB if it hasn't fired yet (module scripts load async)
+                    if (!window.ConvexDB) {
+                        await new Promise(resolve => window.addEventListener('convex-ready', resolve, { once: true }));
+                    }
                     try {
                         const userId = await window.ConvexDB.upsertUser({
                             clerk_id: clerkUser.id,

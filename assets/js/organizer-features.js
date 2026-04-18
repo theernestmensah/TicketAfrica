@@ -10,11 +10,21 @@ let _orgId = null;
 let _allOrders = [];
 let _allEvents = [];
 
-window.__setOrgId = function (id) { _orgId = id; };
+window.__setOrgId = function (id) { _orgId = id; if (id) _pendingOrgResolvers.forEach(r => r()); _pendingOrgResolvers = []; };
 window.__setEvents = function (evs) {
     _allEvents = evs || [];
     populateEventSelectors();
 };
+
+// Wait up to 10s for _orgId to be set, then resolve
+let _pendingOrgResolvers = [];
+function waitForOrgId() {
+    if (_orgId) return Promise.resolve();
+    return new Promise((resolve, reject) => {
+        const timer = setTimeout(() => reject(new Error('Org not loaded')), 10000);
+        _pendingOrgResolvers.push(() => { clearTimeout(timer); resolve(); });
+    });
+}
 
 function populateEventSelectors() {
     const selectors = [
@@ -91,7 +101,8 @@ function renderTable(cols, rows) {
 
 /* ── ORDERS ───────────────────────────────────────────── */
 async function loadOrders() {
-    if (!window.ConvexDB || !_orgId) return;
+    try { await waitForOrgId(); } catch { return; }
+    if (!window.ConvexDB) return;
     const container = document.getElementById('orders-container');
     try {
         const orders = await window.ConvexDB.listOrdersByOrg(_orgId);
@@ -132,7 +143,8 @@ window.filterOrders = filterOrders;
 
 /* ── ATTENDEES ────────────────────────────────────────── */
 async function loadAttendees() {
-    if (!window.ConvexDB || !_orgId) return;
+    try { await waitForOrgId(); } catch { return; }
+    if (!window.ConvexDB) return;
     const container = document.getElementById('attendees-container');
     const eventId = document.getElementById('attendees-event-filter')?.value || null;
     try {
@@ -186,7 +198,8 @@ window.filterAttendees = filterAttendees;
 
 /* ── ANALYTICS ────────────────────────────────────────── */
 async function loadAnalytics() {
-    if (!window.ConvexDB || !_orgId) return;
+    try { await waitForOrgId(); } catch { return; }
+    if (!window.ConvexDB) return;
     try {
         const data = await window.ConvexDB.getOrgAnalytics(_orgId);
         document.getElementById('a-revenue').textContent = fmtCurrency(data.totalRevenue);
@@ -275,7 +288,8 @@ window.loadAnalytics = loadAnalytics;
 
 /* ── PAYOUTS ──────────────────────────────────────────── */
 async function loadPayouts() {
-    if (!window.ConvexDB || !_orgId) return;
+    try { await waitForOrgId(); } catch { return; }
+    if (!window.ConvexDB) return;
     const container = document.getElementById('payouts-container');
     try {
         const payouts = await window.ConvexDB.listPayoutsByOrg(_orgId);
@@ -330,11 +344,18 @@ window.submitPayoutRequest = submitPayoutRequest;
 /* ── PROMO CODES ──────────────────────────────────────── */
 function togglePromoForm() {
     const w = document.getElementById('promo-form-wrap');
-    w.style.display = w.style.display === 'none' ? 'block' : 'none';
+    const isShowing = w.style.display === 'none';
+    w.style.display = isShowing ? 'block' : 'none';
+    
+    if (isShowing && typeof window.getNowMin === 'function') {
+        const expiresIn = document.getElementById('pc-expires');
+        if (expiresIn) expiresIn.min = window.getNowMin();
+    }
 }
 
 async function loadPromos() {
-    if (!window.ConvexDB || !_orgId) return;
+    try { await waitForOrgId(); } catch { return; }
+    if (!window.ConvexDB) return;
     const container = document.getElementById('promos-container');
     try {
         const promos = await window.ConvexDB.listPromosByOrg(_orgId);
@@ -409,7 +430,8 @@ window.deletePromo = deletePromo;
 
 /* ── ATTENDEE MESSAGES ────────────────────────────────── */
 async function loadMessages() {
-    if (!window.ConvexDB || !_orgId) return;
+    try { await waitForOrgId(); } catch { return; }
+    if (!window.ConvexDB) return;
     const container = document.getElementById('messages-container');
     try {
         const msgs = await window.ConvexDB.listMessagesByOrg(_orgId);
@@ -477,7 +499,8 @@ function toggleStaffForm() {
 const ROLE_LABELS = { scanner: 'QR Scanner', co_organizer: 'Co-Organizer', support: 'Support' };
 
 async function loadStaff() {
-    if (!window.ConvexDB || !_orgId) return;
+    try { await waitForOrgId(); } catch { return; }
+    if (!window.ConvexDB) return;
     const container = document.getElementById('staff-container');
     try {
         const staff = await window.ConvexDB.listStaffByOrg(_orgId);
@@ -549,7 +572,16 @@ window.removeStaffMember = removeStaffMember;
 /* ── VOTING & POLLS ──────────────────────────────────── */
 function togglePollForm() {
     const w = document.getElementById('poll-form-wrap');
-    w.style.display = w.style.display === 'none' ? 'block' : 'none';
+    const isShowing = w.style.display === 'none';
+    w.style.display = isShowing ? 'block' : 'none';
+
+    if (isShowing && typeof window.getNowMin === 'function') {
+        const nowMin = window.getNowMin();
+        const pollStart = document.getElementById('poll-start');
+        const pollEnd = document.getElementById('poll-end');
+        if (pollStart) pollStart.min = nowMin;
+        if (pollEnd) pollEnd.min = nowMin;
+    }
 }
 
 function addPollOptionRow() {
@@ -569,7 +601,8 @@ const POLL_STATUS = {
 };
 
 async function loadPolls() {
-    if (!window.ConvexDB || !_orgId) return;
+    try { await waitForOrgId(); } catch { return; }
+    if (!window.ConvexDB) return;
     const container = document.getElementById('polls-container');
     try {
         const polls = await window.ConvexDB.listPollsByOrg(_orgId);
