@@ -1,0 +1,23 @@
+# Ticket Africa — never commit these
+assets/js/config.js
+.env
+.env.local
+.env.*.local
+
+# Supabase local dev
+supabase/.temp
+supabase/functions/.env
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.vscode/settings.json
+.idea/
+
+# Build artifacts
+dist/
+node_modules/
+assets/js/env.js
+

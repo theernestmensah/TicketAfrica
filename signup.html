@@ -1175,20 +1175,35 @@
                         }).catch(function() {}); // silent fail
                     }
 
-                    // 3. If email verification is needed, send the code
+                    // 3. If email verification is needed, send and collect the code
                     if (signUpAttempt.status === 'missing_requirements' &&
                         signUpAttempt.unverifiedFields?.includes('email_address')) {
                         await signUpAttempt.prepareEmailAddressVerification({ strategy: 'email_code' });
+                        const code = window.prompt('We sent a 6-digit verification code to ' + email + '. Enter it here to finish creating your account:');
+                        if (!code) {
+                            alertEl.classList.add('show');
+                            document.getElementById('auth-alert-msg').textContent =
+                                'Check your email for the verification code, then try signing up again to complete your account.';
+                            btn.classList.remove('loading');
+                            btn.disabled = false;
+                            return;
+                        }
+                        const verification = await window.Clerk.client.signUp.attemptEmailAddressVerification({
+                            code: code.trim(),
+                        });
+                        if (verification.status === 'complete') {
+                            await window.Clerk.setActive({ session: verification.createdSessionId });
+                            window.location.href = 'account.html';
+                            return;
+                        }
                         alertEl.classList.add('show');
-                        alertEl.style.borderColor = 'rgba(var(--color-success-rgb, 52,211,153), 0.4)';
-                        alertEl.style.background = 'rgba(var(--color-success-rgb, 52,211,153), 0.06)';
-                        alertEl.style.color = 'var(--color-success, #34d399)';
                         document.getElementById('auth-alert-msg').textContent =
-                            'Check your email — we sent a 6-digit verification code to ' + email + '. Verify then sign in.';
+                            'That code was not accepted. Please check the email and try again.';
                         btn.classList.remove('loading');
                         btn.disabled = false;
                         return;
                     }
+
 
                     // 3. If complete, set session and redirect
                     if (signUpAttempt.status === 'complete') {

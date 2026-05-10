@@ -137,7 +137,7 @@
         </div>
         <div class="dash-content">
             <section id="section-overview">
-                <div class="page-header"><div><div class="page-header__greeting">Good day!</div><h1 id="overview-greeting">Your Dashboard</h1></div></div>
+                <div class="page-header"><div><div class="page-header__greeting" id="overview-time-greeting">Good day</div><h1 id="overview-greeting">Your Dashboard</h1></div></div>
                 <div class="stats-grid">
                     <div class="stat-card"><div class="stat-card__label"><iconify-icon icon="hugeicons:ticket-02"></iconify-icon> Total Tickets Sold</div><div class="stat-card__value" id="stat-tickets">-</div><div class="stat-card__sub">Across all your events</div></div>
                     <div class="stat-card"><div class="stat-card__label"><iconify-icon icon="hugeicons:money-bag-02"></iconify-icon> Gross Revenue</div><div class="stat-card__value" id="stat-revenue">-</div><div class="stat-card__sub">Before platform fees</div></div>
@@ -171,14 +171,47 @@
         <button class="dash-mobile-nav__item" id="mnav-analytics" onclick="mobileSwitchSection('analytics', this)"><iconify-icon icon="hugeicons:chart-increase"></iconify-icon>Analytics</button>
         <button class="dash-mobile-nav__item" id="mnav-more" onclick="openMobileSidebar()"><iconify-icon icon="hugeicons:menu-circle"></iconify-icon>More</button>
     </nav>
-    <script src="assets/js/core.js"></
-script>
-    <script src="assets/js/email-service.js"></
-script>
-    <script src="assets/js/organizer-features.js"></
-script>
+    <script src="assets/js/core.js"></script>
+    <script src="assets/js/email-service.js"></script>
+    <script src="assets/js/organizer-features.js"></script>
     <script>
         /* Shared dashboard state */
+        let _currentOrgId = null;
+
+        function getTimeGreeting() {
+            const hour = new Date().getHours();
+            if (hour < 12) return 'Good Morning';
+            if (hour < 17) return 'Good Afternoon';
+            return 'Good Evening';
+        }
+
+        function getDisplayName(user) {
+            const name = [user?.first_name, user?.last_name].filter(Boolean).join(' ').trim();
+            return name || user?.name || 'Organizer';
+        }
+
+        function setDashboardGreeting(user) {
+            const greeting = getTimeGreeting();
+            const name = getDisplayName(user);
+            const small = document.getElementById('overview-time-greeting');
+            const heading = document.getElementById('overview-greeting');
+            if (small) small.textContent = greeting;
+            if (heading) heading.textContent = `${greeting}, ${name}`;
+        }
+
+        function syncMobileNav(name) {
+            const navMap = {
+                overview: 'mnav-overview',
+                'my-events': 'mnav-events',
+                orders: 'mnav-orders',
+                analytics: 'mnav-analytics',
+            };
+            document.querySelectorAll('.dash-mobile-nav__item').forEach(b => b.classList.remove('active'));
+            const activeButton = document.getElementById(navMap[name] || '');
+            if (activeButton) activeButton.classList.add('active');
+        }
+
+        function _showSectionBase(name, linkEl) {
             // Hide all sections
             document.querySelectorAll('[id^="section-"]').forEach(s => s.style.display = 'none');
             // Show target
@@ -197,6 +230,8 @@ script>
                 staff: 'Staff & Access', voting: 'Voting & Polls'
             };
             document.getElementById('breadcrumb-page').textContent = labels[name] || name;
+            syncMobileNav(name);
+            closeMobileSidebar();
         }
         // Expose base so organizer-features.js can wrap it
         window._showSectionBase = _showSectionBase;
@@ -293,14 +328,12 @@ script>
         window.initDashboard = function initDashboard(user, events) {
             // Update user card
             if (user) {
-                document.getElementById('dash-user-name').textContent =
-                    (user.first_name || '') + ' ' + (user.last_name || '');
+                document.getElementById('dash-user-name').textContent = getDisplayName(user);
                 if (user.image_url) {
                     document.getElementById('dash-user-avatar').innerHTML =
                         `<img src="${user.image_url}" alt="Avatar">`;
                 }
-                document.getElementById('overview-greeting').textContent =
-                    'Welcome back, ' + (user.first_name || 'Organizer') + '!';
+                setDashboardGreeting(user);
             }
 
             // Update stats
@@ -647,9 +680,6 @@ script>
             });
         });
 
-        /* â”€â”€ Globals â”€â”€ */
-        let _currentOrgId = null; // set after Convex loads
-
         /* â”€â”€ Create Event Modal â”€â”€ */
         let tierCount = 0;
 
@@ -950,14 +980,12 @@ script>
                 if (gate) gate.style.display = 'none';
 
                 // Populate sidebar user card
-                document.getElementById('dash-user-name').textContent =
-                    ((clerkUser.firstName || '') + ' ' + (clerkUser.lastName || '')).trim() || 'Organizer';
-
                 const clerkUserData = {
                     first_name: clerkUser.firstName || '',
                     last_name: clerkUser.lastName || '',
                     image_url: clerkUser.imageUrl || ''
                 };
+                document.getElementById('dash-user-name').textContent = getDisplayName(clerkUserData);
 
                 // Wire sign-out link
                 const signOutLink = document.querySelector('.dash-nav-link[href="/index.html"]');
@@ -1040,12 +1068,7 @@ script>
             };
             var linkEl = document.getElementById(navMap[name] || '');
             if (typeof showSection === 'function') showSection(name, linkEl);
-
-            // Update mobile nav active state
-            document.querySelectorAll('.dash-mobile-nav__item').forEach(function(b) {
-                b.classList.remove('active');
-            });
-            if (btn) btn.classList.add('active');
+            if (btn) syncMobileNav(name);
         }
 
         function openMobileSidebar() {
