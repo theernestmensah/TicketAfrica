@@ -1,0 +1,850 @@
+1: <!DOCTYPE html>
+2: <html lang="en">
+4: <head>
+5: <meta charset="UTF-8" />
+6: <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+7: <meta name="description"
+8: content="Afrobeats Night: Grand Finale — Buy tickets for this event at Accra Sports Stadium. Multiple ticket tiers available with mobile money payment." />
+9: <title>Afrobeats Night: Grand Finale — Ticket Africa</title>
+10: <script type="module" src="/assets/js/db.js"></script>
+11: <link rel="stylesheet" href="assets/css/core.css" />
+12: <link rel="stylesheet" href="assets/css/nav-footer.css" />
+13: <style>
+14: .event-detail-layout {
+15: display: grid;
+16: grid-template-columns: 1fr 400px;
+17: gap: var(--space-8);
+18: align-items: flex-start;
+19: padding-top: var(--space-8);
+20: padding-bottom: var(--space-16);
+21: }
+23: .ticket-sidebar {
+24: position: sticky;
+25: top: 84px;
+26: }
+28: /* Cover */
+29: .event-cover {
+30: height: 420px;
+31: background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary), #004D2C);
+32: border-radius: var(--radius-2xl);
+33: margin-top: var(--space-6);
+34: overflow: hidden;
+35: position: relative;
+36: display: flex;
+37: align-items: center;
+38: justify-content: center;
+39: font-size: 8rem;
+40: margin-bottom: var(--space-8);
+41: }
+43: .event-cover__overlay {
+44: position: absolute;
+45: inset: 0;
+46: background: linear-gradient(to top, rgba(13, 13, 13, 0.9) 0%, transparent 60%);
+47: }
+49: .event-cover__info {
+50: position: absolute;
+51: bottom: var(--space-8);
+52: left: var(--space-8);
+53: right: var(--space-8);
+54: }
+56: .event-cover__title {
+57: font-family: var(--font-display);
+58: font-size: clamp(1.5rem, 3vw, 2.5rem);
+59: font-weight: 800;
+60: color: white;
+61: letter-spacing: -0.02em;
+62: margin-bottom: var(--space-3);
+63: }
+65: /* Section blocks */
+66: .detail-section {
+67: margin-bottom: var(--space-8);
+68: padding-bottom: var(--space-8);
+69: border-bottom: 1px solid var(--color-border);
+70: }
+72: .detail-section:last-child {
+73: border-bottom: none;
+74: }
+76: .detail-section__title {
+77: font-family: var(--font-display);
+78: font-size: var(--text-lg);
+79: font-weight: 700;
+80: margin-bottom: var(--space-5);
+81: }
+83: /* Meta row */
+84: .event-meta-grid {
+85: display: grid;
+86: grid-template-columns: repeat(2, 1fr);
+87: gap: var(--space-4);
+88: }
+90: .event-meta-item {
+91: background: var(--color-bg-card);
+92: border: 1px solid var(--color-border);
+93: border-radius: var(--radius-lg);
+94: padding: var(--space-4);
+95: display: flex;
+96: gap: var(--space-3);
+97: align-items: flex-start;
+98: }
+100: .event-meta-item__icon {
+101: width: 36px;
+102: height: 36px;
+103: border-radius: var(--radius-md);
+104: background: var(--color-bg-elevated);
+105: display: flex;
+106: align-items: center;
+107: justify-content: center;
+108: flex-shrink: 0;
+109: }
+111: .event-meta-item__icon svg {
+112: width: 16px;
+113: height: 16px;
+114: color: var(--color-text-primary);
+115: }
+117: .event-meta-item__label {
+118: font-size: var(--text-xs);
+119: color: var(--color-text-muted);
+120: font-weight: 500;
+121: margin-bottom: 2px;
+122: }
+124: .event-meta-item__value {
+125: font-size: var(--text-sm);
+126: font-weight: 600;
+127: color: var(--color-text-primary);
+128: }
+130: /* Ticket tier cards */
+131: .ticket-tier {
+132: background: var(--color-bg-card);
+133: border: 1px solid var(--color-border);
+134: border-radius: var(--radius-xl);
+135: padding: var(--space-5);
+136: margin-bottom: var(--space-4);
+137: cursor: pointer;
+138: transition: all var(--transition-base);
+139: position: relative;
+140: }
+142: .ticket-tier:hover {
+143: border-color: var(--color-text-primary);
+144: }
+146: .ticket-tier.selected {
+147: border-color: var(--color-text-primary);
+148: background: var(--color-bg-elevated);
+149: }
+151: .ticket-tier.sold-out {
+152: opacity: 0.5;
+153: cursor: not-allowed;
+154: }
+156: .ticket-tier__header {
+157: display: flex;
+158: justify-content: space-between;
+159: align-items: flex-start;
+160: margin-bottom: var(--space-2);
+161: }
+163: .ticket-tier__name {
+164: font-family: var(--font-display);
+165: font-size: var(--text-base);
+166: font-weight: 700;
+167: }
+169: .ticket-tier__price {
+170: font-family: var(--font-display);
+171: font-size: var(--text-xl);
+172: font-weight: 800;
+173: color: var(--color-text-primary);
+174: }
+176: .ticket-tier__desc {
+177: font-size: var(--text-sm);
+178: color: var(--color-text-muted);
+179: line-height: 1.6;
+180: margin-bottom: var(--space-3);
+181: }
+183: .ticket-tier__avail {
+184: font-size: var(--text-xs);
+185: font-weight: 600;
+186: }
+188: .ticket-tier__radio {
+189: position: absolute;
+190: top: var(--space-5);
+191: right: var(--space-5);
+192: width: 20px;
+193: height: 20px;
+194: border-radius: 50%;
+195: border: 2px solid var(--color-border);
+196: transition: all var(--transition-fast);
+197: }
+199: .ticket-tier.selected .ticket-tier__radio {
+200: border-color: var(--color-secondary);
+201: background: var(--color-secondary);
+202: }
+204: .ticket-tier.selected .ticket-tier__radio::after {
+205: content: '';
+206: display: block;
+207: width: 8px;
+208: height: 8px;
+209: background: white;
+210: border-radius: 50%;
+211: margin: 4px;
+212: }
+214: /* Qty selector */
+215: .qty-selector {
+216: display: flex;
+217: align-items: center;
+218: gap: var(--space-3);
+219: }
+221: .qty-btn {
+222: width: 36px;
+223: height: 36px;
+224: border-radius: var(--radius-md);
+225: border: 1px solid var(--color-border);
+226: background: var(--color-bg-card);
+227: color: var(--color-text-primary);
+228: font-size: var(--text-lg);
+229: font-weight: 700;
+230: display: flex;
+231: align-items: center;
+232: justify-content: center;
+233: cursor: pointer;
+234: transition: all var(--transition-fast);
+235: }
+237: .qty-btn:hover {
+238: border-color: var(--color-text-primary);
+239: color: var(--color-text-primary);
+240: }
+242: .qty-value {
+243: font-family: var(--font-display);
+244: font-size: var(--text-xl);
+245: font-weight: 800;
+246: min-width: 32px;
+247: text-align: center;
+248: }
+250: /* Order summary */
+251: .order-summary {
+252: background: var(--color-bg-card);
+253: border: 1px solid var(--color-border);
+254: border-radius: var(--radius-xl);
+255: padding: var(--space-6);
+256: }
+258: .order-summary__title {
+259: font-family: var(--font-display);
+260: font-size: var(--text-base);
+261: font-weight: 700;
+262: margin-bottom: var(--space-5);
+263: }
+265: .order-row {
+266: display: flex;
+267: justify-content: space-between;
+268: font-size: var(--text-sm);
+269: margin-bottom: var(--space-3);
+270: }
+272: .order-row span:first-child {
+273: color: var(--color-text-muted);
+274: }
+276: .order-row span:last-child {
+277: font-weight: 600;
+278: }
+280: .order-total {
+281: border-top: 1px solid var(--color-border);
+282: padding-top: var(--space-4);
+283: margin-top: var(--space-2);
+284: }
+286: .order-total span:first-child {
+287: font-weight: 700;
+288: color: var(--color-text-primary);
+289: }
+291: .order-total span:last-child {
+292: font-family: var(--font-display);
+293: font-size: var(--text-xl);
+294: font-weight: 800;
+295: color: var(--color-text-primary);
+296: }
+298: /* Organizer card */
+299: .organizer-card {
+300: display: flex;
+301: gap: var(--space-4);
+302: align-items: center;
+303: }
+305: .organizer-avatar {
+306: width: 56px;
+307: height: 56px;
+308: border-radius: var(--radius-xl);
+309: background: var(--color-bg-elevated);
+310: display: flex;
+311: align-items: center;
+312: justify-content: center;
+313: font-size: 1.5rem;
+314: flex-shrink: 0;
+315: }
+317: .organizer-name {
+318: font-weight: 700;
+319: margin-bottom: 4px;
+320: }
+322: .organizer-events {
+323: font-size: var(--text-sm);
+324: color: var(--color-text-muted);
+325: }
+327: .organizer-verified {
+328: font-size: var(--text-xs);
+329: color: var(--color-success);
+330: font-weight: 600;
+331: display: flex;
+332: align-items: center;
+333: gap: 4px;
+334: margin-top: 4px;
+335: }
+337: /* Map placeholder */
+338: .venue-map {
+339: height: 220px;
+340: background: linear-gradient(135deg, var(--color-bg-elevated), var(--color-bg-card));
+341: border: 1px solid var(--color-border);
+342: border-radius: var(--radius-xl);
+343: display: flex;
+344: align-items: center;
+345: justify-content: center;
+346: flex-direction: column;
+347: gap: var(--space-3);
+348: color: var(--color-text-muted);
+349: font-size: var(--text-sm);
+350: }
+352: /* Countdown */
+353: .sale-countdown {
+354: background: var(--color-secondary);
+355: border: none;
+356: border-radius: var(--radius-lg);
+357: padding: var(--space-4);
+358: text-align: center;
+359: margin-bottom: var(--space-5);
+360: color: var(--color-text-primary);
+361: }
+363: .sale-countdown__label {
+364: font-size: var(--text-xs);
+365: color: var(--color-text-primary);
+366: font-weight: 700;
+367: letter-spacing: 0.06em;
+368: text-transform: uppercase;
+369: margin-bottom: var(--space-2);
+370: }
+372: .countdown {
+373: display: flex;
+374: justify-content: center;
+375: align-items: center;
+376: gap: 8px;
+377: }
+379: .countdown-unit {
+380: display: flex;
+381: flex-direction: column;
+382: align-items: center;
+383: }
+385: .countdown-unit strong {
+386: font-family: var(--font-display);
+387: font-size: var(--text-2xl);
+388: font-weight: 800;
+389: color: var(--color-text-primary);
+390: }
+392: .countdown-unit small {
+393: font-size: 9px;
+394: text-transform: uppercase;
+395: letter-spacing: 0.06em;
+396: color: var(--color-text-muted);
+397: }
+399: .countdown-sep {
+400: font-family: var(--font-display);
+401: font-size: var(--text-xl);
+402: font-weight: 800;
+403: color: var(--color-text-primary);
+404: padding-bottom: 12px;
+405: }
+407: /* Share */
+408: .share-row {
+409: display: flex;
+410: gap: var(--space-3);
+411: flex-wrap: wrap;
+412: }
+414: .share-btn {
+415: display: flex;
+416: align-items: center;
+417: gap: var(--space-2);
+418: padding: var(--space-2) var(--space-4);
+419: border: 1px solid var(--color-border);
+420: border-radius: var(--radius-full);
+421: font-size: var(--text-xs);
+422: font-weight: 600;
+423: color: var(--color-text-secondary);
+424: cursor: pointer;
+425: background: transparent;
+426: transition: all var(--transition-fast);
+427: }
+429: .share-btn:hover {
+430: border-color: var(--color-border-light);
+431: color: var(--color-text-primary);
+432: }
+434: @media(max-width:1024px) {
+435: .event-detail-layout {
+436: grid-template-columns: 1fr;
+437: }
+439: .ticket-sidebar {
+440: position: static;
+441: }
+443: .event-meta-grid {
+444: grid-template-columns: 1fr 1fr;
+445: }
+446: }
+448: @media(max-width:640px) {
+449: .event-meta-grid {
+450: grid-template-columns: 1fr;
+451: }
+453: .event-cover {
+454: height: 280px;
+455: font-size: 5rem;
+456: }
+457: }
+458: </style>
+459: </head>
+461: <body>
+462: <div id="nav-root"></div>
+464: <!-- Breadcrumb -->
+465: <div
+466: style="background:var(--color-bg-elevated);border-bottom:1px solid var(--color-border);padding:var(--space-4) 0;margin-top:68px;">
+467: <div class="container">
+468: <div
+469: style="display:flex;align-items:center;gap:var(--space-2);font-size:var(--text-sm);color:var(--color-text-muted);">
+470: <a href="index.html" style="color:var(--color-text-muted);transition:color var(--transition-fast);"
+471: id="bc-home">Home</a>
+472: <iconify-icon icon="hugeicons:arrow-right-01" style="width:12px;height:12px;"></iconify-icon>
+473: <a href="events.html" style="color:var(--color-text-muted);" id="bc-events">Events</a>
+474: <iconify-icon icon="hugeicons:arrow-right-01" style="width:12px;height:12px;"></iconify-icon>
+475: <span style="color:var(--color-text-primary);">Afrobeats Night: Grand Finale</span>
+476: </div>
+477: </div>
+478: </div>
+480: <div class="container">
+481: <div class="event-detail-layout">
+483: <!-- Left: Event Info -->
+484: <main>
+485: <!-- Cover -->
+486: <div class="event-cover" id="event-cover">
+487: <iconify-icon icon="hugeicons:music-note-01" style="vertical-align:middle;"></iconify-icon>
+488: <div class="event-cover__overlay"></div>
+489: <div class="event-cover__info">
+490: <div style="display:flex;gap:var(--space-2);margin-bottom:var(--space-3);">
+491: <span class="badge badge--primary">Concert</span>
+492: <span class="badge badge--error"><iconify-icon icon="hugeicons:fire"
+493: style="color:var(--color-error);font-size:1.2em;vertical-align:middle;"></iconify-icon>
+494: Hot</span>
+495: </div>
+496: <div class="event-cover__title">Afrobeats Night: Grand Finale ft. Stonebwoy</div>
+497: <div style="display:flex;gap:var(--space-4);flex-wrap:wrap;">
+498: <div
+499: style="display:flex;align-items:center;gap:4px;font-size:var(--text-sm);color:rgba(255,255,255,0.75);">
+500: <iconify-icon icon="hugeicons:calendar-01"
+501: style="width:14px;height:14px;"></iconify-icon>
+502: Sat 15 Mar 2026, 8:00 PM
+503: </div>
+504: <div
+505: style="display:flex;align-items:center;gap:4px;font-size:var(--text-sm);color:rgba(255,255,255,0.75);">
+506: <iconify-icon icon="hugeicons:location-01"
+507: style="width:14px;height:14px;"></iconify-icon>
+508: Accra Sports Stadium, Accra, Ghana
+509: </div>
+510: </div>
+511: </div>
+512: </div>
+514: <!-- Meta grid -->
+515: <div class="detail-section">
+516: <div class="event-meta-grid">
+517: <div class="event-meta-item">
+518: <div class="event-meta-item__icon"><iconify-icon
+519: icon="hugeicons:calendar-01"></iconify-icon></div>
+520: <div>
+521: <div class="event-meta-item__label">Date & Time</div>
+522: <div class="event-meta-item__value">Saturday, 15 March 2026</div>
+523: <div style="font-size:var(--text-xs);color:var(--color-text-muted);">Doors 6:30 PM ·
+524: Show 8:00 PM</div>
+525: </div>
+526: </div>
+527: <div class="event-meta-item">
+528: <div class="event-meta-item__icon"><iconify-icon
+529: icon="hugeicons:location-01"></iconify-icon></div>
+530: <div>
+531: <div class="event-meta-item__label">Venue</div>
+532: <div class="event-meta-item__value">Accra Sports Stadium</div>
+533: <div style="font-size:var(--text-xs);color:var(--color-text-muted);">Accra, Greater
+534: Accra, Ghana</div>
+535: </div>
+536: </div>
+537: <div class="event-meta-item">
+538: <div class="event-meta-item__icon"><iconify-icon
+539: icon="hugeicons:user-add-01"></iconify-icon></div>
+540: <div>
+541: <div class="event-meta-item__label">Expected Attendance</div>
+542: <div class="event-meta-item__value">40,000 attendees</div>
+543: <div style="font-size:var(--text-xs);color:var(--color-text-muted);">General Admission +
+544: Reserved</div>
+545: </div>
+546: </div>
+547: <div class="event-meta-item">
+548: <div class="event-meta-item__icon"><iconify-icon icon="hugeicons:favourite"></iconify-icon>
+549: </div>
+550: <div>
+551: <div class="event-meta-item__label">Category</div>
+552: <div class="event-meta-item__value">Afrobeats / Live Concert</div>
+553: <div style="font-size:var(--text-xs);color:var(--color-text-muted);">18+ event. ID
+554: required at gate.</div>
+555: </div>
+556: </div>
+557: </div>
+558: </div>
+560: <!-- Description -->
+561: <div class="detail-section">
+562: <div class="detail-section__title">About This Event</div>
+563: <div style="color:var(--color-text-secondary);line-height:1.8;font-size:var(--text-base);">
+564: <p style="margin-bottom:var(--space-4);">The most anticipated night of the year returns.
+565: Afrobeats Night: Grand Finale brings together Ghana's biggest musical talent for one
+566: unforgettable evening at Accra Sports Stadium. Headlining the night is international
+567: superstar <strong style="color:var(--color-text-primary);">Stonebwoy</strong>, supported by
+568: an explosive lineup of Afrobeats, Highlife, and Dancehall acts.</p>
+569: <p style="margin-bottom:var(--space-4);">This is not just a concert — it is a cultural
+570: celebration. Expect state-of-the-art production, pyrotechnics, and a crowd energy that will
+571: define 2026. Gates open at 6:30 PM. Main act begins at 10:00 PM. Supporting acts from 8:00
+572: PM.</p>
+573: <p><strong style="color:var(--color-text-primary);">Lineup includes:</strong></p>
+574: <ul
+575: style="margin-top:var(--space-3);padding-left:var(--space-6);display:flex;flex-direction:column;gap:var(--space-2);">
+576: <li style="color:var(--color-text-secondary);">Stonebwoy (Headline)</li>
+577: <li style="color:var(--color-text-secondary);">Kuami Eugene</li>
+578: <li style="color:var(--color-text-secondary);">Sefa</li>
+579: <li style="color:var(--color-text-secondary);">KiDi</li>
+580: <li style="color:var(--color-text-secondary);">+ Special Surprise Guest</li>
+581: </ul>
+582: </div>
+583: </div>
+585: <!-- Venue & Map -->
+586: <div class="detail-section">
+587: <div class="detail-section__title">Venue</div>
+588: <div class="venue-map" id="venue-map">
+589: <iconify-icon icon="hugeicons:location-01"
+590: style="width:32px;height:32px;color:var(--color-text-muted);"></iconify-icon>
+591: <span>Accra Sports Stadium, Accra — Open in Maps</span>
+592: </div>
+593: <div style="margin-top:var(--space-4);display:flex;flex-direction:column;gap:var(--space-2);">
+594: <div style="font-size:var(--text-sm);color:var(--color-text-muted);"><iconify-icon
+595: icon="hugeicons:location-01" style="vertical-align:middle;"></iconify-icon> Independence
+596: Avenue,
+597: Accra, Greater Accra Region, Ghana</div>
+598: <div style="font-size:var(--text-sm);color:var(--color-text-muted);">🚌 Accessible by Metro Mass
+599: Transit, trotro, taxi, and Uber</div>
+600: <div style="font-size:var(--text-sm);color:var(--color-text-muted);">🅿️ Parking available
+601: on-site — arrive early</div>
+602: </div>
+603: </div>
+605: <!-- Organizer -->
+606: <div class="detail-section">
+607: <div class="detail-section__title">Organised By</div>
+608: <div class="organizer-card">
+609: <div class="organizer-avatar">🎭</div>
+610: <div>
+611: <div class="organizer-name">LiveNation Ghana Ltd</div>
+612: <div class="organizer-events">84 events hosted · Est. 2018</div>
+613: <div class="organizer-verified">
+614: <iconify-icon icon="hugeicons:check-circle"
+615: style="width:12px;height:12px;"></iconify-icon>
+616: Verified Organizer
+617: </div>
+618: </div>
+619: </div>
+620: <div style="margin-top:var(--space-4);display:flex;gap:var(--space-3);">
+621: <a href="#" class="btn btn--secondary btn--sm" id="contact-organizer">Contact Organizer</a>
+622: <a href="#" class="btn btn--ghost btn--sm" id="view-organizer-events">View All Events</a>
+623: </div>
+624: </div>
+626: <!-- Share -->
+627: <div>
+628: <div class="detail-section__title" style="margin-bottom:var(--space-4);">Share This Event</div>
+629: <div class="share-row">
+630: <button class="share-btn" id="share-whatsapp"
+631: onclick="TA.toast('Link copied for WhatsApp','success')"><iconify-icon
+632: icon="hugeicons:smart-phone-01" style="vertical-align:middle;"></iconify-icon>
+633: WhatsApp</button>
+634: <button class="share-btn" id="share-twitter" onclick="TA.toast('Opening Twitter/X','info')">🐦
+635: Twitter/X</button>
+636: <button class="share-btn" id="share-facebook" onclick="TA.toast('Opening Facebook','info')">👍
+637: Facebook</button>
+638: <button class="share-btn" id="share-copy"
+639: onclick="navigator.clipboard&&navigator.clipboard.writeText(window.location.href);TA.toast('Event link copied to clipboard','success')">🔗
+640: Copy Link</button>
+641: </div>
+642: </div>
+643: </main>
+645: <!-- Right: Ticket Purchase Sidebar -->
+646: <aside class="ticket-sidebar">
+647: <!-- Sale Countdown -->
+648: <div class="sale-countdown" id="sale-countdown">
+649: <div class="sale-countdown__label">⚡ Sale Ends In</div>
+650: <div class="countdown" id="countdown-display"></div>
+651: </div>
+653: <!-- Ticket Tiers -->
+654: <div style="margin-bottom:var(--space-5);">
+655: <div class="detail-section__title" style="margin-bottom:var(--space-4);">Select Ticket Type</div>
+657: <div class="ticket-tier" id="tier-ga" data-price="150" data-name="General Admission">
+658: <div class="ticket-tier__radio"></div>
+659: <div class="ticket-tier__header">
+660: <span class="ticket-tier__name">General Admission</span>
+661: <span class="ticket-tier__price">GH₵ 150</span>
+662: </div>
+663: <div class="ticket-tier__desc">Standing floor access. First-come, first-served. No seat
+664: assignment.</div>
+665: <div class="ticket-tier__avail" style="color:var(--color-warning);">⚡ 1,241 remaining</div>
+666: </div>
+668: <div class="ticket-tier selected" id="tier-vip" data-price="350" data-name="VIP Section">
+669: <div class="ticket-tier__radio"></div>
+670: <div class="ticket-tier__header">
+671: <span class="ticket-tier__name">VIP Section</span>
+672: <span class="ticket-tier__price">GH₵ 350</span>
+673: </div>
+674: <div class="ticket-tier__desc">Dedicated VIP area with elevated view, private bar access, and
+675: priority entry. Assigned seating.</div>
+676: <div class="ticket-tier__avail" style="color:var(--color-error);"><iconify-icon
+677: icon="hugeicons:fire"
+678: style="color:var(--color-error);font-size:1.2em;vertical-align:middle;"></iconify-icon>
+679: 287 remaining</div>
+680: </div>
+682: <div class="ticket-tier" id="tier-table" data-price="2500" data-name="VIP Table (8 pax)">
+683: <div class="ticket-tier__radio"></div>
+684: <div class="ticket-tier__header">
+685: <span class="ticket-tier__name">VIP Table (8 pax)</span>
+686: <span class="ticket-tier__price">GH₵ 2,500</span>
+687: </div>
+688: <div class="ticket-tier__desc">Private table for 8 people. Complimentary bottle service.
+689: Dedicated host.</div>
+690: <div class="ticket-tier__avail" style="color:var(--color-error);"><iconify-icon
+691: icon="hugeicons:fire"
+692: style="color:var(--color-error);font-size:1.2em;vertical-align:middle;"></iconify-icon>
+693: 12 tables left</div>
+694: </div>
+696: <div class="ticket-tier sold-out" id="tier-platinum">
+697: <div class="ticket-tier__radio"></div>
+698: <div class="ticket-tier__header">
+699: <span class="ticket-tier__name">Platinum Backstage</span>
+700: <span class="ticket-tier__price" style="color:var(--color-text-muted);">GH₵ 1,800</span>
+701: </div>
+702: <div class="ticket-tier__desc">Backstage meet & greet, exclusive merchandise pack. Sold out.
+703: </div>
+704: <div class="ticket-tier__avail" style="color:var(--color-text-muted);">✗ Sold Out</div>
+705: </div>
+706: </div>
+708: <!-- Quantity Selector -->
+709: <div style="margin-bottom:var(--space-5);">
+710: <div
+711: style="font-size:var(--text-sm);font-weight:600;color:var(--color-text-secondary);margin-bottom:var(--space-3);">
+712: Quantity (max 6 per order)</div>
+713: <div class="qty-selector">
+714: <button class="qty-btn" id="qty-minus">−</button>
+715: <div class="qty-value" id="qty-display">2</div>
+716: <button class="qty-btn" id="qty-plus">+</button>
+717: </div>
+718: </div>
+720: <!-- Order Summary -->
+721: <div class="order-summary" id="order-summary">
+722: <div class="order-summary__title">Order Summary</div>
+723: <div class="order-row"><span>VIP Section × 2</span><span id="subtotal">GH₵ 700.00</span></div>
+724: <div class="order-row"><span>Service fee (5%)</span><span id="service-fee">GH₵ 35.00</span></div>
+725: <div class="order-row"><span>SMS delivery</span><span>GH₵ 1.00</span></div>
+726: <div class="order-row order-total"><span>Total</span><span id="total">GH₵ 736.00</span></div>
+727: </div>
+729: <!-- CTA -->
+730: <div style="margin-top:var(--space-5);display:flex;flex-direction:column;gap:var(--space-3);">
+731: <a href="checkout.html" class="btn btn--primary btn--full btn--lg" id="buy-now-btn">
+732: <iconify-icon icon="hugeicons:ticket-01" style="width:18px;height:18px;"></iconify-icon>
+733: Buy Tickets — GH₵ 736.00
+734: </a>
+735: <button class="btn btn--ghost btn--full" id="add-to-wallet-btn"
+736: onclick="TA.toast('Add to wallet — sign in first','info')">
+737: <iconify-icon icon="hugeicons:credit-card" style="width:16px;height:16px;"></iconify-icon>
+738: Save for Later
+739: </button>
+740: </div>
+742: <!-- Trust signals -->
+743: <div style="margin-top:var(--space-5);display:flex;flex-direction:column;gap:var(--space-3);">
+744: <div
+745: style="display:flex;align-items:center;gap:var(--space-2);font-size:var(--text-xs);color:var(--color-text-muted);">
+746: <iconify-icon icon="hugeicons:shield-01"
+747: style="width:14px;height:14px;color:var(--color-success);"></iconify-icon>
+748: 100% authentic QR tickets — guaranteed
+749: </div>
+750: <div
+751: style="display:flex;align-items:center;gap:var(--space-2);font-size:var(--text-xs);color:var(--color-text-muted);">
+752: <iconify-icon icon="hugeicons:tick-01"
+753: style="width:14px;height:14px;color:var(--color-success);"></iconify-icon>
+754: Instant delivery via SMS & email
+755: </div>
+756: <div
+757: style="display:flex;align-items:center;gap:var(--space-2);font-size:var(--text-xs);color:var(--color-text-muted);">
+758: <iconify-icon icon="hugeicons:credit-card"
+759: style="width:14px;height:14px;color:var(--color-success);"></iconify-icon>
+760: Mobile money, card, bank transfer accepted
+761: </div>
+762: </div>
+764: <!-- USSD Purchase -->
+765: <div
+766: style="margin-top:var(--space-5);padding:var(--space-4);background:var(--color-bg-input);border:1px solid var(--color-border);border-radius:var(--radius-lg);">
+767: <div
+768: style="font-size:var(--text-xs);font-weight:700;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:var(--space-2);">
+769: No Smartphone? No Problem.</div>
+770: <div style="font-size:var(--text-sm);color:var(--color-text-secondary);">Buy via USSD: <strong
+771: style="font-family:var(--font-mono);color:var(--color-accent);">*123*88#</strong> then
+772: select Event #1047</div>
+773: </div>
+774: </aside>
+775: </div>
+776: </div>
+778: <div id="footer-root"></div>
+780: <script src="assets/js/core.js"></script>
+781: <script src="assets/js/nav.js"></script>
+782: <script src="assets/js/layout.js"></script>
+783: <script>
+784: document.addEventListener('DOMContentLoaded', function () {
+785: // ── Countdown (static fallback) ──
+786: const cd = document.getElementById('countdown-display');
+787: if (cd) TA.countdown(cd, '2026-03-15T20:00:00');
+789: // ── Ticket tier selection (works for both static and dynamic tiers) ──
+790: let selectedPrice = 350;
+791: let selectedTierId = null;
+792: let selectedTierName = 'Ticket';
+793: let qty = 2;
+794: const maxQty = 6;
+796: function updateSummary() {
+797: const subtotal = selectedPrice * qty;
+798: const fee = Math.round(subtotal * 0.05);
+799: const sms = 1;
+800: const total = subtotal + fee + sms;
+801: const s = document.getElementById('subtotal');
+802: const sf = document.getElementById('service-fee');
+803: const t = document.getElementById('total');
+804: const row = document.querySelector('#order-summary .order-row:first-child span:first-child');
+805: const btn = document.getElementById('buy-now-btn');
+806: if (s) s.textContent = 'GH\u20B5 ' + subtotal.toFixed(2);
+807: if (sf) sf.textContent = 'GH\u20B5 ' + fee.toFixed(2);
+808: if (t) t.textContent = 'GH\u20B5 ' + total.toFixed(2);
+809: if (row) row.textContent = selectedTierName + ' \u00D7 ' + qty;
+810: if (btn) {
+811: btn.textContent = 'Buy Tickets \u2014 GH\u20B5 ' + total.toFixed(2);
+812: // Pass order info in URL
+813: const params = new URLSearchParams({
+814: event: document.getElementById('event-cover')?.dataset.eventId || '',
+815: tier: selectedTierId || '',
+816: tier_name: selectedTierName,
+817: qty: qty,
+818: price: selectedPrice,
+819: total: total,
+820: });
+821: btn.href = 'checkout.html?' + params.toString();
+822: }
+823: }
+825: function attachTierListeners() {
+826: const tiers = document.querySelectorAll('.ticket-tier:not(.sold-out)');
+827: tiers.forEach(function (tier) {
+828: tier.addEventListener('click', function () {
+829: tiers.forEach(t => t.classList.remove('selected'));
+830: this.classList.add('selected');
+831: selectedPrice = parseFloat(this.dataset.price) || 0;
+832: selectedTierId = this.dataset.tierId || null;
+833: selectedTierName = this.dataset.name || 'Ticket';
+834: updateSummary();
+835: });
+836: });
+837: }
+839: // Qty buttons
+840: document.getElementById('qty-minus')?.addEventListener('click', function () {
+841: if (qty > 1) { qty--; document.getElementById('qty-display').textContent = qty; updateSummary(); }
+842: });
+843: document.getElementById('qty-plus')?.addEventListener('click', function () {
+844: if (qty < maxQty) { qty++; document.getElementById('qty-display').textContent = qty; updateSummary(); }
+845: });
+847: // ── Dynamic Convex data load ──
+848: function loadFromConvex() {
+849: const slug = new URLSearchParams(window.location.search).get('slug');
+850: if (!slug || !window.ConvexDB) return;
+852: window.ConvexDB.getEventBySlug(slug).then(function (event) {
+853: if (!event) return;
+855: // Update page title & meta
+856: document.title = event.title + ' \u2014 Ticket Africa';
+857: document.querySelector('meta[name="description"]')?.setAttribute('content',
+858: event.description.substring(0, 160));
+860: // Breadcrumb
+861: const bcSpan = document.querySelector('[id^="bc-"] ~ iconify-icon + span');
+862: if (bcSpan) bcSpan.textContent = event.title;
+864: // Cover
+865: const cover = document.getElementById('event-cover');
+866: if (cover) {
+867: cover.dataset.eventId = event._id;
+868: if (event.cover_image) {
+869: cover.style.backgroundImage = 'url(' + event.cover_image + ')';
+870: cover.style.backgroundSize = 'cover';
+871: cover.style.backgroundPosition = 'center';
+872: }
+873: }
+874: document.querySelector('.event-cover__title') && (
+875: document.querySelector('.event-cover__title').textContent = event.title
+876: );
+878: // Date
+879: const d = new Date(event.start_date);
+880: const dateStr = d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+881: const timeStr = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+882: const dateEl = document.querySelector('.event-meta-item__value');
+883: if (dateEl) dateEl.textContent = dateStr;
+885: // Venue
+886: const venueEls = document.querySelectorAll('.event-meta-item__value');
+887: if (venueEls[1]) venueEls[1].textContent = event.location.venue_name;
+888: const venueMap = document.getElementById('venue-map');
+889: if (venueMap) venueMap.querySelector('span').textContent = event.location.venue_name + ', ' + event.location.city + ' \u2014 Open in Maps';
+891: // Description
+892: const descEl = document.querySelector('.detail-section:nth-child(2) div[style*="color"]');
+893: if (descEl) descEl.innerHTML = '<p>' + event.description.replace(/\n/g, '</p><p>') + '</p>';
+895: // Countdown
+896: if (cd) TA.countdown(cd, event.sales_end_date || event.start_date);
+898: // Load ticket tiers
+899: window.ConvexDB.getTicketTiers(event._id).then(function (tiers) {
+900: const container = document.querySelector('.ticket-sidebar > div:first-child + div');
+901: if (!container || !tiers || !tiers.length) return;
+903: const heading = container.querySelector('.detail-section__title');
+904: container.innerHTML = '';
+905: if (heading) container.appendChild(heading);
+907: let firstActive = null;
+908: tiers.forEach(function (tier, i) {
+909: const avail = tier.capacity - tier.sold;
+910: const soldOut = avail <= 0;
+911: const priceGHS = (tier.price / 100).toFixed(2);
+912: const div = document.createElement('div');
+913: div.className = 'ticket-tier' + (soldOut ? ' sold-out' : '') + (i === 0 && !soldOut ? ' selected' : '');
+914: div.dataset.price = (tier.price / 100);
+915: div.dataset.tierId = tier._id;
+916: div.dataset.name = tier.name;
+917: div.innerHTML = `
+918: <div class="ticket-tier__radio"></div>
+919: <div class="ticket-tier__header">
+920: <span class="ticket-tier__name">${tier.name}</span>
+921: <span class="ticket-tier__price">GH\u20B5 ${priceGHS}</span>
+922: </div>
+923: ${tier.description ? `<div class="ticket-tier__desc">${tier.description}</div>` : ''}
+924: <div class="ticket-tier__avail" style="color:${avail < 50 ? 'var(--color-error)' : 'var(--color-warning)'}">
+925: ${soldOut ? '\u2717 Sold Out' : (avail < 50 ? '\uD83D\uDD25 ' : '\u26A1 ') + avail + ' remaining'}
+926: </div>`;
+927: container.appendChild(div);
+928: if (!soldOut && !firstActive) {
+929: firstActive = div;
+930: selectedPrice = tier.price / 100;
+931: selectedTierId = tier._id;
+932: selectedTierName = tier.name;
+933: }
+934: });
+936: attachTierListeners();
+937: updateSummary();
+938: });
+939: });
+940: }
+942: window.addEventListener('convex-ready', loadFromConvex);
+943: if (window.ConvexDB) loadFromConvex();
+945: // Static fallback for initial render
+946: attachTierListeners();
+947: updateSummary();
+948: });
+950: </script>
+951: </body>
+953: </html>

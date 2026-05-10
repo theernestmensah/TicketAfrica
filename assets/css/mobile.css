@@ -1,0 +1,372 @@
+/* ============================================================
+   TICKET AFRICA — GLOBAL MOBILE STYLESHEET
+   Applied on all pages via <link> in <head>
+   Breakpoints: 1024px (tablet), 768px (mobile), 480px (small)
+   ============================================================ */
+
+/* ─── 1. Base mobile touch improvements ─────────────────── */
+* {
+    -webkit-tap-highlight-color: transparent;
+}
+
+input, select, textarea, button {
+    font-size: 16px !important; /* prevent iOS zoom on focus */
+}
+
+/* ─── 2. Toast — full width on mobile ───────────────────── */
+@media (max-width: 480px) {
+    .toast-container {
+        left: var(--space-4);
+        right: var(--space-4);
+        bottom: var(--space-4);
+        max-width: 100%;
+    }
+}
+
+/* ─── 3. Modal — full screen on small devices ────────────── */
+@media (max-width: 600px) {
+    .modal-overlay {
+        padding: 0;
+        align-items: flex-end;
+    }
+    .modal {
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+        max-height: 92vh;
+        overflow-y: auto;
+    }
+    .modal__footer {
+        flex-direction: column-reverse;
+    }
+    .modal__footer .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* ─── 4. Nav (shared) ────────────────────────────────────── */
+@media (max-width: 768px) {
+    .nav-links,
+    .nav__links {
+        display: none !important;
+    }
+    .nav-cta-group {
+        gap: var(--space-2) !important;
+    }
+}
+
+/* ─── 5. Organizer Dashboard ─────────────────────────────── */
+@media (max-width: 1024px) {
+    .dash-layout {
+        grid-template-columns: 1fr !important;
+    }
+    .dash-sidebar {
+        display: none !important;
+    }
+    .dash-main {
+        padding: var(--space-4) !important;
+    }
+}
+
+@media (max-width: 768px) {
+    /* Mobile nav bar replaces sidebar */
+    .dash-mobile-nav {
+        display: flex !important;
+    }
+
+    /* Stats grid → 2 cols */
+    .overview-stats {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: var(--space-3) !important;
+    }
+
+    /* Tables → scrollable */
+    .events-table,
+    .orders-table,
+    .staff-table {
+        min-width: 600px;
+    }
+
+    /* Section header wrap */
+    .section-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: var(--space-3) !important;
+    }
+    .section-header .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* Dashboard stat card font */
+    .stat-value {
+        font-size: 1.5rem !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .overview-stats {
+        grid-template-columns: 1fr !important;
+    }
+    .dash-main {
+        padding: var(--space-3) !important;
+    }
+}
+
+/* Mobile bottom nav for dashboard */
+.dash-mobile-nav {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 200;
+    background: var(--color-bg-elevated);
+    border-top: 1px solid var(--color-border);
+    padding: var(--space-2) 0 env(safe-area-inset-bottom, 8px);
+    justify-content: space-around;
+    align-items: center;
+}
+
+.dash-mobile-nav__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: var(--space-2);
+    color: var(--color-text-muted);
+    font-size: 9px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-family: var(--font-body);
+    transition: color var(--transition-fast);
+    min-width: 52px;
+    text-align: center;
+}
+
+.dash-mobile-nav__item iconify-icon {
+    font-size: 22px;
+    transition: color var(--transition-fast);
+}
+
+.dash-mobile-nav__item.active,
+.dash-mobile-nav__item:hover {
+    color: var(--color-secondary);
+}
+
+/* Pad dash-main so content isn't behind mobile nav */
+@media (max-width: 768px) {
+    .dash-main {
+        padding-bottom: 70px !important;
+    }
+}
+
+/* ─── 6. Checkout ────────────────────────────────────────── */
+@media (max-width: 768px) {
+    .checkout-layout,
+    .checkout-grid {
+        grid-template-columns: 1fr !important;
+        gap: var(--space-4) !important;
+    }
+    .checkout-summary {
+        order: -1; /* show order card on top */
+    }
+    .payment-methods {
+        grid-template-columns: 1fr !important;
+    }
+    .payment-step {
+        padding: var(--space-4) !important;
+    }
+}
+
+/* ─── 7. Event Detail ────────────────────────────────────── */
+@media (max-width: 768px) {
+    .event-detail-grid,
+    .event-layout {
+        grid-template-columns: 1fr !important;
+    }
+    .event-sticky-sidebar {
+        position: static !important;
+        top: auto !important;
+    }
+    .event-hero {
+        height: 240px !important;
+    }
+    .event-hero__title {
+        font-size: 1.5rem !important;
+    }
+    .ticket-tier-row {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: var(--space-3);
+    }
+    .ticket-tier-row .btn {
+        width: 100%;
+    }
+}
+
+/* ─── 8. Events listing ──────────────────────────────────── */
+@media (max-width: 768px) {
+    .events-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: var(--space-3) !important;
+    }
+    .events-filters {
+        flex-direction: column !important;
+    }
+    .events-filters .filter-row {
+        flex-wrap: wrap;
+        gap: var(--space-2);
+    }
+    .events-search {
+        width: 100% !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .events-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* ─── 9. Account / Wallet ────────────────────────────────── */
+@media (max-width: 768px) {
+    .account-layout {
+        grid-template-columns: 1fr !important;
+    }
+    .account-sidebar {
+        display: none !important;
+    }
+    .account-mobile-nav {
+        display: flex !important;
+    }
+    .account-tabs {
+        overflow-x: auto;
+        flex-wrap: nowrap !important;
+        -webkit-overflow-scrolling: touch;
+    }
+    .ticket-card-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* ─── 10. Scanner ────────────────────────────────────────── */
+@media (max-width: 768px) {
+    .scanner-layout {
+        grid-template-columns: 1fr !important;
+    }
+    .scanner-video-wrap {
+        max-width: 100% !important;
+    }
+    .scanner-log {
+        max-height: 200px !important;
+    }
+}
+
+/* ─── 11. Voting ─────────────────────────────────────────── */
+@media (max-width: 768px) {
+    .voting-layout {
+        grid-template-columns: 1fr !important;
+    }
+    .poll-options {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* ─── 12. Home (index.html) ──────────────────────────────── */
+@media (max-width: 1024px) {
+    .hero-grid,
+    .hero-layout {
+        grid-template-columns: 1fr !important;
+        text-align: center;
+    }
+    .hero-visual {
+        display: none !important;
+    }
+    .hero-cta-group {
+        justify-content: center !important;
+        flex-wrap: wrap;
+    }
+    .features-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: clamp(2rem, 8vw, 3.5rem) !important;
+    }
+    .features-grid,
+    .stats-grid {
+        grid-template-columns: 1fr !important;
+    }
+    .testimonials-track {
+        grid-template-columns: 1fr !important;
+    }
+    .footer-grid {
+        grid-template-columns: 1fr !important;
+        gap: var(--space-8) !important;
+    }
+    .pricing-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* ─── 13. For-Organizers landing ─────────────────────────── */
+@media (max-width: 768px) {
+    .organizer-hero-grid {
+        grid-template-columns: 1fr !important;
+    }
+    .organizer-features-grid {
+        grid-template-columns: 1fr !important;
+    }
+    .step-list {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* ─── 14. Table overflow wrapper ─────────────────────────── */
+/* Wrap tables in a scrollable div on mobile */
+@media (max-width: 768px) {
+    .table-wrap {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin: 0 calc(-1 * var(--space-4));
+        padding: 0 var(--space-4);
+    }
+}
+
+/* ─── 15. Auth pages (login/signup) ──────────────────────── */
+/* Already handled inline in those pages — this supplements */
+@media (max-width: 768px) {
+    .auth-layout {
+        display: block !important;
+    }
+    .auth-visual {
+        display: none !important;
+    }
+    .auth-form-panel {
+        min-height: 100vh;
+        padding: var(--space-8) var(--space-5) !important;
+    }
+}
+
+/* ─── 16. Utility: hide/show on mobile ───────────────────── */
+@media (max-width: 768px) {
+    .hide-mobile { display: none !important; }
+}
+@media (min-width: 769px) {
+    .show-mobile { display: none !important; }
+}
+
+/* ─── 17. Safe area for notched phones ───────────────────── */
+body {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+}
