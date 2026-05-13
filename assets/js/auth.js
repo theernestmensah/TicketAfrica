@@ -10,7 +10,7 @@
  *       in a no-build environment.
  */
 
-const PUBLISHABLE_KEY = 'pk_test_ZGl2aW5lLWZyb2ctMjUuY2xlcmsuYWNjb3VudHMuZGV2JA';
+const PUBLISHABLE_KEY = window.ENV?.CLERK_PUBLISHABLE_KEY || 'pk_test_ZGl2aW5lLWZyb2ctMjUuY2xlcmsuYWNjb3VudHMuZGV2JA';
 
 export async function initClerk() {
     if (!PUBLISHABLE_KEY) {

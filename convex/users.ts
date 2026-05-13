@@ -19,19 +19,33 @@ export const upsertUser = mutation({
         email: v.string(),
         first_name: v.string(),
         last_name: v.string(),
+        phone: v.optional(v.string()),
+        role: v.optional(v.union(v.literal("buyer"), v.literal("organizer"), v.literal("admin"))),
     },
     handler: async (ctx, args) => {
+        const role = args.role ?? "buyer";
         const existing = await ctx.db
             .query("users")
             .withIndex("by_clerk_id", (q) => q.eq("clerk_id", args.clerk_id))
             .first();
 
         if (existing) {
-            await ctx.db.patch(existing._id, {
+            const updates: {
+                email: string;
+                first_name: string;
+                last_name: string;
+                phone?: string;
+                role?: "buyer" | "organizer" | "admin";
+            } = {
                 email: args.email,
                 first_name: args.first_name,
                 last_name: args.last_name,
-            });
+            };
+
+            if (args.phone !== undefined) updates.phone = args.phone;
+            if (args.role && existing.role !== "admin") updates.role = args.role;
+
+            await ctx.db.patch(existing._id, updates);
             return existing._id;
         }
 
@@ -40,7 +54,8 @@ export const upsertUser = mutation({
             email: args.email,
             first_name: args.first_name,
             last_name: args.last_name,
-            role: "organizer",
+            phone: args.phone,
+            role,
             joined_at: new Date().toISOString(),
         });
     },

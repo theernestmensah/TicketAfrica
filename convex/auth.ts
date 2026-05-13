@@ -29,21 +29,33 @@ export const syncClerkUser = internalMutation({
         email: v.string(),
         first_name: v.string(),
         last_name: v.string(),
-        phone: v.optional(v.string())
+        phone: v.optional(v.string()),
+        role: v.optional(v.union(v.literal("buyer"), v.literal("organizer"), v.literal("admin"))),
     },
     handler: async (ctx, args) => {
+        const role = args.role ?? "buyer";
         const existingUser = await ctx.db
             .query("users")
             .withIndex("by_clerk_id", (q) => q.eq("clerk_id", args.clerk_id))
             .unique();
 
         if (existingUser) {
-            await ctx.db.patch(existingUser._id, {
+            const updates: {
+                email: string;
+                first_name: string;
+                last_name: string;
+                phone?: string;
+                role?: "buyer" | "organizer" | "admin";
+            } = {
                 email: args.email,
                 first_name: args.first_name,
                 last_name: args.last_name,
-                phone: args.phone
-            });
+            };
+
+            if (args.phone !== undefined) updates.phone = args.phone;
+            if (args.role && existingUser.role !== "admin") updates.role = args.role;
+
+            await ctx.db.patch(existingUser._id, updates);
             return existingUser._id;
         }
 
@@ -53,7 +65,7 @@ export const syncClerkUser = internalMutation({
             first_name: args.first_name,
             last_name: args.last_name,
             phone: args.phone,
-            role: "buyer", // default role
+            role,
             joined_at: new Date().toISOString()
         });
 

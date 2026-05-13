@@ -30,9 +30,13 @@ http.route({
 
         // Sync User creation/updates
         if (eventType === "user.created" || eventType === "user.updated") {
-            const { id, email_addresses, first_name, last_name, phone_numbers } = event.data;
+            const { id, email_addresses, first_name, last_name, phone_numbers, unsafe_metadata, public_metadata } = event.data;
             const primaryEmail = email_addresses?.[0]?.email_address;
             const phone = phone_numbers?.[0]?.phone_number;
+            const rawRole = unsafe_metadata?.role || public_metadata?.role;
+            const role = rawRole === "organizer" || rawRole === "admin" || rawRole === "buyer"
+                ? rawRole
+                : undefined;
 
             if (!primaryEmail) {
                 return new Response("Missing Email", { status: 400 });
@@ -44,6 +48,7 @@ http.route({
                 first_name: first_name || "Unknown",
                 last_name: last_name || "User",
                 phone: phone || undefined,
+                role,
             });
         }
 

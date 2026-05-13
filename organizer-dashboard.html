@@ -1017,6 +1017,7 @@
                             email: clerkUser.primaryEmailAddress?.emailAddress || '',
                             first_name: clerkUser.firstName || '',
                             last_name: clerkUser.lastName || '',
+                            role: 'organizer',
                         });
 
                         const org = await window.ConvexDB.getOrCreateOrg({

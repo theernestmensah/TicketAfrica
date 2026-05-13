@@ -45,6 +45,7 @@
             const dest = params.get('redirect') === 'organizer'
                 ? '/organizer-dashboard.html'
                 : '/account.html';
+            const role = params.get('redirect') === 'organizer' ? 'organizer' : 'buyer';
 
             try {
                 // Inject and wait for Clerk
@@ -70,9 +71,9 @@
                     try {
                         // Lazy-load the Convex client to upsert the user
                         const { ConvexHttpClient } = await import('https://esm.sh/convex@1.32.0/browser');
-                        const convex = new ConvexHttpClient('https://zealous-ptarmigan-734.convex.cloud');
+                        const convex = new ConvexHttpClient(window.ENV?.CONVEX_URL || 'https://gallant-greyhound-48.convex.cloud');
                         if (window.Clerk.session) {
-                            const token = await window.Clerk.session.getToken();
+                            const token = await window.Clerk.session.getToken({ template: 'convex' });
                             convex.setAuth(token);
                         }
                         await convex.mutation('users:upsertUser', {
@@ -80,6 +81,7 @@
                             email: clerkUser.primaryEmailAddress?.emailAddress || '',
                             first_name: clerkUser.firstName || '',
                             last_name: clerkUser.lastName || '',
+                            role,
                         });
                     } catch (syncErr) {
                         console.warn('[SSO] Convex sync error (non-fatal):', syncErr);

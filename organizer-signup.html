@@ -20,6 +20,7 @@
             font-family: var(--font-body);
             color: var(--color-text-primary);
             -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
         }
 
         /* ── Split Layout ── */
@@ -37,6 +38,7 @@
             padding: var(--space-10) var(--space-12);
             background: var(--color-bg);
             overflow-y: auto;
+            overflow-x: hidden;
             position: relative;
         }
 
@@ -748,6 +750,19 @@
         @media (max-width: 480px) {
             .input-row { grid-template-columns: 1fr; }
             .social-buttons { grid-template-columns: 1fr; }
+            .auth-form__nav {
+                align-items: flex-start;
+                gap: var(--space-3);
+            }
+            .auth-logo {
+                flex-shrink: 0;
+                font-size: 1.1rem;
+            }
+            .auth-signin-link {
+                max-width: 140px;
+                text-align: right;
+                line-height: 1.35;
+            }
         }
     </style>
 </head>
@@ -1165,6 +1180,7 @@
                         lastName: lname,
                         emailAddress: email,
                         password,
+                        unsafeMetadata: { role: 'organizer' },
                     });
 
                     // 2. Send welcome email to organizer immediately (fire-and-forget)

@@ -425,6 +425,7 @@ async function initAccountPage() {
             email,
             first_name: clerkUser.firstName || '',
             last_name: clerkUser.lastName || '',
+            role: 'buyer',
         });
     } catch (e) {
         console.warn('[TA] upsertUser error on account:', e);

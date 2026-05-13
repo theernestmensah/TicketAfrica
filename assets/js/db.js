@@ -10,17 +10,27 @@ import { ConvexHttpClient } from "https://esm.sh/convex@1.32.0/browser";
 // -- Inject Clerk CDN script (once, idempotent) ----------------------------
 (function injectClerk() {
     if (document.getElementById('clerk-sdk')) return;
+    const clerkKey = window.ENV?.CLERK_PUBLISHABLE_KEY || 'pk_test_ZGl2aW5lLWZyb2ctMjUuY2xlcmsuYWNjb3VudHMuZGV2JA';
     const s = document.createElement('script');
     s.id = 'clerk-sdk';
     s.async = true;
     s.src = 'https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js';
-    s.setAttribute('data-clerk-publishable-key', 'pk_test_ZGl2aW5lLWZyb2ctMjUuY2xlcmsuYWNjb3VudHMuZGV2JA');
+    s.setAttribute('data-clerk-publishable-key', clerkKey);
     document.head.appendChild(s);
 })();
 
 // -- Convex Config ---------------------------------------------------------
-const CONVEX_URL = 'https://gallant-greyhound-48.convex.cloud';
+const CONVEX_URL = window.ENV?.CONVEX_URL || 'https://gallant-greyhound-48.convex.cloud';
 const convex = new ConvexHttpClient(CONVEX_URL);
+
+async function syncConvexAuth() {
+    if (window.Clerk && window.Clerk.session) {
+        const token = await window.Clerk.session.getToken({ template: 'convex' });
+        convex.setAuth(token);
+    } else {
+        convex.clearAuth();
+    }
+}
 
 // -- Event card renderer ---------------------------------------------------
 function renderEventCard(event) {
@@ -82,32 +92,17 @@ window.ConvexDB = {
     // Generic wrappers (used by voting.js etc.)
     query: async function(name, args) {
         args = args || {};
-        if (window.Clerk && window.Clerk.session) {
-            const token = await window.Clerk.session.getToken();
-            convex.setAuth(token);
-        } else {
-            convex.clearAuth();
-        }
+        await syncConvexAuth();
         return convex.query(name, args);
     },
     mutation: async function(name, args) {
         args = args || {};
-        if (window.Clerk && window.Clerk.session) {
-            const token = await window.Clerk.session.getToken();
-            convex.setAuth(token);
-        } else {
-            convex.clearAuth();
-        }
+        await syncConvexAuth();
         return convex.mutation(name, args);
     },
     action: async function(name, args) {
         args = args || {};
-        if (window.Clerk && window.Clerk.session) {
-            const token = await window.Clerk.session.getToken();
-            convex.setAuth(token);
-        } else {
-            convex.clearAuth();
-        }
+        await syncConvexAuth();
         return convex.action(name, args);
     },
 
