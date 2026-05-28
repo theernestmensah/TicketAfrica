@@ -1,14 +1,15 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description"
-        content="Organizer Dashboard â€” Manage your events, track sales, and pay out on Ticket Africa." />
-    <title>Organizer Dashboard â€” Ticket Africa</title>
-    <script type="module" src="/assets/js/db.js"></script>
+        content="Organizer Dashboard - Manage your events, track sales, and pay out on Ticket Africa." />
+    <title>Organizer Dashboard - Ticket Africa</title>
     <script src="assets/js/env.js"></script>
+    <script type="module" src="/assets/js/db.js"></script>
+    
     <link rel="stylesheet" href="assets/css/core.css" />
     <link rel="stylesheet" href="assets/css/mobile.css" />
     <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
@@ -17,7 +18,7 @@
 
 <body>
 
-    <!-- Auth Gate â€” shown until Clerk verifies user -->
+    <!-- Auth Gate - shown until Clerk verifies user -->
     <div class="auth-gate" id="auth-gate">
         <div class="auth-gate__card">
             <div class="auth-gate__icon">
@@ -56,7 +57,7 @@
                 onclick="showSection('my-events', this); return false;">
                 <iconify-icon icon="hugeicons:calendar-01"></iconify-icon>
                 My Events
-                <span class="badge-count" id="sidebar-event-count">â€”</span>
+                <span class="badge-count" id="sidebar-event-count">-</span>
             </a>
             <a href="#" class="dash-nav-link" id="nav-orders" onclick="showSection('orders', this); return false;">
                 <iconify-icon icon="hugeicons:package-delivered"></iconify-icon>
@@ -238,7 +239,7 @@
         // showSection is overridden by organizer-features.js to add lazy-loading
         window.showSection = window.showSection || _showSectionBase;
 
-        /* â”€â”€ Render events into a container â”€â”€ */
+        /* -- Render events into a container -- */
         window.renderEventsTable = function renderEventsTable(events, containerId, limit) {
             const container = document.getElementById(containerId);
             if (!container) return;
@@ -270,10 +271,10 @@
                 return `<tr>
                     <td>
                         <div class="event-name-cell">
-                            <div class="event-thumb">ðŸŽµ</div>
+                            <div class="event-thumb"><iconify-icon icon="hugeicons:calendar-03"></iconify-icon></div>
                             <div>
                                 <div class="event-name">${ev.title || 'Untitled Event'}</div>
-                                <div class="event-venue">${ev.location?.city || 'Location TBD'} Â· ${ev.start_date ? new Date(ev.start_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : 'â€”'}</div>
+                                <div class="event-venue">${ev.location?.city || 'Location TBD'} -  ${ev.start_date ? new Date(ev.start_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : 'TBA'}</div>
                             </div>
                         </div>
                     </td>
@@ -283,7 +284,7 @@
                         <div class="mini-bar" style="margin-top:4px;"><div class="mini-bar__fill" style="width:${pct}%"></div></div>
                          <div class="td-muted" style="margin-top:2px;">${capacity ? `${pct}% of ${capacity}` : 'No tiers yet'}</div>
                     </td>
-                    <td class="td-value">${ev.currency || 'GHâ‚µ'} ${((sold * (ev.base_price ?? 0)) / 100).toFixed(2)}</td>
+                    <td class="td-value">${ev.currency || 'GHS'} ${((sold * (ev.base_price ?? 0)) / 100).toFixed(2)}</td>
                     <td>
                         <a href="scanner.html?event_id=${ev._id}" title="Open scanner for this event"
                             style="display:inline-flex;align-items:center;background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.22);border-radius:7px;padding:5px 10px;color:#60a5fa;font-size:12px;text-decoration:none;margin-right:4px;transition:all 150ms;">Scan</a>
@@ -324,7 +325,7 @@
             </div>`;
         };
 
-        /* â”€â”€ Auth + Data initialization â”€â”€ */
+        /* -- Auth + Data initialization -- */
         window.initDashboard = function initDashboard(user, events) {
             // Update user card
             if (user) {
@@ -342,7 +343,7 @@
             const activeEvents = events.filter(e => e.status === 'published').length;
 
             document.getElementById('stat-tickets').textContent = totalSold.toLocaleString();
-            document.getElementById('stat-revenue').textContent = 'GHâ‚µ ' + (totalRev / 100).toLocaleString('en-GH', { minimumFractionDigits: 2 });
+            document.getElementById('stat-revenue').textContent = 'GHS ' + (totalRev / 100).toLocaleString('en-GH', { minimumFractionDigits: 2 });
             document.getElementById('stat-events').textContent = activeEvents;
             document.getElementById('stat-attendees').textContent = totalSold.toLocaleString();
             document.getElementById('sidebar-event-count').textContent = events.length;
@@ -369,7 +370,7 @@
         window.__setOrgId = window.__setOrgId || function(id) { if (id) _currentOrgId = id; };
         window.__setEvents = window.__setEvents || function() {};
 
-        /* â”€â”€ Wait for Clerk â”€â”€ */
+        /* -- Wait for Clerk -- */
         window.addEventListener('clerk-ready', () => {
             const clerk = window.Clerk;
 
@@ -382,7 +383,7 @@
                 return;
             }
 
-            // Signed in â€” populate user info from Clerk directly
+            // Signed in - populate user info from Clerk directly
             const clerkUser = clerk.user;
             const clerkUserData = {
                 first_name: clerkUser.firstName,
@@ -390,7 +391,7 @@
                 image_url: clerkUser.imageUrl
             };
 
-            // Get events from Convex when ready â€” scoped to this organizer's org
+            // Get events from Convex when ready - scoped to this organizer's org
             window.addEventListener('convex-ready', async () => {
                 try {
                     // _currentOrgId may not be set yet if the new init hasn't run;
@@ -398,38 +399,36 @@
                 } catch (e) { }
             });
 
-            // If convex is already ready â€” defer to new init block
+            // If convex is already ready - defer to new init block
             if (window.ConvexDB) {
                 // new Clerk init block handles this
             } else {
-                // Clerk ready but no convex yet â€” still render user
+                // Clerk ready but no convex yet - still render user
                 setTimeout(() => {
-                    if (document.getElementById('stat-tickets').textContent === 'â€”') {
+                    if (document.getElementById('stat-tickets').textContent === '0') {
                         initDashboard(clerkUserData, []);
                     }
                 }, 3000);
             }
         });
 
-        // If clerk never fires (no db.js), don't block
+        // If Clerk never fires, fail closed and keep the auth gate visible.
         setTimeout(() => {
             if (!window.Clerk) {
-                // Dev mode: show dashboard without auth
-                console.warn('[Dashboard] Clerk not detected. Running in dev mode.');
-                document.getElementById('dash-user-name').textContent = 'Dev Mode';
-                initDashboard({ first_name: 'Developer', last_name: '' }, []);
+                console.warn('[Dashboard] Clerk not detected. Redirecting to organizer login.');
+                window.location.replace('organizer-login.html');
             }
         }, 4000);
 
     </script>
 
-    <!-- â”€â”€ Manage / Edit Event Modal â”€â”€ -->
+    <!-- -- Manage / Edit Event Modal -- -->
     <div id="manage-event-modal"
         style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(12px);z-index:9999;align-items:center;justify-content:center;padding:20px;">
         <div style="background:var(--color-bg-card);border:1px solid var(--color-border);border-radius:24px;width:100%;max-width:620px;max-height:92vh;overflow-y:auto;box-shadow:var(--shadow-2xl);color:var(--color-text-primary);">
             <div style="padding:24px 28px;border-bottom:1px solid var(--color-border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--color-bg-card);z-index:10;">
                 <h2 id="me-modal-title" style="font-size:1.1rem;font-weight:700;">Edit Event</h2>
-                <button onclick="closeManageModal()" style="background:none;border:none;color:rgba(255,255,255,0.5);font-size:22px;cursor:pointer;line-height:1;">Ã—</button>
+                <button onclick="closeManageModal()" style="background:none;border:none;color:rgba(255,255,255,0.5);font-size:22px;cursor:pointer;line-height:1;">x </button>
             </div>
             <form id="manage-event-form" style="padding:28px;">
                 <input type="hidden" id="me-event-id" />
@@ -441,7 +440,7 @@
                     </div>
                     <div>
                         <label style="font-size:12px;font-weight:600;color:rgba(255,255,255,0.5);display:block;margin-bottom:6px;">Description</label>
-                        <textarea id="me-description" rows="3" placeholder="Describe the eventâ€¦"
+                        <textarea id="me-description" rows="3" placeholder="Describe the event..."
                             style="width:100%;background:var(--color-bg-elevated);border:1px solid var(--color-border);border-radius:10px;padding:12px 14px;color:var(--color-text-primary);font-size:14px;outline:none;resize:vertical;"></textarea>
                     </div>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
@@ -492,7 +491,7 @@
         </div>
     </div>
 
-    <!-- â”€â”€ Create Event Modal â”€â”€ -->
+    <!-- -- Create Event Modal -- -->
     <div id="create-event-modal"
         style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(12px);z-index:9999;align-items:center;justify-content:center;padding:20px;">
         <div
@@ -520,7 +519,7 @@
                         <label
                             style="font-size:12px;font-weight:600;color:var(--color-text-secondary);display:block;margin-bottom:6px;">Event
                             Title *</label>
-                        <input id="ce-title" type="text" required placeholder="e.g. Afrobeats Night 2026"
+                        <input id="ce-title" type="text" required placeholder="e.g. Selected Event 2026"
                             style="width:100%;background:var(--color-bg-elevated);border:1px solid var(--color-border);border-radius:10px;padding:12px 14px;color:var(--color-text-primary);font-size:14px;outline:none;transition:border-color 200ms;"
                             onfocus="this.style.borderColor='var(--color-primary)'"
                             onblur="this.style.borderColor='var(--color-border)'" />
@@ -556,8 +555,8 @@
                                 style="font-size:12px;font-weight:600;color:rgba(255,255,255,0.5);display:block;margin-bottom:6px;">Currency</label>
                             <select id="ce-currency"
                                 style="width:100%;background:#1a1a2e;border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:12px 14px;color:#f0f0f5;font-size:14px;outline:none;">
-                                <option value="GHâ‚µ">GHâ‚µ (GHS)</option>
-                                <option value="â‚¦">â‚¦ (NGN)</option>
+                                <option value="GHS">GHS</option>
+                                <option value="NGN">NGN</option>
                                 <option value="R">R (ZAR)</option>
                                 <option value="KSh">KSh (KES)</option>
                                 <option value="$">$ (USD)</option>
@@ -655,7 +654,7 @@
 
     <script src="assets/js/core.js"></script>
     <script>
-        /* â”€â”€ Date helpers â”€â”€ */
+        /* -- Date helpers -- */
         function getNowMin() {
             // Returns current local datetime string for use as datetime-local min
             const now = new Date();
@@ -680,7 +679,7 @@
             });
         });
 
-        /* â”€â”€ Create Event Modal â”€â”€ */
+        /* -- Create Event Modal -- */
         let tierCount = 0;
 
         function openCreateModal() {
@@ -720,7 +719,7 @@
                     </div>
                     <div>
                         <label style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.4);display:block;margin-bottom:5px;">Price (pesewas)</label>
-                        <input name="tier-price-${id}" type="number" min="0" placeholder="5000 = GHâ‚µ50" required style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 12px;color:#f0f0f5;font-size:13px;outline:none;" />
+                        <input name="tier-price-${id}" type="number" min="0" placeholder="5000 = GHS 50" required style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 12px;color:#f0f0f5;font-size:13px;outline:none;" />
                     </div>
                     <div>
                         <label style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.4);display:block;margin-bottom:5px;">Capacity</label>
@@ -736,7 +735,7 @@
             const err = document.getElementById('ce-error');
             err.style.display = 'none';
             btn.disabled = true;
-            btn.textContent = 'Connectingâ€¦';
+            btn.textContent = 'Connecting...';
 
             try {
                 // Wait up to 8 seconds for ConvexDB to be ready (it loads as a module)
@@ -749,14 +748,14 @@
 
                 // Wait up to 8 seconds for org ID to be populated by Clerk+Convex init
                 if (!_currentOrgId) {
-                    btn.textContent = 'Loading your accountâ€¦';
+                    btn.textContent = 'Loading your account...';
                     await new Promise((resolve, reject) => {
                         const t = setTimeout(() => reject(new Error('Could not load your organisation. Please refresh.')), 8000);
                         const poll = setInterval(() => { if (_currentOrgId) { clearInterval(poll); clearTimeout(t); resolve(); } }, 200);
                     });
                 }
 
-                btn.textContent = 'Creatingâ€¦';
+                btn.textContent = 'Creating...';
 
                 const startDt = new Date(document.getElementById('ce-start').value).toISOString();
                 const endDt = new Date(document.getElementById('ce-end').value).toISOString();
@@ -797,7 +796,7 @@
                 closeCreateModal();
                 window.TA?.toast('Event created as Draft! Publish it when ready.', 'success');
 
-                // Refresh table â€” scoped to this organizer's org
+                // Refresh table - scoped to this organizer's org
                 if (_currentOrgId) {
                     const events = await window.ConvexDB.listEventsByOrg(_currentOrgId);
                     renderEventsTable(events || [], 'overview-events-container', 5);
@@ -813,7 +812,7 @@
             }
         });
 
-        /* â”€â”€ Event Actions â”€â”€ */
+        /* -- Event Actions -- */
         async function handlePublish(eventId) {
             if (!window.ConvexDB) return window.TA?.toast('Not connected to backend.', 'error');
             try {
@@ -849,7 +848,7 @@
             }
         }
 
-        /* â”€â”€ Manage / Edit Panel â”€â”€ */
+        /* -- Manage / Edit Panel -- */
         function openManagePanel(eventId, title) {
             // Find event object from the events already fetched by refreshEvents
             // We'll fetch fresh from Convex to guarantee accuracy
@@ -896,7 +895,7 @@
                     const err = document.getElementById('me-error');
                     err.style.display = 'none';
                     btn.disabled = true;
-                    btn.textContent = 'Savingâ€¦';
+                    btn.textContent = 'Saving...';
                     try {
                         const eventId = document.getElementById('me-event-id').value;
                         await window.ConvexDB.updateEvent({
@@ -933,32 +932,32 @@
                 const totalRev  = (events || []).reduce((s, e) => s + (e.gross_revenue ?? ((e.tickets_sold ?? 0) * (e.base_price ?? 0))), 0);
                 const activeEvents = (events || []).filter(e => e.status === 'published').length;
                 document.getElementById('stat-tickets').textContent = totalSold.toLocaleString();
-                document.getElementById('stat-revenue').textContent = 'GHâ‚µ ' + (totalRev / 100).toLocaleString('en-GH', { minimumFractionDigits: 2 });
+                document.getElementById('stat-revenue').textContent = 'GHS ' + (totalRev / 100).toLocaleString('en-GH', { minimumFractionDigits: 2 });
                 document.getElementById('stat-events').textContent = activeEvents;
                 document.getElementById('stat-attendees').textContent = totalSold.toLocaleString();
                 document.getElementById('sidebar-event-count').textContent = (events || []).length;
                 // Update available payout balance card
                 const paidRev = (events || []).reduce((s, e) => s + (e.gross_revenue ?? ((e.tickets_sold ?? 0) * (e.base_price ?? 0))), 0);
                 const payoutEl = document.getElementById('payout-balance');
-                if (payoutEl) payoutEl.textContent = 'GHâ‚µ ' + (paidRev / 100).toLocaleString('en-GH', { minimumFractionDigits: 2 });
+                if (payoutEl) payoutEl.textContent = 'GHS ' + (paidRev / 100).toLocaleString('en-GH', { minimumFractionDigits: 2 });
                 // Keep organizer-features in sync
                 window.__setEvents(events || []);
             } catch (e) { console.error('[refreshEvents]', e); }
         }
 
-        /* â”€â”€ Wire "New Event" buttons â”€â”€ */
+        /* -- Wire "New Event" buttons -- */
         document.getElementById('create-event-btn').onclick = openCreateModal;
         document.querySelectorAll('[onclick*="Create Event coming soon"]').forEach(el => {
             el.removeAttribute('onclick');
             el.addEventListener('click', openCreateModal);
         });
 
-        /* â”€â”€ Section nav â”€â”€ (defined in first script block; alias here) */
+        /* -- Section nav -- (defined in first script block; alias here) */
         // showSection / renderEventsTable / initDashboard are already on window
         // Re-expose _showSectionBase in case organizer-features.js ran first
         if (typeof _showSectionBase === 'function') window._showSectionBase = _showSectionBase;
 
-        /* â”€â”€ Clerk: inject and initialize â”€â”€ */
+        /* -- Clerk: inject and initialize -- */
         const clerkScript = document.createElement('script');
         clerkScript.src = 'https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js';
         clerkScript.setAttribute('data-clerk-publishable-key', window.ENV.CLERK_PUBLISHABLE_KEY);
@@ -970,7 +969,7 @@
                 const clerkUser = window.Clerk.user;
 
                 if (!clerkUser) {
-                    // Not signed in â€” send to login
+                    // Not signed in - send to login
                     window.location.replace('organizer-login.html');
                     return;
                 }
@@ -1052,7 +1051,7 @@
         };
         document.body.appendChild(clerkScript);
 
-        /* â”€â”€ Mobile navigation helpers â”€â”€ */
+        /* -- Mobile navigation helpers -- */
         function mobileSwitchSection(name, btn) {
             // Switch section using the existing showSection
             var navMap = {

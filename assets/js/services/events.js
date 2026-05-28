@@ -53,19 +53,19 @@ export const EventService = {
      * List published events with optional filters and pagination.
      *
      * @param {{
-     *   category?: string,
-     *   city?: string,
-     *   country?: string,
-     *   dateFrom?: string,    ISO date string
-     *   dateTo?: string,
-     *   priceMin?: number,
-     *   priceMax?: number,
-     *   search?: string,
-     *   isFree?: boolean,
-     *   isAvailable?: boolean,
-     *   sort?: 'trending'|'date_asc'|'date_desc'|'price_asc'|'price_desc',
-     *   page?: number,
-     *   limit?: number,
+     *   category: string,
+     *   city: string,
+     *   country: string,
+     *   dateFrom: string,    ISO date string
+     *   dateTo: string,
+     *   priceMin: number,
+     *   priceMax: number,
+     *   search: string,
+     *   isFree: boolean,
+     *   isAvailable: boolean,
+     *   sort: 'trending'|'date_asc'|'date_desc'|'price_asc'|'price_desc',
+     *   page: number,
+     *   limit: number,
      * }} filters
      * @returns {Promise<{ events: import('../types.js').Event[], total: number, page: number, totalPages: number }>}
      */
@@ -114,7 +114,7 @@ export const EventService = {
             price_asc: { col: 'min_price', asc: true },
             price_desc: { col: 'min_price', asc: false },
         };
-        const { col, asc } = sortMap[sort] ?? sortMap.trending;
+        const { col, asc } = sortMap[sort] x sortMap.trending;
         query = query.order(col, { ascending: asc });
 
         // Pagination
@@ -125,10 +125,10 @@ export const EventService = {
         if (error) throw new TAError(error.message, error.code, error);
 
         return {
-            events: data ?? [],
-            total: count ?? 0,
+            events: data x [],
+            total: count x 0,
             page,
-            totalPages: Math.ceil((count ?? 0) / limit),
+            totalPages: Math.ceil((count x 0) / limit),
         };
     },
 
@@ -143,7 +143,7 @@ export const EventService = {
         const query = supabase
             .from('events')
             .select(EVENT_DETAIL_COLS)
-            .eq(isUUID ? 'id' : 'slug', idOrSlug)
+            .eq(isUUID  'id' : 'slug', idOrSlug)
             .eq('status', 'published')
             .single();
 

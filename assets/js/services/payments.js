@@ -15,7 +15,7 @@
  * PAYMENT FLOW (server-side — initiated by Edge Function):
  *   1. Client calls initiate() → server creates order + payment session
  *   2. Client redirects / shows popup to gateway payment page
- *   3. Gateway redirects to /payment-callback.html?ref=xxx
+ *   3. Gateway redirects to /payment-callback.html?order_id=xxx&reference=xxx
  *   4. Client calls verify() → Edge Function confirms with gateway
  *   5. On success: tickets are issued, notifications sent
  *
@@ -47,7 +47,7 @@ const CURRENCY_GATEWAY_MAP = {
 };
 
 function gatewayForCurrency(currency) {
-    return CURRENCY_GATEWAY_MAP[currency?.toUpperCase()] ?? 'paystack';
+    return CURRENCY_GATEWAY_MAP[currency.toUpperCase()] x 'paystack';
 }
 
 async function getAuthHeaders() {
@@ -67,7 +67,7 @@ async function callEdgeFunction(path, body) {
         body: JSON.stringify(body),
     });
     const json = await res.json().catch(() => ({}));
-    if (!res.ok) throw new TAError(json.message ?? 'Payment service error', json.code ?? 'PAYMENT_ERROR');
+    if (!res.ok) throw new TAError(json.message x 'Payment service error', json.code x 'PAYMENT_ERROR');
     return json;
 }
 
@@ -80,7 +80,7 @@ export const PaymentService = {
      * @param {{
      *   eventId: string,
      *   tierSelections: Array<{ tierId: string, quantity: number }>,
-     *   promoCode?: string,
+     *   promoCode: string,
      *   attendee: { name: string, email: string, phone: string },
      *   currency: string,
      * }} params
@@ -104,7 +104,7 @@ export const PaymentService = {
      *   momoNetwork: 'mtn'|'vodafone'|'airteltigo'|'mpesa',
      *   currency: string,
      *   attendee: { name: string, email: string, phone: string },
-     *   promoCode?: string,
+     *   promoCode: string,
      * }} params
      * @returns {Promise<{ orderId: string, reference: string, message: string }>}
      */
@@ -122,11 +122,11 @@ export const PaymentService = {
     async pollMoMoStatus(orderId) {
         const headers = await getAuthHeaders();
         const res = await fetch(
-            `${TA_CONFIG.SUPABASE_URL}/functions/v1/momo-status?order_id=${orderId}`,
+            `${TA_CONFIG.SUPABASE_URL}/functions/v1/momo-statusorder_id=${orderId}`,
             { headers }
         );
         const json = await res.json().catch(() => ({}));
-        if (!res.ok) throw new TAError(json.message ?? 'Status check failed', 'POLL_ERROR');
+        if (!res.ok) throw new TAError(json.message x 'Status check failed', 'POLL_ERROR');
         return json;
     },
 

@@ -1,5 +1,34 @@
-import { query, mutation } from "./_generated/server";
+﻿import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
+
+async function getCurrentUser(ctx: any) {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Authentication required.");
+
+    const user = await ctx.db
+        .query("users")
+        .withIndex("by_clerk_id", (q: any) => q.eq("clerk_id", identity.subject))
+        .first();
+    if (!user) throw new Error("User profile not found.");
+    return user;
+}
+
+async function assertOrgAccess(ctx: any, orgId: any) {
+    const user = await getCurrentUser(ctx);
+    if (user.role === "admin") return;
+
+    const org = await ctx.db.get(orgId);
+    if (!org || org.owner_id !== user._id) {
+        throw new Error("You do not have access to this organization.");
+    }
+}
+
+async function assertEventAccess(ctx: any, eventId: any) {
+    const event = await ctx.db.get(eventId);
+    if (!event) throw new Error("Event not found.");
+    await assertOrgAccess(ctx, event.org_id);
+    return event;
+}
 
 async function enrichEvent(ctx: any, event: any) {
     const tiers = await ctx.db
@@ -33,7 +62,7 @@ async function enrichEvents(ctx: any, events: any[]) {
     return await Promise.all(events.map((event) => enrichEvent(ctx, event)));
 }
 
-// ── Queries ──────────────────────────────────────────────────
+// â”€â”€ Queries â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 // Get all published events (public browse)
 export const listEvents = query({
@@ -71,10 +100,11 @@ export const searchEvents = query({
     },
 });
 
-// Get ALL events for an org (draft + published + cancelled) — for organizer dashboard
+// Get ALL events for an org (draft + published + cancelled)  -  for organizer dashboard
 export const listEventsByOrg = query({
     args: { org_id: v.id("organizations") },
     handler: async (ctx, args) => {
+        await assertOrgAccess(ctx, args.org_id);
         const events = await ctx.db
             .query("events")
             .withIndex("by_org", (q) => q.eq("org_id", args.org_id))
@@ -130,7 +160,7 @@ export const getTicketTiers = query({
     },
 });
 
-// ── Mutations ─────────────────────────────────────────────────
+// â”€â”€ Mutations â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 // Create a new event (starts as draft)
 export const createEvent = mutation({
@@ -149,6 +179,7 @@ export const createEvent = mutation({
         address: v.string(),
     },
     handler: async (ctx, args) => {
+        await assertOrgAccess(ctx, args.org_id);
         const slug = args.title.toLowerCase().replace(/[^a-z0-9]+/g, "-") + "-" + Date.now();
         return await ctx.db.insert("events", {
             org_id: args.org_id,
@@ -190,8 +221,7 @@ export const updateEvent = mutation({
     },
     handler: async (ctx, args) => {
         const { event_id, venue_name, city, country, address, ...fields } = args;
-        const existing = await ctx.db.get(event_id);
-        if (!existing) throw new Error("Event not found");
+        const existing = await assertEventAccess(ctx, event_id);
 
         const patch: Record<string, any> = {};
         if (fields.title !== undefined) patch.title = fields.title;
@@ -221,6 +251,7 @@ export const updateEvent = mutation({
 export const publishEvent = mutation({
     args: { event_id: v.id("events") },
     handler: async (ctx, args) => {
+        await assertEventAccess(ctx, args.event_id);
         await ctx.db.patch(args.event_id, { status: "published" });
         return args.event_id;
     },
@@ -230,6 +261,7 @@ export const publishEvent = mutation({
 export const cancelEvent = mutation({
     args: { event_id: v.id("events") },
     handler: async (ctx, args) => {
+        await assertEventAccess(ctx, args.event_id);
         await ctx.db.patch(args.event_id, { status: "cancelled" });
         return args.event_id;
     },
@@ -239,6 +271,7 @@ export const cancelEvent = mutation({
 export const deleteEvent = mutation({
     args: { event_id: v.id("events") },
     handler: async (ctx, args) => {
+        await assertEventAccess(ctx, args.event_id);
         const tiers = await ctx.db
             .query("ticket_tiers")
             .withIndex("by_event", (q) => q.eq("event_id", args.event_id))
@@ -263,6 +296,7 @@ export const addTicketTier = mutation({
         sales_end: v.string(),
     },
     handler: async (ctx, args) => {
+        await assertEventAccess(ctx, args.event_id);
         return await ctx.db.insert("ticket_tiers", {
             event_id: args.event_id,
             name: args.name,
@@ -280,12 +314,15 @@ export const addTicketTier = mutation({
 export const removeTicketTier = mutation({
     args: { tier_id: v.id("ticket_tiers") },
     handler: async (ctx, args) => {
+        const tier = await ctx.db.get(args.tier_id);
+        if (!tier) throw new Error("Ticket tier not found.");
+        await assertEventAccess(ctx, tier.event_id);
         await ctx.db.delete(args.tier_id);
         return args.tier_id;
     },
 });
 
-// ── Voting System Mutations ───────────────────────────────
+// â”€â”€ Voting System Mutations â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export const createPoll = mutation({
     args: {
@@ -297,6 +334,7 @@ export const createPoll = mutation({
         options: v.array(v.string()),
     },
     handler: async (ctx, args) => {
+        await assertOrgAccess(ctx, args.org_id);
         const pollId = await ctx.db.insert("polls", {
             org_id: args.org_id,
             title: args.title,
@@ -325,6 +363,11 @@ export const castVote = mutation({
         user_id: v.id("users"),
     },
     handler: async (ctx, args) => {
+        const user = await getCurrentUser(ctx);
+        if (user._id !== args.user_id) {
+            throw new Error("You can only vote as yourself.");
+        }
+
         // Check if user already voted
         const existing = await ctx.db
             .query("votes")
@@ -334,7 +377,7 @@ export const castVote = mutation({
 
         // Check if poll is active
         const poll = await ctx.db.get(args.poll_id);
-        if (poll?.status !== "active") throw new Error("This poll is not active.");
+        if (poll.status !== "active") throw new Error("This poll is not active.");
 
         // Insert vote
         await ctx.db.insert("votes", {
@@ -355,6 +398,7 @@ export const castVote = mutation({
 export const listPollsByOrg = query({
     args: { org_id: v.id("organizations") },
     handler: async (ctx, args) => {
+        await assertOrgAccess(ctx, args.org_id);
         const polls = await ctx.db
             .query("polls")
             .withIndex("by_org", (q) => q.eq("org_id", args.org_id))
@@ -395,6 +439,9 @@ export const updatePollStatus = mutation({
         status: v.union(v.literal("draft"), v.literal("active"), v.literal("completed")),
     },
     handler: async (ctx, args) => {
+        const poll = await ctx.db.get(args.poll_id);
+        if (!poll) throw new Error("Poll not found.");
+        await assertOrgAccess(ctx, poll.org_id);
         await ctx.db.patch(args.poll_id, { status: args.status });
         return args.poll_id;
     },
@@ -403,6 +450,9 @@ export const updatePollStatus = mutation({
 export const deletePoll = mutation({
     args: { poll_id: v.id("polls") },
     handler: async (ctx, args) => {
+        const poll = await ctx.db.get(args.poll_id);
+        if (!poll) throw new Error("Poll not found.");
+        await assertOrgAccess(ctx, poll.org_id);
         const options = await ctx.db
             .query("poll_options")
             .withIndex("by_poll", (q) => q.eq("poll_id", args.poll_id))
@@ -415,263 +465,23 @@ export const deletePoll = mutation({
     },
 });
 
-// ── Seed ─────────────────────────────────────────────────────
+// â”€â”€ Seed â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export const seed = mutation({
     args: {},
-    handler: async (ctx) => {
-        const anyEvent = await ctx.db.query("events").first();
-        if (anyEvent) return "Already seeded";
-
-        const userId = await ctx.db.insert("users", {
-            email: "admin@ticketafrica.com",
-            first_name: "Admin",
-            last_name: "User",
-            role: "admin",
-            joined_at: new Date().toISOString()
-        });
-
-        const orgId = await ctx.db.insert("organizations", {
-            owner_id: userId,
-            name: "Ticket Africa Official",
-            slug: "ta-official",
-            verified: true,
-            created_at: new Date().toISOString()
-        });
-
-        const e1 = await ctx.db.insert("events", {
-            org_id: orgId,
-            title: "Afrobeats Night: Grand Finale",
-            slug: "afrobeats-night-grand-finale",
-            description: "The ultimate music experience.",
-            category: "concerts",
-            start_date: new Date(Date.now() + 86400000 * 2).toISOString(),
-            end_date: new Date(Date.now() + 86400000 * 2).toISOString(),
-            cover_image: "",
-            currency: "GHS",
-            status: "published",
-            location: { venue_name: "Accra Sports Stadium", city: "Accra", country: "Ghana", address: "Osu" },
-            created_at: new Date().toISOString()
-        });
-
-        await ctx.db.insert("ticket_tiers", {
-            event_id: e1,
-            name: "General Admission",
-            price: 5000,
-            capacity: 2000,
-            sold: 847,
-            sales_start: new Date().toISOString(),
-            sales_end: new Date(Date.now() + 86400000 * 2).toISOString(),
-        });
-
-        await ctx.db.insert("ticket_tiers", {
-            event_id: e1,
-            name: "VIP",
-            price: 15000,
-            capacity: 200,
-            sold: 143,
-            sales_start: new Date().toISOString(),
-            sales_end: new Date(Date.now() + 86400000 * 2).toISOString(),
-        });
-
-        const e2 = await ctx.db.insert("events", {
-            org_id: orgId,
-            title: "CAF Champions League Q-Final",
-            slug: "caf-champions-league-qf",
-            description: "Football action live.",
-            category: "sports",
-            start_date: new Date(Date.now() + 86400000 * 10).toISOString(),
-            end_date: new Date(Date.now() + 86400000 * 10).toISOString(),
-            cover_image: "",
-            currency: "GHS",
-            status: "published",
-            location: { venue_name: "FNB Stadium", city: "Johannesburg", country: "South Africa", address: "" },
-            created_at: new Date().toISOString()
-        });
-
-        await ctx.db.insert("ticket_tiers", {
-            event_id: e2,
-            name: "General Admission",
-            price: 30000,
-            capacity: 5000,
-            sold: 1200,
-            sales_start: new Date().toISOString(),
-            sales_end: new Date(Date.now() + 86400000 * 10).toISOString(),
-        });
-
-        // Seed Polls
-        const now = new Date().toISOString();
-        const nextMonth = new Date(Date.now() + 86400000 * 30).toISOString();
-        
-        const pollId = await ctx.db.insert("polls", {
-            title: "Artist of the Year 2026",
-            description: "Vote for your favorite artist in the upcoming Ashanti Music Awards. Finalists have been selected based on performance and impact.",
-            org_id: orgId,
-            status: "active",
-            start_date: now,
-            end_date: nextMonth,
-            created_at: now
-        });
-        await ctx.db.insert("poll_options", { poll_id: pollId, label: "Sarkodie", votes_count: 1250 });
-        await ctx.db.insert("poll_options", { poll_id: pollId, label: "Stonebwoy", votes_count: 1320 });
-        await ctx.db.insert("poll_options", { poll_id: pollId, label: "Black Sherif", votes_count: 980 });
-
-        const pollId2 = await ctx.db.insert("polls", {
-            title: "Lagos Carnival: Best Float",
-            description: "Who had the most creative and colorful display at this years carnival? Your vote determines the winner of the $10,000 grand prize.",
-            org_id: orgId,
-            status: "active",
-            start_date: now,
-            end_date: nextMonth,
-            created_at: now
-        });
-        await ctx.db.insert("poll_options", { poll_id: pollId2, label: "Eko Atlantic", votes_count: 450 });
-        await ctx.db.insert("poll_options", { poll_id: pollId2, label: "Victoria Island Crew", votes_count: 380 });
-        await ctx.db.insert("poll_options", { poll_id: pollId2, label: "Surulere Stars", votes_count: 520 });
-
-        return "Seeded successfully";
-    }
+    handler: async () => {
+        return "Demo seeding is disabled for launch.";
+    },
 });
 
 export const addRealDemoEvents = mutation({
     args: {},
-    handler: async (ctx) => {
-        const admin = await ctx.db
-            .query("users")
-            .filter((q) => q.eq(q.field("email"), "admin@ticketafrica.com"))
-            .first();
-        const userId = admin?._id ?? (await ctx.db.insert("users", {
-            email: "admin@ticketafrica.com",
-            first_name: "Admin",
-            last_name: "User",
-            role: "admin",
-            joined_at: new Date().toISOString(),
-        }));
-
-        const org = await ctx.db
-            .query("organizations")
-            .filter((q) => q.eq(q.field("slug"), "ta-official"))
-            .first();
-        const orgId = org?._id ?? (await ctx.db.insert("organizations", {
-            owner_id: userId,
-            name: "Ticket Africa Official",
-            slug: "ta-official",
-            verified: true,
-            created_at: new Date().toISOString(),
-        }));
-
-        const demoEvents = [
-            {
-                title: "Accra Creators Summit 2026",
-                slug: "accra-creators-summit-2026",
-                description: "A full-day gathering for creators, founders, designers, and media teams building modern African brands.",
-                category: "conferences",
-                days: 18,
-                venue: "Accra International Conference Centre",
-                city: "Accra",
-                country: "Ghana",
-                address: "Osu, Accra",
-                tiers: [
-                    { name: "Standard Pass", description: "Main-stage access and networking lounge.", price: 12000, capacity: 800, sold: 214 },
-                    { name: "Founder Pass", description: "Priority seating, workshop access, and private mixer.", price: 35000, capacity: 180, sold: 64 },
-                ],
-            },
-            {
-                title: "Lagos Food & Culture Weekend",
-                slug: "lagos-food-culture-weekend",
-                description: "Street food, live chefs, fashion pop-ups, and evening performances from Lagos culture makers.",
-                category: "festivals",
-                days: 26,
-                venue: "Muri Okunola Park",
-                city: "Lagos",
-                country: "Nigeria",
-                address: "Victoria Island, Lagos",
-                tiers: [
-                    { name: "Day Pass", description: "Entry for one festival day.", price: 8000, capacity: 3000, sold: 982 },
-                    { name: "Weekend Pass", description: "Two-day access with priority entry.", price: 14000, capacity: 1200, sold: 401 },
-                ],
-            },
-            {
-                title: "Kumasi Highlife Live",
-                slug: "kumasi-highlife-live",
-                description: "A live highlife concert celebrating classic bands, new voices, and dance-floor nostalgia.",
-                category: "concerts",
-                days: 34,
-                venue: "Rattray Park",
-                city: "Kumasi",
-                country: "Ghana",
-                address: "Nhyiaeso, Kumasi",
-                tiers: [
-                    { name: "General Admission", description: "Standing access close to the main stage.", price: 6000, capacity: 2500, sold: 1304 },
-                    { name: "VIP Lounge", description: "Dedicated lounge access and premium viewing.", price: 18000, capacity: 300, sold: 118 },
-                ],
-            },
-            {
-                title: "Cape Town Sevens Fan Zone",
-                slug: "cape-town-sevens-fan-zone",
-                description: "A match-day fan zone with big screens, games, music, and food vendors for rugby weekend.",
-                category: "sports",
-                days: 42,
-                venue: "Green Point Urban Park",
-                city: "Cape Town",
-                country: "South Africa",
-                address: "Green Point, Cape Town",
-                tiers: [
-                    { name: "Fan Zone Entry", description: "General entry with access to all screens.", price: 9000, capacity: 4000, sold: 1507 },
-                    { name: "Family Pack", description: "Entry for four guests with reserved picnic area.", price: 30000, capacity: 500, sold: 132 },
-                ],
-            },
-        ];
-
-        let inserted = 0;
-        for (const demo of demoEvents) {
-            const existing = await ctx.db
-                .query("events")
-                .withIndex("by_slug", (q) => q.eq("slug", demo.slug))
-                .first();
-            if (existing) continue;
-
-            const start = new Date(Date.now() + 86400000 * demo.days);
-            const eventId = await ctx.db.insert("events", {
-                org_id: orgId,
-                title: demo.title,
-                slug: demo.slug,
-                description: demo.description,
-                category: demo.category,
-                start_date: start.toISOString(),
-                end_date: new Date(start.getTime() + 1000 * 60 * 60 * 6).toISOString(),
-                cover_image: "",
-                currency: "GHS",
-                status: "published",
-                location: {
-                    venue_name: demo.venue,
-                    city: demo.city,
-                    country: demo.country,
-                    address: demo.address,
-                },
-                created_at: new Date().toISOString(),
-            });
-
-            for (const tier of demo.tiers) {
-                await ctx.db.insert("ticket_tiers", {
-                    event_id: eventId,
-                    name: tier.name,
-                    description: tier.description,
-                    price: tier.price,
-                    capacity: tier.capacity,
-                    sold: tier.sold,
-                    sales_start: new Date().toISOString(),
-                    sales_end: start.toISOString(),
-                });
-            }
-            inserted++;
-        }
-
-        return { inserted };
+    handler: async () => {
+        return { inserted: 0, disabled: true };
     },
 });
 
-// ── Admin Utilities ─────────────────────────────────────────
+// â”€â”€ Admin Utilities â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export const deleteAllEvents = mutation({
     args: {},
@@ -687,5 +497,68 @@ export const deleteAllEvents = mutation({
         }
         
         return { deleted_events: events.length, deleted_tiers: tiers.length };
+    },
+});
+
+export const deleteDemoContent = mutation({
+    args: {},
+    handler: async (ctx) => {
+        const demoSlugs = new Set([
+            "afrobeats-night-grand-finale",
+            "caf-champions-league-qf",
+            "accra-creators-summit-2026",
+            "lagos-food-culture-weekend",
+            "kumasi-highlife-live",
+            "cape-town-sevens-fan-zone",
+        ]);
+
+        const events = await ctx.db.query("events").collect();
+        const demoEvents = events.filter((event) => demoSlugs.has(event.slug));
+        const demoEventIds = new Set(demoEvents.map((event) => event._id));
+
+        const tiers = await ctx.db.query("ticket_tiers").collect();
+        let deletedTiers = 0;
+        for (const tier of tiers) {
+            if (demoEventIds.has(tier.event_id)) {
+                await ctx.db.delete(tier._id);
+                deletedTiers++;
+            }
+        }
+
+        let deletedEvents = 0;
+        for (const event of demoEvents) {
+            await ctx.db.delete(event._id);
+            deletedEvents++;
+        }
+
+        const demoPollTitles = new Set([
+            "Artist of the Year 2026",
+            "Lagos Carnival: Best Float",
+        ]);
+        const polls = await ctx.db.query("polls").collect();
+        const demoPolls = polls.filter((poll) => demoPollTitles.has(poll.title));
+        const demoPollIds = new Set(demoPolls.map((poll) => poll._id));
+
+        const pollOptions = await ctx.db.query("poll_options").collect();
+        let deletedPollOptions = 0;
+        for (const option of pollOptions) {
+            if (demoPollIds.has(option.poll_id)) {
+                await ctx.db.delete(option._id);
+                deletedPollOptions++;
+            }
+        }
+
+        let deletedPolls = 0;
+        for (const poll of demoPolls) {
+            await ctx.db.delete(poll._id);
+            deletedPolls++;
+        }
+
+        return {
+            deleted_events: deletedEvents,
+            deleted_tiers: deletedTiers,
+            deleted_polls: deletedPolls,
+            deleted_poll_options: deletedPollOptions,
+        };
     },
 });

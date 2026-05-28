@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ticket Africa | Ghana Event Tickets</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/css/style.css" rel="stylesheet">
+</head>
+<body>
+  <div data-nav></div>
+  <main>
+    <section class="hero">
+      <div class="container hero-inner">
+        <div class="row align-items-center g-4 w-100">
+          <div class="col-lg-7">
+            <p class="eyebrow">Ghana's event ticketing MVP</p>
+            <h1 class="display-4 fw-bold">Discover events, buy tickets, and enter with QR codes.</h1>
+            <p class="lead mt-3">Ticket Africa helps customers find great Ghanaian events while organizers sell, track, and validate tickets at the gate.</p>
+            <form class="row g-2 mt-4" action="events.html">
+              <div class="col-md-8"><input class="form-control form-control-lg" name="q" placeholder="Search concerts, conferences, food fairs"></div>
+              <div class="col-md-4 d-grid"><button class="btn btn-accent btn-lg">Find Events</button></div>
+            </form>
+          </div>
+          <div class="col-lg-5">
+            <div class="panel bg-white text-dark p-4">
+              <h2 class="h5">Ready for organizers</h2>
+              <p class="text-muted">Create events, add Regular, VIP, and VVIP tickets, then validate entries using ticket codes.</p>
+              <a class="btn btn-brand" href="organizer-register.html">Sell Tickets on Ticket Africa</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-pad bg-white">
+      <div class="container">
+        <div class="d-flex justify-content-between align-items-end mb-4 gap-3">
+          <div><p class="eyebrow">Featured</p><h2 class="h3 fw-bold">Events People Are Booking</h2></div>
+          <a href="events.html" class="btn btn-outline-success">Browse All</a>
+        </div>
+        <div class="row row-cols-1 row-cols-md-3 g-4" data-featured-events></div>
+      </div>
+    </section>
+
+    <section class="section-pad">
+      <div class="container">
+        <div class="row g-4">
+          <div class="col-lg-4">
+            <p class="eyebrow">Categories</p>
+            <h2 class="h3 fw-bold">Built for Ghana's live scene</h2>
+          </div>
+          <div class="col-lg-8">
+            <div class="row g-3">
+              <div class="col-6 col-md-3"><div class="category-tile p-3 h-100">Music</div></div>
+              <div class="col-6 col-md-3"><div class="category-tile p-3 h-100">Conference</div></div>
+              <div class="col-6 col-md-3"><div class="category-tile p-3 h-100">Food</div></div>
+              <div class="col-6 col-md-3"><div class="category-tile p-3 h-100">Arts</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-pad bg-white">
+      <div class="container">
+        <p class="eyebrow">Upcoming</p>
+        <h2 class="h3 fw-bold mb-4">More Events</h2>
+        <div class="row row-cols-1 row-cols-md-3 g-4" data-upcoming-events></div>
+      </div>
+    </section>
+
+    <section class="section-pad">
+      <div class="container">
+        <div class="row g-4 text-center">
+          <div class="col-md-4"><div class="panel bg-white p-4 h-100"><h3 class="h5">1. Choose</h3><p class="text-muted mb-0">Find an event and select a ticket type.</p></div></div>
+          <div class="col-md-4"><div class="panel bg-white p-4 h-100"><h3 class="h5">2. Pay</h3><p class="text-muted mb-0">Mock Paystack flow calculates ticket price plus service fee.</p></div></div>
+          <div class="col-md-4"><div class="panel bg-white p-4 h-100"><h3 class="h5">3. Scan</h3><p class="text-muted mb-0">Get a QR-coded ticket and validate it at the gate.</p></div></div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <div data-footer></div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/events.js"></script>
+</body>
+</html>

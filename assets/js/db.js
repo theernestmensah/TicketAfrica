@@ -144,7 +144,9 @@ window.ConvexDB = {
     listOrdersByBuyer: function(buyer_email) { return window.ConvexDB.query("organizer:listOrdersByBuyer", { buyer_email: buyer_email }); },
     createOrder: function(args) { return window.ConvexDB.mutation("organizer:createOrder", args); },
     createCheckout: function(args) { return window.ConvexDB.mutation("payments:createCheckout", args); },
+    setPaystackReference: function(args) { return window.ConvexDB.mutation("payments:setPaystackReference", args); },
     verifyPaystackPayment: function(args) { return window.ConvexDB.action("payments:verifyPaystackPayment", args); },
+    verifyPaystackReference: function(args) { return window.ConvexDB.action("payments:verifyPaystackReference", args); },
 
     // -- Organizer: Promos --
     listPromosByOrg: function(org_id) { return window.ConvexDB.query("organizer:listPromosByOrg", { org_id: org_id }); },

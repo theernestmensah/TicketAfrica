@@ -2,7 +2,7 @@ const fs = require('fs');
 
 const signupHtml = fs.readFileSync('signup.html', 'utf8');
 
-const regex = /\/\/ Form Sub[\s\S]*?\}\);\s*<\/script>/g;
+const regex = /\/\/ Form Sub[\s\S]*\}\);\s*<\/script>/g;
 const match = regex.exec(signupHtml);
 
 if (match) {

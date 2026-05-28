@@ -2,7 +2,7 @@ const fs = require('fs');
 
 const eventsHtml = fs.readFileSync('events.html', 'utf8');
 
-const regex = /<div class="events-grid--discovery" id="events-grid">([\s\S]*?)<\/\s*div>\s*<\/div>\s*<!-- Pagination -->/g;
+const regex = /<div class="events-grid--discovery" id="events-grid">([\s\S]*)<\/\s*div>\s*<\/div>\s*<!-- Pagination -->/g;
 
 const match = regex.exec(eventsHtml);
 if (match) {

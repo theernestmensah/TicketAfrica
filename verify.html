@@ -1,10 +1,11 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Verify Ticket Authenticity — Ticket Africa</title>
+    <title>Verify Ticket Authenticity  -  Ticket Africa</title>
+    <script src="assets/js/env.js"></script>
     <script type="module" src="/assets/js/db.js"></script>
     <link rel="stylesheet" href="assets/css/core.css" />
     <link rel="stylesheet" href="assets/css/mobile.css" />
@@ -201,45 +202,6 @@
     <script src="assets/js/layout.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            function showResult(ref) {
-                const resultDiv = document.getElementById('verify-result');
-                resultDiv.style.display = 'block';
-                const isValid = ref.toUpperCase().startsWith('TKA-');
-                const html = isValid ? `
-          <div class="result-panel result-panel--valid">
-            <div class="result-icon-large result-icon-large--valid">
-              <iconify-icon icon="hugeicons:tick-01" style="width:40px;height:40px;"></iconify-icon>
-            </div>
-            <h2 style="color:#22C55E;margin-bottom:8px;"><iconify-icon inline icon="ph:check-bold"></iconify-icon> Authentic Ticket</h2>
-            <p style="color:var(--color-text-muted);font-size:var(--text-sm);">This ticket is valid and was issued by Ticket Africa</p>
-            <div class="ticket-detail-grid">
-              <div class="ticket-detail-item"><div class="ticket-detail-item__label">Reference</div><div class="ticket-detail-item__value" style="font-family:var(--font-mono);">${ref.toUpperCase()}</div></div>
-              <div class="ticket-detail-item"><div class="ticket-detail-item__label">Status</div><div class="ticket-detail-item__value" style="color:#22C55E;">Valid — Not Yet Used</div></div>
-              <div class="ticket-detail-item"><div class="ticket-detail-item__label">Event</div><div class="ticket-detail-item__value">Afrobeats Night: Grand Finale</div></div>
-              <div class="ticket-detail-item"><div class="ticket-detail-item__label">Ticket Type</div><div class="ticket-detail-item__value">VIP Section</div></div>
-              <div class="ticket-detail-item"><div class="ticket-detail-item__label">Date</div><div class="ticket-detail-item__value">Sat, 15 Mar 2026</div></div>
-              <div class="ticket-detail-item"><div class="ticket-detail-item__label">Registered To</div><div class="ticket-detail-item__value">K. Mensah</div></div>
-            </div>
-          </div>` : `
-          <div class="result-panel result-panel--invalid">
-            <div class="result-icon-large result-icon-large--invalid">
-              <iconify-icon icon="hugeicons:cancel-01" style="width:40px;height:40px;"></iconify-icon>
-            </div>
-            <h2 style="color:#EF4444;margin-bottom:8px;"><iconify-icon inline icon="ph:x-bold"></iconify-icon> Ticket Not Found</h2>
-            <p style="color:var(--color-text-muted);font-size:var(--text-sm);max-width:360px;margin:0 auto;line-height:1.7;">No ticket matching <strong style="font-family:var(--font-mono);">${ref}</strong> was found in our system. This ticket may be counterfeit, or the reference may be misspelled.</p>
-            <div style="margin-top:var(--space-6);padding:var(--space-4);background:rgba(239,68,68,0.06);border-radius:var(--radius-lg);text-align:left;">
-              <p style="font-size:var(--text-sm);font-weight:600;color:#EF4444;margin-bottom:8px;">What to do:</p>
-              <ul style="list-style:none;display:flex;flex-direction:column;gap:6px;">
-                <li style="font-size:var(--text-sm);color:var(--color-text-muted);">→ Check your SMS or email for the correct reference</li>
-                <li style="font-size:var(--text-sm);color:var(--color-text-muted);">→ Contact us via <a href="contact.html" style="color: var(--color-text-primary);">support</a> with your purchase receipt</li>
-                <li style="font-size:var(--text-sm);color:var(--color-text-muted);">→ Do not use this ticket — it may be fraudulent</li>
-              </ul>
-            </div>
-          </div>`;
-                resultDiv.innerHTML = html;
-                resultDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-
             document.getElementById('verify-btn').addEventListener('click', async function () {
                 const ref = document.getElementById('ticket-ref-input').value.trim();
                 if (!ref) { TA.toast('Enter a ticket reference code', 'warning'); return; }
@@ -257,10 +219,10 @@
                     if (result.valid) {
                         const dateStr = result.event_date
                             ? new Date(result.event_date).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })
-                            : '—';
+                            : ' - ';
                         const usedWarning = result.already_used
                             ? `<div style="margin-top:var(--space-4);padding:var(--space-3);background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:var(--radius-md);font-size:var(--text-sm);color:#F59E0B;">
-                                ⚠ This ticket has already been scanned at ${result.scanned_at ? new Date(result.scanned_at).toLocaleString() : 'an earlier time'}.
+                                Warning This ticket has already been scanned at ${result.scanned_at ? new Date(result.scanned_at).toLocaleString() : 'an earlier time'}.
                               </div>` : '';
                         resultDiv.innerHTML = `
                         <div class="result-panel ${result.already_used ? 'result-panel--invalid' : 'result-panel--valid'}">
@@ -268,7 +230,7 @@
                             <iconify-icon icon="${result.already_used ? 'hugeicons:alert-02' : 'hugeicons:tick-01'}" style="width:40px;height:40px;"></iconify-icon>
                           </div>
                           <h2 style="color:${result.already_used ? '#F59E0B' : '#22C55E'};margin-bottom:8px;">
-                            ${result.already_used ? '⚠ Ticket Already Used' : '✓ Authentic Ticket'}
+                            ${result.already_used ? 'Warning Ticket Already Used' : 'OK Authentic Ticket'}
                           </h2>
                           <p style="color:var(--color-text-muted);font-size:var(--text-sm);">${result.message}</p>
                           ${usedWarning}
@@ -292,9 +254,9 @@
                           <div style="margin-top:var(--space-6);padding:var(--space-4);background:rgba(239,68,68,0.06);border-radius:var(--radius-lg);text-align:left;">
                             <p style="font-size:var(--text-sm);font-weight:600;color:#EF4444;margin-bottom:8px;">What to do:</p>
                             <ul style="list-style:none;display:flex;flex-direction:column;gap:6px;">
-                              <li style="font-size:var(--text-sm);color:var(--color-text-muted);">→ Check your SMS or email for the correct reference</li>
-                              <li style="font-size:var(--text-sm);color:var(--color-text-muted);">→ Contact us via <a href="contact.html" style="color:var(--color-text-primary);">support</a> with your purchase receipt</li>
-                              <li style="font-size:var(--text-sm);color:var(--color-text-muted);">→ Do not use this ticket — it may be fraudulent</li>
+                              <li style="font-size:var(--text-sm);color:var(--color-text-muted);">-> Check your SMS or email for the correct reference</li>
+                              <li style="font-size:var(--text-sm);color:var(--color-text-muted);">-> Contact us via <a href="contact.html" style="color:var(--color-text-primary);">support</a> with your purchase receipt</li>
+                              <li style="font-size:var(--text-sm);color:var(--color-text-muted);">-> Do not use this ticket  -  it may be fraudulent</li>
                             </ul>
                           </div>
                         </div>`;
@@ -304,8 +266,17 @@
 
                 } catch (e) {
                     console.warn('[TA] Verify error:', e);
-                    // Local fallback: prefix check
-                    showResult(ref);
+                    const resultDiv = document.getElementById('verify-result');
+                    resultDiv.style.display = 'block';
+                    resultDiv.innerHTML = `
+                        <div class="result-panel result-panel--invalid">
+                          <div class="result-icon-large result-icon-large--invalid">
+                            <iconify-icon icon="hugeicons:alert-02" style="width:40px;height:40px;"></iconify-icon>
+                          </div>
+                          <h2 style="color:#EF4444;margin-bottom:8px;">Verification Unavailable</h2>
+                          <p style="color:var(--color-text-muted);font-size:var(--text-sm);max-width:360px;margin:0 auto;line-height:1.7;">We could not reach the ticket database. Please check your connection and try again.</p>
+                        </div>`;
+                    resultDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
 
                 this.disabled = false;
@@ -317,7 +288,7 @@
             });
 
             document.getElementById('scan-qr-btn').addEventListener('click', function () {
-                TA.toast('Camera scanner requires device permission — full integration coming', 'info');
+                TA.toast('Camera scanner requires device permission  -  full integration coming', 'info');
             });
         });
     </script>

@@ -137,7 +137,7 @@ export const AuthService = {
             options: {
                 redirectTo: `${window.location.origin}/account.html`,
                 // Apple requires scopes to get name + email on first login
-                ...(provider === 'apple' ? { scopes: 'name email' } : {}),
+                ...(provider === 'apple'  { scopes: 'name email' } : {}),
             },
         });
         if (error) throw new TAError(error.message, error.status);

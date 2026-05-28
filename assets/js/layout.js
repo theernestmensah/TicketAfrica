@@ -293,15 +293,8 @@
   window.addEventListener('convex-ready', async () => {
     try {
       const events = await window.ConvexDB.listEvents();
-      console.log('[TicketAfrica] Backend connected! Events:', events);
 
-      if (events && events.length === 0) {
-        if (window.TA?.toast) window.TA.toast('No events found. Add some events in the organizer dashboard!', 'info');
-      } else if (events && events.length > 0) {
-        if (window.TA?.toast && (window.location.pathname.endsWith('index.html') || window.location.pathname === '/')) {
-          window.TA.toast(`Backend Connected! ${events.length} live events loaded.`, 'success');
-        }
-
+      if (events && events.length > 0) {
         // ── Update category counts from real data ──
         const catMap = { concerts: 0, sports: 0, festivals: 0, church: 0, conferences: 0, nightlife: 0, culture: 0 };
         const cityMap = { accra: 0, lagos: 0, nairobi: 0, johannesburg: 0, kigali: 0, abuja: 0, kumasi: 0 };

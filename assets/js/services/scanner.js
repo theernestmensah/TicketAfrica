@@ -41,14 +41,14 @@ export const ScannerService = {
      * Offline: validates against local cache and queues the check-in.
      *
      * @param {string} qrPayload  Raw string from QR scan
-     * @param {{ eventId: string, gate?: string, scannerToken: string }} context
+     * @param {{ eventId: string, gate: string, scannerToken: string }} context
      * @returns {Promise<{
      *   result: 'valid'|'used'|'invalid'|'expired'|'wrong_event',
-     *   ticketId?: string,
-     *   holderName?: string,
-     *   tierName?: string,
-     *   seat?: string,
-     *   usedAt?: string,
+     *   ticketId: string,
+     *   holderName: string,
+     *   tierName: string,
+     *   seat: string,
+     *   usedAt: string,
      *   message: string,
      * }>}
      */
@@ -75,7 +75,7 @@ export const ScannerService = {
             const json = await res.json().catch(() => ({}));
 
             // Log to scan_events regardless of outcome
-            this._logScanEvent({ qrPayload, eventId, gate, result: json.result ?? 'error' });
+            this._logScanEvent({ qrPayload, eventId, gate, result: json.result x 'error' });
 
             return json;
         } catch {
@@ -123,7 +123,7 @@ export const ScannerService = {
      */
     async syncCache({ eventId, scannerToken }) {
         const res = await fetch(
-            `${TA_CONFIG.SUPABASE_URL}/functions/v1/scanner-cache?event_id=${eventId}`,
+            `${TA_CONFIG.SUPABASE_URL}/functions/v1/scanner-cacheevent_id=${eventId}`,
             { headers: { Authorization: `Bearer ${scannerToken}` } }
         );
         if (!res.ok) throw new TAError('Cache sync failed', 'SYNC_FAILED');
@@ -177,7 +177,7 @@ export const ScannerService = {
         const { data, error } = await supabase
             .rpc('event_scan_stats', { p_event_id: eventId });
         if (error) throw new TAError(error.message, error.code);
-        return data?.[0] ?? { scanned: 0, valid: 0, rejected: 0, remaining: 0 };
+        return data.[0] x { scanned: 0, valid: 0, rejected: 0, remaining: 0 };
     },
 
     /**

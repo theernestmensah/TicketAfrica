@@ -1,10 +1,11 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Checkout — Ticket Africa</title>
+    <title>Checkout  -  Ticket Africa</title>
+    <script src="assets/js/env.js"></script>
     <script type="module" src="/assets/js/db.js"></script>
     <link rel="stylesheet" href="assets/css/core.css" />
     <link rel="stylesheet" href="assets/css/mobile.css" />
@@ -374,6 +375,10 @@
             flex-shrink: 0;
         }
 
+        .checkout-timer__text {
+            min-width: 0;
+        }
+
         @media(max-width:1024px) {
             .checkout-layout {
                 grid-template-columns: 1fr;
@@ -385,12 +390,114 @@
         }
 
         @media(max-width:640px) {
+            .checkout-layout {
+                margin-top: 64px;
+                padding-top: var(--space-4);
+                width: 100%;
+                max-width: 100%;
+                overflow: hidden;
+            }
+
+            .checkout-layout > *,
+            .checkout-section,
+            .order-card {
+                min-width: 0;
+                max-width: 100%;
+            }
+
             .form-row {
                 grid-template-columns: 1fr;
             }
 
             .checkout-steps {
-                overflow-x: auto;
+                align-items: flex-start;
+                justify-content: space-between;
+                gap: var(--space-2);
+                overflow: hidden;
+                margin-bottom: var(--space-6);
+                padding-bottom: var(--space-2);
+            }
+
+            .step {
+                flex: 1 1 0;
+                flex-direction: column;
+                align-items: center;
+                gap: var(--space-1);
+                min-width: 0;
+                text-align: center;
+            }
+
+            .step__num {
+                width: 30px;
+                height: 30px;
+            }
+
+            .step__label {
+                max-width: 64px;
+                white-space: normal;
+                line-height: 1.2;
+                font-size: 10px;
+            }
+
+            .step-connector {
+                flex: 0 0 12px;
+                min-width: 12px;
+                margin: 15px 0 0;
+            }
+
+            .checkout-timer {
+                display: grid;
+                grid-template-columns: 1fr;
+                align-items: start;
+                line-height: 1.35;
+                gap: var(--space-2);
+                padding: var(--space-3);
+                overflow-wrap: anywhere;
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .checkout-timer iconify-icon {
+                display: none;
+            }
+
+            .checkout-timer span {
+                display: inline;
+                white-space: normal;
+            }
+
+            .checkout-timer__text {
+                display: block !important;
+                min-width: 0;
+                overflow-wrap: anywhere;
+            }
+
+            #timer-value {
+                font-weight: 800;
+                white-space: nowrap;
+            }
+
+            .checkout-section,
+            .order-card {
+                padding: var(--space-5);
+            }
+
+            .momo-network-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .order-card__event {
+                align-items: flex-start;
+            }
+
+            .order-line,
+            .order-total {
+                gap: var(--space-4);
+            }
+
+            .order-line span:last-child,
+            .order-total span:last-child {
+                text-align: right;
             }
         }
     </style>
@@ -429,9 +536,9 @@
                 <!-- Session Timer -->
                 <div class="checkout-timer" id="checkout-timer">
                     <iconify-icon icon="hugeicons:time-04"></iconify-icon>
-                    Your tickets are reserved for <span id="timer-value"
-                        style="font-weight:800;margin:0 4px;">8:47</span> — complete your purchase before they are
-                    released
+                    <span class="checkout-timer__text">Your tickets are reserved for <span id="timer-value"
+                            style="font-weight:800;margin:0 4px;">8:47</span>  -  complete your purchase before they are
+                        released</span>
                 </div>
 
                 <!-- Attendee Details -->
@@ -547,7 +654,7 @@
                         <div class="pay-method__icon" style="background:rgba(139, 92, 246,0.15);"><iconify-icon icon="ph:ticket" style="vertical-align:middle;"></iconify-icon></div>
                         <div class="pay-method__info">
                             <div class="pay-method__name">Ticket Africa Wallet</div>
-                            <div class="pay-method__desc">Balance: GH₵ 0.00 — Insufficient funds</div>
+                            <div class="pay-method__desc">Balance: GHS 0.00  -  Insufficient funds</div>
                         </div>
                         <div class="pay-method__radio"></div>
                     </div>
@@ -583,7 +690,7 @@
 
                 <button class="btn btn--primary btn--full btn--lg" id="complete-purchase-btn">
                     <iconify-icon icon="hugeicons:shield-01" style="width:18px;height:18px;"></iconify-icon>
-                    Complete Secure Purchase — GH₵ 736.00
+                    Complete Secure Purchase  -  GHS 736.00
                 </button>
 
                 <div
@@ -608,17 +715,17 @@
                         <div class="order-card__event-img"><iconify-icon icon="hugeicons:music-note-01"
                                 style="vertical-align:middle;"></iconify-icon></div>
                         <div>
-                            <div class="order-card__event-name">Afrobeats Night: Grand Finale</div>
-                            <div class="order-card__event-meta">Sat 15 Mar 2026 · Accra Sports Stadium</div>
+                            <div class="order-card__event-name">Selected Event</div>
+                            <div class="order-card__event-meta">Sat 15 Mar 2026  -  Accra Sports Stadium</div>
                         </div>
                     </div>
-                    <div class="order-line"><span>VIP Section × 2</span><span>GH₵ 700.00</span></div>
+                    <div class="order-line"><span>VIP Section x 2</span><span>GHS 700.00</span></div>
                     <div class="order-divider"></div>
-                    <div class="order-line"><span>Subtotal</span><span>GH₵ 700.00</span></div>
-                    <div class="order-line"><span>Service fee (5%)</span><span>GH₵ 35.00</span></div>
-                    <div class="order-line"><span>SMS delivery</span><span>GH₵ 1.00</span></div>
+                    <div class="order-line"><span>Subtotal</span><span>GHS 700.00</span></div>
+                    <div class="order-line"><span>Service fee (5%)</span><span>GHS 35.00</span></div>
+                    <div class="order-line"><span>SMS delivery</span><span>GHS 1.00</span></div>
                     <div class="order-divider"></div>
-                    <div class="order-total"><span>Total</span><span>GH₵ 736.00</span></div>
+                    <div class="order-total"><span>Total</span><span>GHS 736.00</span></div>
 
                     <div
                         style="margin-top:var(--space-6);padding:var(--space-4);background:var(--color-bg-elevated);border:1px solid var(--color-border);border-radius:var(--radius-lg);">
@@ -628,7 +735,7 @@
                         <div style="display:flex;flex-direction:column;gap:var(--space-2);">
                             <div
                                 style="font-size:var(--text-sm);color:var(--color-text-secondary);display:flex;gap:var(--space-2);align-items:center;">
-                                <iconify-icon inline icon="ph:check-bold" style="color:var(--color-success);"></iconify-icon> 2× QR code tickets (PDF + digital)</div>
+                                <iconify-icon inline icon="ph:check-bold" style="color:var(--color-success);"></iconify-icon> 2x QR code tickets (PDF + digital)</div>
                             <div
                                 style="font-size:var(--text-sm);color:var(--color-text-secondary);display:flex;gap:var(--space-2);align-items:center;">
                                 <iconify-icon inline icon="ph:check-bold" style="color:var(--color-success);"></iconify-icon> SMS confirmation to your phone</div>
@@ -671,7 +778,7 @@
     </div>
 
     <div id="footer-root"></div>
-    <script src="assets/js/env.js"></script>
+    
     <script src="assets/js/core.js"></script>
     <script src="assets/js/nav.js"></script>
     <script src="assets/js/layout.js"></script>
@@ -680,7 +787,7 @@
     <script src="https://js.paystack.co/v1/inline.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // ── Read cart from URL params ──
+            // â”€â”€ Read cart from URL params â”€â”€
             const params = new URLSearchParams(window.location.search);
             const eventId = params.get('event') || '';
             const tierId = params.get('tier') || '';
@@ -695,16 +802,16 @@
                 const fee = Math.round(subtotal * 0.05);
                 const total = subtotal + fee + 1;
                 const qLine = document.querySelector('.order-line');
-                if (qLine) qLine.innerHTML = `<span>${tierName} × ${qty}</span><span>GH₵ ${subtotal.toFixed(2)}</span>`;
-                document.querySelectorAll('.order-line')[1] && (document.querySelectorAll('.order-line')[1].innerHTML = `<span>Subtotal</span><span>GH₵ ${subtotal.toFixed(2)}</span>`);
-                document.querySelectorAll('.order-line')[2] && (document.querySelectorAll('.order-line')[2].innerHTML = `<span>Service fee (5%)</span><span>GH₵ ${fee.toFixed(2)}</span>`);
+                if (qLine) qLine.innerHTML = `<span>${tierName} x ${qty}</span><span>GHS ${subtotal.toFixed(2)}</span>`;
+                document.querySelectorAll('.order-line')[1] && (document.querySelectorAll('.order-line')[1].innerHTML = `<span>Subtotal</span><span>GHS ${subtotal.toFixed(2)}</span>`);
+                document.querySelectorAll('.order-line')[2] && (document.querySelectorAll('.order-line')[2].innerHTML = `<span>Service fee (5%)</span><span>GHS ${fee.toFixed(2)}</span>`);
                 const totalEl = document.querySelector('.order-total');
-                if (totalEl) totalEl.innerHTML = `<span>Total</span><span>GH₵ ${total.toFixed(2)}</span>`;
+                if (totalEl) totalEl.innerHTML = `<span>Total</span><span>GHS ${total.toFixed(2)}</span>`;
                 const btn = document.getElementById('complete-purchase-btn');
-                if (btn) btn.innerHTML = `<iconify-icon icon="hugeicons:shield-01" style="width:18px;height:18px;"></iconify-icon> Complete Secure Purchase — GH₵ ${total.toFixed(2)}`;
+                if (btn) btn.innerHTML = `<iconify-icon icon="hugeicons:shield-01" style="width:18px;height:18px;"></iconify-icon> Complete Secure Purchase  -  GHS ${total.toFixed(2)}`;
             }
 
-            // ── Payment method selection ──
+            // â”€â”€ Payment method selection â”€â”€
             const methods = document.querySelectorAll('.pay-method');
             const momoPanel = document.getElementById('momo-panel');
             methods.forEach(function (m) {
@@ -715,7 +822,7 @@
                 });
             });
 
-            // ── MoMo network selection ──
+            // â”€â”€ MoMo network selection â”€â”€
             document.querySelectorAll('.momo-network').forEach(function (n) {
                 n.addEventListener('click', function () {
                     document.querySelectorAll('.momo-network').forEach(x => x.classList.remove('active'));
@@ -723,7 +830,7 @@
                 });
             });
 
-            // ── Promo code (Convex-backed) ──
+            // â”€â”€ Promo code (Convex-backed) â”€â”€
             let appliedPromo = null;
             document.getElementById('apply-promo-btn').addEventListener('click', async function () {
                 const code = document.getElementById('promo-input').value.trim().toUpperCase();
@@ -745,7 +852,7 @@
                 }
             });
 
-            // ── Checkout session timer ──
+            // â”€â”€ Checkout session timer â”€â”€
             let seconds = 527;
             const timerDisplay = document.getElementById('timer-value');
             const timer = setInterval(function () {
@@ -753,7 +860,7 @@
                 if (seconds <= 0) {
                     clearInterval(timer);
                     timerDisplay.textContent = '0:00';
-                    TA.toast('Session expired — please restart your purchase', 'error');
+                    TA.toast('Session expired  -  please restart your purchase', 'error');
                     return;
                 }
                 const m = Math.floor(seconds / 60);
@@ -761,10 +868,14 @@
                 timerDisplay.textContent = m + ':' + String(s).padStart(2, '0');
             }, 1000);
 
-            // ── Complete Purchase (Enhanced Payment Integration) ──
+            // â”€â”€ Complete Purchase (Enhanced Payment Integration) â”€â”€
             document.getElementById('complete-purchase-btn').addEventListener('click', async function () {
                 const terms = document.getElementById('terms-check');
                 if (!terms.checked) { TA.toast('Please accept the Terms of Service to continue', 'warning'); return; }
+                if (!eventId || !tierId) {
+                    TA.toast('Missing event or ticket selection. Please restart checkout from the event page.', 'error');
+                    return;
+                }
 
                 const firstName = document.getElementById('first-name')?.value.trim();
                 const lastName = document.getElementById('last-name')?.value.trim();
@@ -837,15 +948,30 @@
                     else if (selectedMethod === 'card') paystackChannels = ['card'];
                     else if (selectedMethod === 'bank') paystackChannels = ['bank', 'eft'];
 
+                    const paystackReference = 'TKA_' + orderId.toString().replace(/[^a-zA-Z0-9]/g, '').slice(-8) + '_' + Math.floor(Date.now() / 1000);
+                    await window.ConvexDB.setPaystackReference({
+                        order_id: orderId,
+                        buyer_email: email,
+                        reference: paystackReference,
+                    });
+
                     let handler = PaystackPop.setup({
                         key: window.ENV.PAYSTACK_PUBLIC_KEY, // Secretly injected key
                         email: email,
                         amount: Math.round(total * 100), // Amount in pesewas
                         currency: 'GHS', // Ghanaian Cedi
                         channels: paystackChannels,
-                        ref: 'TKA_' + orderId.toString().replace(/[^a-zA-Z0-9]/g, '').slice(-8) + '_' + Math.floor(Date.now() / 1000), 
+                        ref: paystackReference,
+                        callback_url: `${window.location.origin}/payment-callback.html?order_id=${encodeURIComponent(orderId)}`,
                         metadata: {
+                            order_id: orderId,
+                            ticket_africa_order_id: orderId,
                             custom_fields: [
+                                {
+                                    display_name: "Ticket Africa Order",
+                                    variable_name: "order_id",
+                                    value: orderId
+                                },
                                 {
                                     display_name: "Event Ticket",
                                     variable_name: "event_ticket",

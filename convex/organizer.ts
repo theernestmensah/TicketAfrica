@@ -1,12 +1,64 @@
-import { query, mutation } from "./_generated/server";
+﻿import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
 
-// ── Orders ────────────────────────────────────────────────────
+async function getCurrentUser(ctx: any) {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Authentication required.");
+
+    const user = await ctx.db
+        .query("users")
+        .withIndex("by_clerk_id", (q: any) => q.eq("clerk_id", identity.subject))
+        .first();
+    if (!user) throw new Error("User profile not found.");
+    return user;
+}
+
+async function assertOrgAccess(ctx: any, orgId: any) {
+    const user = await getCurrentUser(ctx);
+    if (user.role === "admin") return;
+
+    const org = await ctx.db.get(orgId);
+    if (!org || org.owner_id !== user._id) {
+        throw new Error("You do not have access to this organization.");
+    }
+}
+
+async function assertEventOrgAccess(ctx: any, eventId: any) {
+    const event = await ctx.db.get(eventId);
+    if (!event) throw new Error("Event not found.");
+    await assertOrgAccess(ctx, event.org_id);
+    return event;
+}
+
+async function findTicketByCode(ctx: any, code: string) {
+    const normalized = code.trim();
+    if (!normalized) return null;
+
+    const byScanToken = await ctx.db
+        .query("tickets")
+        .withIndex("by_scan_token", (q: any) => q.eq("scan_token", normalized))
+        .first();
+    if (byScanToken) return byScanToken;
+
+    const byQr = await ctx.db
+        .query("tickets")
+        .withIndex("by_qr", (q: any) => q.eq("qr_code", normalized))
+        .first();
+    if (byQr) return byQr;
+
+    return await ctx.db
+        .query("tickets")
+        .withIndex("by_ticket_number", (q: any) => q.eq("ticket_number", normalized.toUpperCase()))
+        .first();
+}
+
+// â”€â”€ Orders â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export const listOrdersByOrg = query({
     args: { org_id: v.id("organizations") },
     handler: async (ctx, args) => {
+        await assertOrgAccess(ctx, args.org_id);
         const orders = await ctx.db
             .query("orders")
             .withIndex("by_org", (q) => q.eq("org_id", args.org_id))
@@ -16,7 +68,7 @@ export const listOrdersByOrg = query({
         // Enrich with event title
         const enriched = await Promise.all(orders.map(async (o) => {
             const event = await ctx.db.get(o.event_id);
-            return { ...o, event_title: event?.title ?? "Unknown Event", event_city: event?.location?.city };
+            return { ...o, event_title: event.title ?? "Unknown Event", event_city: event.location.city };
         }));
         return enriched;
     },
@@ -25,6 +77,7 @@ export const listOrdersByOrg = query({
 export const listOrdersByEvent = query({
     args: { event_id: v.id("events") },
     handler: async (ctx, args) => {
+        await assertEventOrgAccess(ctx, args.event_id);
         return await ctx.db
             .query("orders")
             .withIndex("by_event", (q) => q.eq("event_id", args.event_id))
@@ -59,6 +112,7 @@ export const createOrder = mutation({
             if (!event) throw new Error("Event not found");
             orgId = event.org_id;
         }
+        await assertOrgAccess(ctx, orgId);
         const { org_id: _, ...rest } = args;
         return await ctx.db.insert("orders", {
             ...rest,
@@ -70,11 +124,12 @@ export const createOrder = mutation({
 });
 
 
-// ── Promo Codes ───────────────────────────────────────────────
+// â”€â”€ Promo Codes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export const listPromosByOrg = query({
     args: { org_id: v.id("organizations") },
     handler: async (ctx, args) => {
+        await assertOrgAccess(ctx, args.org_id);
         const promos = await ctx.db
             .query("promo_codes")
             .withIndex("by_org", (q) => q.eq("org_id", args.org_id))
@@ -83,7 +138,7 @@ export const listPromosByOrg = query({
 
         const enriched = await Promise.all(promos.map(async (p) => {
             const event = p.event_id ? await ctx.db.get(p.event_id) : null;
-            return { ...p, event_title: event?.title ?? "All Events" };
+            return { ...p, event_title: event.title ?? "All Events" };
         }));
         return enriched;
     },
@@ -101,6 +156,7 @@ export const createPromoCode = mutation({
         expires_at: v.optional(v.string()),
     },
     handler: async (ctx, args) => {
+        await assertOrgAccess(ctx, args.org_id);
         // Check code isn't already taken
         const existing = await ctx.db
             .query("promo_codes")
@@ -121,6 +177,9 @@ export const createPromoCode = mutation({
 export const deactivatePromoCode = mutation({
     args: { promo_id: v.id("promo_codes") },
     handler: async (ctx, args) => {
+        const promo = await ctx.db.get(args.promo_id);
+        if (!promo) throw new Error("Promo code not found.");
+        await assertOrgAccess(ctx, promo.org_id);
         await ctx.db.patch(args.promo_id, { active: false });
         return args.promo_id;
     },
@@ -129,16 +188,20 @@ export const deactivatePromoCode = mutation({
 export const deletePromoCode = mutation({
     args: { promo_id: v.id("promo_codes") },
     handler: async (ctx, args) => {
+        const promo = await ctx.db.get(args.promo_id);
+        if (!promo) throw new Error("Promo code not found.");
+        await assertOrgAccess(ctx, promo.org_id);
         await ctx.db.delete(args.promo_id);
         return args.promo_id;
     },
 });
 
-// ── Staff Members ─────────────────────────────────────────────
+// â”€â”€ Staff Members â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export const listStaffByOrg = query({
     args: { org_id: v.id("organizations") },
     handler: async (ctx, args) => {
+        await assertOrgAccess(ctx, args.org_id);
         const staff = await ctx.db
             .query("staff_members")
             .withIndex("by_org", (q) => q.eq("org_id", args.org_id))
@@ -146,7 +209,7 @@ export const listStaffByOrg = query({
 
         const enriched = await Promise.all(staff.map(async (s) => {
             const event = s.event_id ? await ctx.db.get(s.event_id) : null;
-            return { ...s, event_title: event?.title ?? "All Events" };
+            return { ...s, event_title: event.title ?? "All Events" };
         }));
         return enriched;
     },
@@ -161,6 +224,7 @@ export const inviteStaff = mutation({
         role: v.union(v.literal("scanner"), v.literal("co_organizer"), v.literal("support")),
     },
     handler: async (ctx, args) => {
+        await assertOrgAccess(ctx, args.org_id);
         return await ctx.db.insert("staff_members", {
             ...args,
             status: "pending",
@@ -172,6 +236,9 @@ export const inviteStaff = mutation({
 export const revokeStaff = mutation({
     args: { staff_id: v.id("staff_members") },
     handler: async (ctx, args) => {
+        const staff = await ctx.db.get(args.staff_id);
+        if (!staff) throw new Error("Staff member not found.");
+        await assertOrgAccess(ctx, staff.org_id);
         await ctx.db.patch(args.staff_id, { status: "revoked" });
         return args.staff_id;
     },
@@ -180,16 +247,20 @@ export const revokeStaff = mutation({
 export const removeStaff = mutation({
     args: { staff_id: v.id("staff_members") },
     handler: async (ctx, args) => {
+        const staff = await ctx.db.get(args.staff_id);
+        if (!staff) throw new Error("Staff member not found.");
+        await assertOrgAccess(ctx, staff.org_id);
         await ctx.db.delete(args.staff_id);
         return args.staff_id;
     },
 });
 
-// ── Payouts ───────────────────────────────────────────────────
+// â”€â”€ Payouts â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export const listPayoutsByOrg = query({
     args: { org_id: v.id("organizations") },
     handler: async (ctx, args) => {
+        await assertOrgAccess(ctx, args.org_id);
         return await ctx.db
             .query("payouts")
             .withIndex("by_org", (q) => q.eq("org_id", args.org_id))
@@ -211,6 +282,7 @@ export const requestPayout = mutation({
         }),
     },
     handler: async (ctx, args) => {
+        await assertOrgAccess(ctx, args.org_id);
         const ref = "TA-PAY-" + Date.now().toString(36).toUpperCase();
         return await ctx.db.insert("payouts", {
             ...args,
@@ -221,11 +293,12 @@ export const requestPayout = mutation({
     },
 });
 
-// ── Attendee Messages ─────────────────────────────────────────
+// â”€â”€ Attendee Messages â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export const listMessagesByOrg = query({
     args: { org_id: v.id("organizations") },
     handler: async (ctx, args) => {
+        await assertOrgAccess(ctx, args.org_id);
         const messages = await ctx.db
             .query("attendee_messages")
             .withIndex("by_org", (q) => q.eq("org_id", args.org_id))
@@ -234,7 +307,7 @@ export const listMessagesByOrg = query({
 
         const enriched = await Promise.all(messages.map(async (m) => {
             const event = m.event_id ? await ctx.db.get(m.event_id) : null;
-            return { ...m, event_title: event?.title ?? "All Events" };
+            return { ...m, event_title: event.title ?? "All Events" };
         }));
         return enriched;
     },
@@ -250,6 +323,7 @@ export const sendAttendeeMessage = mutation({
         sent_to: v.number(),
     },
     handler: async (ctx, args) => {
+        await assertOrgAccess(ctx, args.org_id);
         const orders = args.event_id
             ? await ctx.db
                 .query("orders")
@@ -289,7 +363,7 @@ export const sendAttendeeMessage = mutation({
                 template_key: "attendee_update",
                 data: {
                     attendee_message_id: messageId.toString(),
-                    event_title: event?.title || "your event",
+                    event_title: event.title || "your event",
                     channel: args.channel,
                 },
             });
@@ -299,11 +373,12 @@ export const sendAttendeeMessage = mutation({
     },
 });
 
-// ── Analytics query ───────────────────────────────────────────
+// â”€â”€ Analytics query â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export const getOrgAnalytics = query({
     args: { org_id: v.id("organizations") },
     handler: async (ctx, args) => {
+        await assertOrgAccess(ctx, args.org_id);
         const events = await ctx.db
             .query("events")
             .withIndex("by_org", (q) => q.eq("org_id", args.org_id))
@@ -366,50 +441,78 @@ export const getOrgAnalytics = query({
 export const checkInTicket = mutation({
     args: { qr_code: v.string(), event_id: v.id("events") },
     handler: async (ctx, args) => {
-        const ticket = await ctx.db
-            .query("tickets")
-            .withIndex("by_event", (q) => q.eq("event_id", args.event_id))
-            .filter((q) => q.eq(q.field("qr_code"), args.qr_code))
-            .first();
+        await assertEventOrgAccess(ctx, args.event_id);
+        const scanner = await getCurrentUser(ctx);
+        const ticket = await findTicketByCode(ctx, args.qr_code);
 
-        if (!ticket) {
+        if (!ticket || ticket.event_id !== args.event_id) {
             return { status: "invalid", message: "Ticket not found for this event." };
         }
+
+        const owner = ticket.owner_id ? await ctx.db.get(ticket.owner_id) : null;
+        const tier = await ctx.db.get(ticket.tier_id);
+        const event = await ctx.db.get(ticket.event_id);
 
         if (ticket.status === "scanned") {
             return { 
                 status: "used", 
                 message: "This ticket has already been used.",
+                owner_name: owner ? `${owner.first_name} ${owner.last_name}` : "Guest",
+                tier_name: (tier as any).name || "General Admission",
+                ticket_number: ticket.ticket_number || ticket.qr_code,
+                event_title: event?.title || "Unknown Event",
                 scanned_at: ticket.scanned_at 
             };
         }
 
         if (ticket.status !== "valid") {
-            return { status: "invalid", message: "Ticket is no longer valid." };
+            return {
+                status: "invalid",
+                message: "Ticket is no longer valid.",
+                owner_name: owner ? `${owner.first_name} ${owner.last_name}` : "Guest",
+                tier_name: (tier as any).name || "General Admission",
+                ticket_number: ticket.ticket_number || ticket.qr_code,
+                event_title: event?.title || "Unknown Event",
+            };
         }
 
         const now = new Date().toISOString();
-        await ctx.db.patch(ticket._id, { status: "scanned", scanned_at: now });
-
-        // Get owner details
-        const owner = ticket.owner_id ? await ctx.db.get(ticket.owner_id) : null;
-        const tier = await ctx.db.get(ticket.tier_id);
+        await ctx.db.patch(ticket._id, {
+            status: "scanned",
+            scanned_at: now,
+            scanned_by: scanner._id,
+        });
 
         return { 
             status: "valid", 
             message: "Ticket verified successfully.",
             owner_name: owner ? `${owner.first_name} ${owner.last_name}` : "Guest",
-            tier_name: (tier as any)?.name || "General Admission",
+            tier_name: (tier as any).name || "General Admission",
+            ticket_number: ticket.ticket_number || ticket.qr_code,
+            event_title: event?.title || "Unknown Event",
             scanned_at: now
         };
     },
 });
 
-// ── Buyer-facing: Orders for a specific email (used by account.html) ─────────
+// â”€â”€ Buyer-facing: Orders for a specific email (used by account.html) â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export const listOrdersByBuyer = query({
     args: { buyer_email: v.string() },
     handler: async (ctx, args) => {
+        const identity = await ctx.auth.getUserIdentity();
+        if (!identity) throw new Error("Authentication required.");
+        const requestedEmail = args.buyer_email.trim().toLowerCase();
+        const identityEmail = (((identity as any).email || "") as string).trim().toLowerCase();
+        const user = await ctx.db
+            .query("users")
+            .withIndex("by_clerk_id", (q) => q.eq("clerk_id", identity.subject))
+            .first();
+        const userEmail = (user.email || "").trim().toLowerCase();
+        if (requestedEmail !== identityEmail && requestedEmail !== userEmail) {
+            throw new Error("You can only view your own orders.");
+        }
+
         const orders = await ctx.db
             .query("orders")
             .withIndex("by_email", (q) => q.eq("buyer_email", args.buyer_email))
@@ -426,19 +529,19 @@ export const listOrdersByBuyer = query({
                 const tier = await ctx.db.get(ticket.tier_id);
                 return {
                     ...ticket,
-                    tier_name: (tier as any)?.name || "Ticket",
-                    event_title: event?.title ?? "Unknown Event",
-                    event_date: event?.start_date ?? null,
-                    event_city: event?.location?.city ?? "",
-                    event_venue: event?.location?.venue_name ?? "",
+                    tier_name: (tier as any).name || "Ticket",
+                    event_title: event.title ?? "Unknown Event",
+                    event_date: event.start_date ?? null,
+                    event_city: event.location.city ?? "",
+                    event_venue: event.location.venue_name ?? "",
                 };
             }));
             return {
                 ...o,
-                event_title: event?.title ?? "Unknown Event",
-                event_city: event?.location?.city ?? "",
-                event_date: event?.start_date ?? null,
-                event_venue: event?.location?.venue_name ?? "",
+                event_title: event.title ?? "Unknown Event",
+                event_city: event.location.city ?? "",
+                event_date: event.start_date ?? null,
+                event_venue: event.location.venue_name ?? "",
                 tickets: enrichedTickets,
             };
         }));
@@ -446,15 +549,12 @@ export const listOrdersByBuyer = query({
     },
 });
 
-// ── Read-only ticket verification (used by verify.html) ──────────────────────
+// â”€â”€ Read-only ticket verification (used by verify.html) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export const verifyTicket = query({
     args: { qr_code: v.string() },
     handler: async (ctx, args) => {
-        const ticket = await ctx.db
-            .query("tickets")
-            .withIndex("by_qr", (q) => q.eq("qr_code", args.qr_code))
-            .first();
+        const ticket = await findTicketByCode(ctx, args.qr_code);
 
         if (!ticket) {
             return { valid: false, message: "No ticket found with that code." };
@@ -468,10 +568,13 @@ export const verifyTicket = query({
             valid: ticket.status === "valid" || ticket.status === "scanned",
             already_used: ticket.status === "scanned",
             status: ticket.status,
+            ticket_number: ticket.ticket_number || ticket.qr_code,
             attendee_name: owner ? `${owner.first_name} ${owner.last_name}` : "Guest",
-            ticket_type: (tier as any)?.name || "General Admission",
-            event_title: event?.title ?? "Unknown Event",
-            event_date: event?.start_date ?? null,
+            ticket_type: (tier as any).name || "General Admission",
+            event_title: event.title ?? "Unknown Event",
+            event_date: event.start_date ?? null,
+            event_venue: event.location.venue_name ?? "",
+            event_city: event.location.city ?? "",
             scanned_at: ticket.scanned_at ?? null,
             message: ticket.status === "scanned"
                 ? "Ticket has already been used."

@@ -1363,8 +1363,9 @@
     position: absolute;
     inset: 0;
     background:
-        linear-gradient(135deg, rgba(13, 13, 13, 0.95) 0%, rgba(13, 13, 13, 0.75) 50%, rgba(13, 13, 13, 0.9) 100%),
-        url('../img/hero-bg.jpg') center/cover no-repeat;
+        radial-gradient(circle at 20% 20%, rgba(245, 158, 11, 0.16), transparent 32%),
+        radial-gradient(circle at 80% 30%, rgba(16, 185, 129, 0.12), transparent 30%),
+        linear-gradient(135deg, rgba(13, 13, 13, 0.96) 0%, rgba(13, 13, 13, 0.78) 50%, rgba(13, 13, 13, 0.92) 100%);
 }
 
 .hero__bg-pattern {

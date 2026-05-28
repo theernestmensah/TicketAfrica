@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex" />
+  <title>Maintenance - Ticket Africa</title>
+  <link rel="stylesheet" href="assets/css/core.css" />
+  <style>
+    body {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: var(--space-6);
+      background:
+        radial-gradient(circle at 75% 20%, rgba(var(--color-secondary-rgb), 0.16), transparent 32%),
+        linear-gradient(135deg, var(--color-bg) 0%, var(--color-bg-elevated) 100%);
+    }
+
+    .maintenance {
+      width: min(680px, 100%);
+      text-align: center;
+    }
+
+    .maintenance__mark {
+      width: 56px;
+      height: 56px;
+      margin: 0 auto var(--space-6);
+      border-radius: var(--radius-lg);
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--color-secondary), var(--color-accent));
+      color: var(--color-bg);
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: var(--text-2xl);
+    }
+  </style>
+</head>
+<body>
+  <main class="maintenance">
+    <div class="maintenance__mark">TA</div>
+    <h1 class="display-3">We will be right back</h1>
+    <p class="text-secondary" style="margin-top:var(--space-4);">
+      Ticket Africa is temporarily offline for maintenance. Existing ticket links and account access will be back shortly.
+    </p>
+    <p class="text-muted" style="margin-top:var(--space-6);font-size:var(--text-sm);">
+      For urgent help, contact support from your purchase confirmation email.
+    </p>
+  </main>
+</body>
+</html>

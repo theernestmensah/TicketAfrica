@@ -230,7 +230,11 @@
 })();
 
 
-// Inject Iconify globally
-const _ik = document.createElement('script');
-_ik.src = 'https://code.iconify.design/iconify-icon/1.0.8/iconify-icon.min.js';
-document.head.appendChild(_ik);
+// Inject Iconify once, even if core.js is included more than once.
+if (!document.querySelector('script[data-ta-iconify]') && !window.customElements?.get('iconify-icon')) {
+    var iconifyScript = document.createElement('script');
+    iconifyScript.src = 'https://code.iconify.design/iconify-icon/1.0.8/iconify-icon.min.js';
+    iconifyScript.defer = true;
+    iconifyScript.dataset.taIconify = 'true';
+    document.head.appendChild(iconifyScript);
+}

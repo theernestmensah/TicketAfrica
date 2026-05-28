@@ -1,4 +1,4 @@
-import { query, mutation } from "./_generated/server";
+﻿import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
 
 // Get a user by their Clerk ID
@@ -20,10 +20,10 @@ export const upsertUser = mutation({
         first_name: v.string(),
         last_name: v.string(),
         phone: v.optional(v.string()),
-        role: v.optional(v.union(v.literal("buyer"), v.literal("organizer"), v.literal("admin"))),
+        role: v.optional(v.union(v.literal("buyer"), v.literal("organizer"))),
     },
     handler: async (ctx, args) => {
-        const role = args.role ?? "buyer";
+        const role: "buyer" | "organizer" = args.role ?? "buyer";
         const existing = await ctx.db
             .query("users")
             .withIndex("by_clerk_id", (q) => q.eq("clerk_id", args.clerk_id))
@@ -34,8 +34,8 @@ export const upsertUser = mutation({
                 email: string;
                 first_name: string;
                 last_name: string;
-                phone?: string;
-                role?: "buyer" | "organizer" | "admin";
+                phone: string;
+                role: "buyer" | "organizer" | "admin";
             } = {
                 email: args.email,
                 first_name: args.first_name,
@@ -128,7 +128,7 @@ export const validatePromoCode = query({
             valid: true,
             discount_type: promo.discount_type,
             discount_value: promo.discount_value,
-            message: `Code applied: ${promo.discount_type === "percent" ? promo.discount_value + "% off" : "GH₵" + (promo.discount_value / 100).toFixed(2) + " off"}`,
+            message: `Code applied: ${promo.discount_type === "percent" ? promo.discount_value + "% off" : "GHS " + (promo.discount_value / 100).toFixed(2) + " off"}`,
         };
     },
 });

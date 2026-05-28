@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex" />
+  <title>Confirming Payment - Ticket Africa</title>
+  <script src="assets/js/env.js"></script>
+  <script type="module" src="/assets/js/db.js"></script>
+  <link rel="stylesheet" href="assets/css/core.css" />
+  <style>
+    body {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: var(--space-6);
+      background: var(--color-bg);
+    }
+
+    .callback-panel {
+      width: min(560px, 100%);
+      text-align: center;
+    }
+
+    .callback-spinner {
+      width: 44px;
+      height: 44px;
+      margin: 0 auto var(--space-6);
+      border: 3px solid rgba(var(--color-secondary-rgb), 0.18);
+      border-top-color: var(--color-secondary);
+      border-radius: 50%;
+      animation: spin 800ms linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <main class="callback-panel">
+    <div class="callback-spinner" id="spinner"></div>
+    <h1 class="h2" id="title">Confirming payment</h1>
+    <p class="text-secondary" id="message" style="margin-top:var(--space-3);">
+      Please wait while we verify your transaction.
+    </p>
+    <div style="margin-top:var(--space-8);display:none;" id="actions">
+      <a class="btn btn--primary" href="account.html">View Account</a>
+      <a class="btn btn--secondary" href="events.html">Browse Events</a>
+    </div>
+  </main>
+
+  <script>
+    function getReference() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('reference') || params.get('trxref') || params.get('ref');
+    }
+
+    function getOrderId() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('order_id') || params.get('orderId') || params.get('order');
+    }
+
+    async function waitForConvex() {
+      if (window.ConvexDB) return;
+      await new Promise(resolve => window.addEventListener('convex-ready', resolve, { once: true }));
+    }
+
+    function finish(title, message) {
+      document.getElementById('spinner').style.display = 'none';
+      document.getElementById('title').textContent = title;
+      document.getElementById('message').textContent = message;
+      document.getElementById('actions').style.display = 'flex';
+      document.getElementById('actions').style.justifyContent = 'center';
+      document.getElementById('actions').style.gap = '12px';
+      document.getElementById('actions').style.flexWrap = 'wrap';
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const reference = getReference();
+      const order_id = getOrderId();
+      if (!reference) {
+        finish('Payment reference missing', 'We could not find a transaction reference in this callback URL.');
+        return;
+      }
+      try {
+        await waitForConvex();
+        if (order_id) {
+          await window.ConvexDB.verifyPaystackPayment({ order_id, reference });
+        } else {
+          await window.ConvexDB.verifyPaystackReference({ reference });
+        }
+        finish('Payment confirmed', 'Your transaction has been verified. Your tickets will appear in your account.');
+      } catch (error) {
+        console.error('Payment callback error:', error);
+        finish('Payment needs review', error?.message || 'We could not confirm this payment automatically.');
+      }
+    });
+  </script>
+</body>
+</html>

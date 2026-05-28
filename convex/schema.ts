@@ -1,4 +1,4 @@
-import { defineSchema, defineTable } from "convex/server";
+﻿import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
 export default defineSchema({
@@ -67,14 +67,22 @@ export default defineSchema({
         tier_id: v.id("ticket_tiers"),
         owner_id: v.id("users"),
         order_id: v.string(),
+        ticket_number: v.optional(v.string()),
+        scan_token: v.optional(v.string()),
         qr_code: v.string(),
         status: v.union(v.literal("valid"), v.literal("scanned"), v.literal("refunded")),
         scanned_at: v.optional(v.string()),
         scanned_by: v.optional(v.id("users")),
         purchased_at: v.string(),
-    }).index("by_owner", ["owner_id"]).index("by_event", ["event_id"]).index("by_qr", ["qr_code"]).index("by_order", ["order_id"]),
+    })
+    .index("by_owner", ["owner_id"])
+    .index("by_event", ["event_id"])
+    .index("by_qr", ["qr_code"])
+    .index("by_scan_token", ["scan_token"])
+    .index("by_ticket_number", ["ticket_number"])
+    .index("by_order", ["order_id"]),
 
-    // ── Orders (each purchase transaction) ──
+    // â”€â”€ Orders (each purchase transaction) â”€â”€
     orders: defineTable({
         event_id: v.id("events"),
         org_id: v.id("organizations"),
@@ -102,7 +110,7 @@ export default defineSchema({
     .index("by_email", ["buyer_email"])
     .index("by_payment_reference", ["payment_reference"]),
 
-    // ── Promo Codes ──
+    // â”€â”€ Promo Codes â”€â”€
     promo_codes: defineTable({
         org_id: v.id("organizations"),
         event_id: v.optional(v.id("events")),  // null = applies to all org events
@@ -117,7 +125,7 @@ export default defineSchema({
         created_at: v.string(),
     }).index("by_org", ["org_id"]).index("by_code", ["code"]),
 
-    // ── Staff Members ──
+    // â”€â”€ Staff Members â”€â”€
     staff_members: defineTable({
         org_id: v.id("organizations"),
         event_id: v.optional(v.id("events")),  // null = org-wide access
@@ -128,7 +136,7 @@ export default defineSchema({
         invited_at: v.string(),
     }).index("by_org", ["org_id"]).index("by_email", ["invited_email"]),
 
-    // ── Payouts ──
+    // â”€â”€ Payouts â”€â”€
     payouts: defineTable({
         org_id: v.id("organizations"),
         amount: v.number(),         // minor units
@@ -145,7 +153,7 @@ export default defineSchema({
         processed_at: v.optional(v.string()),
     }).index("by_org", ["org_id"]),
 
-    // ── Attendee Messages (broadcast) ──
+    // â”€â”€ Attendee Messages (broadcast) â”€â”€
     attendee_messages: defineTable({
         org_id: v.id("organizations"),
         event_id: v.optional(v.id("events")),
@@ -203,7 +211,7 @@ export default defineSchema({
         unsubscribed_at: v.optional(v.string()),
     }).index("by_email", ["email"]).index("by_status", ["status"]),
 
-    // ── Voting System ──
+    // â”€â”€ Voting System â”€â”€
     polls: defineTable({
         org_id: v.id("organizations"),
         title: v.string(),

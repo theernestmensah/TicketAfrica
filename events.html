@@ -1,12 +1,13 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description"
-        content="Discover events across Africa — concerts, sports, festivals, conferences and more. Browse by country, filter by city, category, date and price." />
-    <title>Discover Events — Ticket Africa</title>
+        content="Discover events across Africa  -  concerts, sports, festivals, conferences and more. Browse by country, filter by city, category, date and price." />
+    <title>Discover Events  -  Ticket Africa</title>
+    <script src="assets/js/env.js"></script>
     <script type="module" src="/assets/js/db.js"></script>
     <link rel="stylesheet" href="assets/css/core.css" />
     <link rel="stylesheet" href="assets/css/mobile.css" />
@@ -23,7 +24,7 @@
             transform: translateY(0);
         }
 
-        /* ── Country Selector Hero ── */
+        /* â”€â”€ Country Selector Hero â”€â”€ */
         .country-hero {
             background: var(--color-bg-elevated);
             border-bottom: 1px solid var(--color-border);
@@ -53,7 +54,7 @@
             font-size: var(--text-sm);
         }
 
-        /* ── Country Tabs ── */
+        /* â”€â”€ Country Tabs â”€â”€ */
         .country-tabs {
             display: flex;
             gap: 0;
@@ -115,7 +116,7 @@
             color: var(--color-text-primary);
         }
 
-        /* ── Main Layout ── */
+        /* â”€â”€ Main Layout â”€â”€ */
         .discovery-layout {
             display: grid;
             grid-template-columns: 260px 1fr;
@@ -125,7 +126,7 @@
             padding-bottom: var(--space-16);
         }
 
-        /* ── Filter Sidebar ── */
+        /* â”€â”€ Filter Sidebar â”€â”€ */
         .filter-sidebar {
             position: sticky;
             top: 84px;
@@ -258,7 +259,7 @@
             border-color: var(--color-text-primary);
         }
 
-        /* ── Events Main Panel ── */
+        /* â”€â”€ Events Main Panel â”€â”€ */
         .events-main__header {
             display: flex;
             align-items: center;
@@ -330,7 +331,7 @@
             font-weight: 700;
         }
 
-        /* ── Country Context Banner ── */
+        /* â”€â”€ Country Context Banner â”€â”€ */
         .country-context-banner {
             display: flex;
             align-items: center;
@@ -701,7 +702,7 @@
                 <div style="display:flex;gap:var(--space-3);align-items:center;flex-wrap:wrap;">
                     <div class="search-bar" style="max-width:360px;">
                         <iconify-icon icon="hugeicons:search-01"></iconify-icon>
-                        <input type="search" placeholder="Search events, artists, venues…" id="main-search" />
+                        <input type="search" placeholder="Search events, artists, venues..." id="main-search" />
                     </div>
                     <button class="mobile-filter-btn btn btn--secondary" id="toggle-filters-btn">
                         <iconify-icon icon="hugeicons:menu-01" style="width:16px;height:16px;"></iconify-icon>
@@ -712,20 +713,20 @@
 
             <!-- Country Tabs -->
             <nav class="country-tabs" id="country-tabs" role="tablist" aria-label="Browse by country">
-                <button class="country-tab active" id="ctab-all" data-country="" data-currency="GHS" data-currency-symbol="GH₵" role="tab" aria-selected="true">
+                <button class="country-tab active" id="ctab-all" data-country="" data-currency="GHS" data-currency-symbol="GHS" role="tab" aria-selected="true">
                     <span class="country-tab__flag"><iconify-icon icon="ph:globe-hemisphere-africa-bold"></iconify-icon></span>
                     All Africa
                     <span class="country-tab__currency">Multi</span>
                 </button>
-                <button class="country-tab" id="ctab-gh" data-country="Ghana" data-currency="GHS" data-currency-symbol="GH₵" role="tab" aria-selected="false">
+                <button class="country-tab" id="ctab-gh" data-country="Ghana" data-currency="GHS" data-currency-symbol="GHS" role="tab" aria-selected="false">
                     <span class="country-tab__flag"><iconify-icon icon="ph:flag-bold"></iconify-icon></span>
                     Ghana
-                    <span class="country-tab__currency">GH₵</span>
+                    <span class="country-tab__currency">GHS</span>
                 </button>
-                <button class="country-tab" id="ctab-ng" data-country="Nigeria" data-currency="NGN" data-currency-symbol="₦" role="tab" aria-selected="false">
+                <button class="country-tab" id="ctab-ng" data-country="Nigeria" data-currency="NGN" data-currency-symbol="NGN" role="tab" aria-selected="false">
                     <span class="country-tab__flag"><iconify-icon icon="ph:flag-bold"></iconify-icon></span>
                     Nigeria
-                    <span class="country-tab__currency">₦</span>
+                    <span class="country-tab__currency">NGN</span>
                 </button>
                 <button class="country-tab" id="ctab-ke" data-country="Kenya" data-currency="KES" data-currency-symbol="KSh" role="tab" aria-selected="false">
                     <span class="country-tab__flag"><iconify-icon icon="ph:flag-bold"></iconify-icon></span>
@@ -791,7 +792,7 @@
                     <div class="filter-group__label">Price Range</div>
                     <div class="currency-indicator" id="currency-indicator">
                         <iconify-icon icon="hugeicons:money-01"></iconify-icon>
-                        <span id="price-currency-label">Prices shown in GH₵</span>
+                        <span id="price-currency-label">Prices shown in GHS</span>
                     </div>
                     <div class="filter-price-range">
                         <input type="number" placeholder="Min" id="f-price-min" value="0" />
@@ -817,7 +818,7 @@
                 <div class="country-context-banner" id="country-context-banner">
                     <span class="country-context-banner__flag" id="ctx-flag"><iconify-icon icon="ph:globe-hemisphere-africa-bold"></iconify-icon></span>
                     <span class="country-context-banner__text">
-                        Showing events across <strong id="ctx-name">All Africa</strong> — prices displayed in local currency
+                        Showing events across <strong id="ctx-name">All Africa</strong>  -  prices displayed in local currency
                     </span>
                     <span class="country-context-banner__currency" id="ctx-currency">Multi-currency</span>
                 </div>
@@ -835,7 +836,7 @@
                 </div>
 
                 <div class="events-main__header">
-                    <span class="results-count" id="results-count">Loading events…</span>
+                    <span class="results-count" id="results-count">Loading events...</span>
                     <select class="sort-select" id="sort-select" aria-label="Sort events">
                         <option value="trending">Trending</option>
                         <option value="date-asc">Date: Earliest first</option>
@@ -863,17 +864,17 @@
     <script src="assets/js/page-connectors.js"></script>
     <script>
         /* =============================================================
-           TICKET AFRICA — Events Discovery Page
+           TICKET AFRICA  -  Events Discovery Page
            Country browser + currency-aware pricing
            ============================================================= */
 
-        // ── Country Config ─────────────────────────────────────
+        // â”€â”€ Country Config â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         const COUNTRY_CONFIG = {
             '': { // All Africa
                 name: 'All Africa',
                 flag: '<iconify-icon icon="ph:globe-hemisphere-africa-bold"></iconify-icon>',
                 currency: 'GHS',
-                currencySymbol: 'GH₵',
+                currencySymbol: 'GHS',
                 currencyLabel: 'Multi-currency',
                 cities: [],
                 priceMax: 1000,
@@ -883,8 +884,8 @@
                 name: 'Ghana',
                 flag: '<iconify-icon icon="ph:flag-bold"></iconify-icon>',
                 currency: 'GHS',
-                currencySymbol: 'GH₵',
-                currencyLabel: 'GH₵ (Ghanaian Cedi)',
+                currencySymbol: 'GHS',
+                currencyLabel: 'GHS (Ghanaian Cedi)',
                 cities: ['Accra', 'Kumasi', 'Tamale', 'Cape Coast', 'Takoradi'],
                 priceMax: 1000,
                 placeholder: 'All Ghanaian cities'
@@ -893,8 +894,8 @@
                 name: 'Nigeria',
                 flag: '<iconify-icon icon="ph:flag-bold"></iconify-icon>',
                 currency: 'NGN',
-                currencySymbol: '₦',
-                currencyLabel: '₦ (Nigerian Naira)',
+                currencySymbol: 'NGN',
+                currencyLabel: 'NGN (Nigerian Naira)',
                 cities: ['Lagos', 'Abuja', 'Port Harcourt', 'Ibadan', 'Kano'],
                 priceMax: 500000,
                 placeholder: 'All Nigerian cities'
@@ -951,23 +952,23 @@
             }
         };
 
-        // Sample event data — populated dynamically from DB in production
+        // Sample event data  -  populated dynamically from DB in production
         const DEMO_EVENTS = [];
 
-        // ── State ───────────────────────────────────────────────
+        // â”€â”€ State â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         let state = {
             country: '',
             currency: 'GHS',
-            currencySymbol: 'GH₵',
+            currencySymbol: 'GHS',
             quickFilter: 'all',
             search: '',
             cities: []
         };
 
-        // ── Helpers ─────────────────────────────────────────────
+        // â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         function formatPrice(amount, currency) {
             const symbols = {
-                GHS: 'GH₵', NGN: '₦', KES: 'KSh', ZAR: 'R',
+                GHS: 'GHS', NGN: 'NGN', KES: 'KSh', ZAR: 'R',
                 RWF: 'RWF', TZS: 'TSh', UGX: 'USh'
             };
             const sym = symbols[currency] || currency;
@@ -983,7 +984,7 @@
             return { hot: '<iconify-icon inline icon="ph:fire-fill" style="color:inherit;"></iconify-icon> Almost gone', limited: '<iconify-icon inline icon="ph:lightning-fill" style="color:inherit;"></iconify-icon> Limited seats', ok: '<iconify-icon inline icon="ph:check-bold" style="color:inherit;"></iconify-icon> Available', sold: '<iconify-icon inline icon="ph:x-bold" style="color:inherit;"></iconify-icon> Sold out' }[avail] || '';
         }
 
-        // ── Render City Filters ──────────────────────────────────
+        // â”€â”€ Render City Filters â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         function renderCityFilters(country) {
             const cfg = COUNTRY_CONFIG[country] || COUNTRY_CONFIG[''];
             const container = document.getElementById('city-filter-options');
@@ -1003,7 +1004,7 @@
             `).join('');
         }
 
-        // ── Update Country Context ───────────────────────────────
+        // â”€â”€ Update Country Context â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         function updateCountryContext(country) {
             const cfg = COUNTRY_CONFIG[country] || COUNTRY_CONFIG[''];
 
@@ -1014,7 +1015,7 @@
 
             // Update subtitle
             document.getElementById('discovery-subtitle').textContent =
-                country ? `Events in ${cfg.name} — prices in ${cfg.currencyLabel}` : 'Events across Africa — in local currencies';
+                country ? `Events in ${cfg.name}  -  prices in ${cfg.currencyLabel}` : 'Events across Africa  -  in local currencies';
 
             // Update price filter label
             document.getElementById('price-currency-label').textContent = `Prices in ${cfg.currencyLabel}`;
@@ -1029,7 +1030,7 @@
             state.currencySymbol = cfg.currencySymbol;
         }
 
-        // ── Render Events ────────────────────────────────────────
+        // â”€â”€ Render Events â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         function renderEvents(events) {
             const grid = document.getElementById('events-grid');
             const countEl = document.getElementById('results-count');
@@ -1077,7 +1078,7 @@
                         </div>
                         <div class="event-card__detail">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 1 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                            ${ev.venue} · <span style="color:var(--color-text-secondary)">${ev.city}</span>
+                            ${ev.venue}  -  <span style="color:var(--color-text-secondary)">${ev.city}</span>
                         </div>
                         <div class="event-card__footer">
                             <div>
@@ -1094,7 +1095,7 @@
             if (window.TA && TA.initScrollReveal) TA.initScrollReveal();
         }
 
-        // ── Filter Events ────────────────────────────────────────
+        // â”€â”€ Filter Events â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         // NOTE: page-connectors.js overrides window.filterAndRender with Convex-powered version
         window.filterAndRender = filterAndRender;
         function filterAndRender() {
@@ -1146,7 +1147,7 @@
             renderEvents(filtered);
         }
 
-        // ── Toggle Save ──────────────────────────────────────────
+        // â”€â”€ Toggle Save â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         function toggleSave(btn) {
             const saved = btn.dataset.saved === 'true';
             btn.dataset.saved = !saved;
@@ -1156,7 +1157,7 @@
             if (window.TA) TA.toast(!saved ? 'Event saved' : 'Event removed', !saved ? 'success' : 'info');
         }
 
-        // ── Init ─────────────────────────────────────────────────
+        // â”€â”€ Init â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         document.addEventListener('DOMContentLoaded', function () {
             // Expose globally for page-connectors.js
             window.filterAndRender = filterAndRender;

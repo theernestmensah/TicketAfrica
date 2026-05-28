@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#07070f" />
     <meta name="description" content="Sign in to Ticket Africa and access your tickets, saved events, and account." />
-    <title>Sign In — Ticket Africa</title>
+    <title>Sign In  -  Ticket Africa</title>
+    
     <script src="assets/js/env.js"></script>
     <script type="module" src="/assets/js/db.js"></script>
     <link rel="stylesheet" href="assets/css/core.css" />
@@ -23,14 +24,14 @@
             overflow-x: hidden;
         }
 
-        /* ── Split Layout ── */
+        /* â”€â”€ Split Layout â”€â”€ */
         .auth-layout {
             display: grid;
             grid-template-columns: 1fr 1fr;
             min-height: 100vh;
         }
 
-        /* ── LEFT — Visual Panel ── */
+        /* â”€â”€ LEFT  -  Visual Panel â”€â”€ */
         .auth-visual {
             position: relative;
             overflow: hidden;
@@ -252,7 +253,7 @@
             border: 1px solid rgba(var(--color-secondary-rgb), 0.2);
         }
 
-        /* ── RIGHT — Form Panel ── */
+        /* â”€â”€ RIGHT  -  Form Panel â”€â”€ */
         .auth-form-panel {
             display: flex;
             flex-direction: column;
@@ -314,7 +315,7 @@
             line-height: 1.6;
         }
 
-        /* Social buttons — Google branded, Apple branded */
+        /* Social buttons  -  Google branded, Apple branded */
         .social-buttons {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -672,7 +673,7 @@
 <body>
     <div class="auth-layout">
 
-        <!-- ── LEFT: Visual Panel ── -->
+        <!-- â”€â”€ LEFT: Visual Panel â”€â”€ -->
         <div class="auth-visual">
             <div class="auth-visual__orb auth-visual__orb--1"></div>
             <div class="auth-visual__orb auth-visual__orb--2"></div>
@@ -691,7 +692,7 @@
             <div class="auth-visual__content">
                 <div>
                     <p class="visual-headline">Your events.<br><span>Your Africa.</span></p>
-                    <p class="visual-desc">Discover, book, and experience the best events across Africa — from Lagos to Nairobi, Accra to Johannesburg.</p>
+                    <p class="visual-desc">Discover, book, and experience the best events across Africa  -  from Lagos to Nairobi, Accra to Johannesburg.</p>
                 </div>
 
                 <div class="visual-stats">
@@ -713,15 +714,15 @@
                 <div class="floating-card ticket-3d">
                     <div class="ticket-holo"></div>
                     <div class="floating-card__top">
-                        <div class="floating-card__icon">🎵</div>
+                        <div class="floating-card__icon">*</div>
                         <div>
-                            <div class="floating-card__name">Afrobeats Night Live</div>
-                            <div class="floating-card__sub">Sat, 5 Apr · National Theatre, Accra</div>
+                            <div class="floating-card__name">Live Event</div>
+                            <div class="floating-card__sub">Sat, 5 Apr  -  National Theatre, Accra</div>
                         </div>
                     </div>
                     <div class="floating-card__divider"></div>
                     <div class="floating-card__footer">
-                        <div class="floating-card__price">GH₵ 150</div>
+                        <div class="floating-card__price">GHS 150</div>
                         <div class="floating-card__badge"><iconify-icon inline icon="ph:fire-fill"></iconify-icon> Selling Fast</div>
                     </div>
                 </div>
@@ -733,7 +734,7 @@
             </div>
         </div>
 
-        <!-- ── RIGHT: Form Panel ── -->
+        <!-- â”€â”€ RIGHT: Form Panel â”€â”€ -->
         <div class="auth-form-panel">
             <div class="auth-form">
                 <a href="index.html" class="auth-back">
@@ -785,7 +786,7 @@
                         </div>
                         <div class="input-wrapper">
                             <iconify-icon icon="hugeicons:lock-key" class="input-icon"></iconify-icon>
-                            <input type="password" id="password" class="input-field" placeholder="••••••••"
+                            <input type="password" id="password" class="input-field" placeholder="********"
                                 autocomplete="current-password" required style="padding-right:48px;" />
                             <button type="button" class="pwd-toggle" id="pwd-toggle" aria-label="Toggle password visibility">
                                 <iconify-icon icon="hugeicons:view" id="pwd-toggle-icon"></iconify-icon>
@@ -813,9 +814,9 @@
         </div>
     </div>
 
-    <script src="assets/js/env.js"></script><script src="assets/js/core.js"></script>
+    <script src="assets/js/core.js"></script>
     <script>
-        // ── Password Toggle ──────────────────────────────────
+        // â”€â”€ Password Toggle â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         const pwdInput = document.getElementById('password');
         const pwdToggle = document.getElementById('pwd-toggle');
         const pwdIcon = document.getElementById('pwd-toggle-icon');
@@ -827,7 +828,7 @@
             pwdToggle.style.color = shown ? 'rgba(255,255,255,0.3)' : 'var(--color-primary-light)';
         });
 
-        // ── Validation ───────────────────────────────────────
+        // â”€â”€ Validation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         function showError(groupId, errorId, show) {
             const grp = document.getElementById(groupId);
             const err = document.getElementById(errorId);
@@ -851,7 +852,7 @@
             }
         });
 
-        // ── Form Submit ───────────────────────────────────────
+        // â”€â”€ Form Submit â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         document.getElementById('login-form').addEventListener('submit', async function (e) {
             e.preventDefault();
 
@@ -899,9 +900,7 @@
                         btn.disabled = false;
                     }
                 } else {
-                    // Clerk not loaded — demo fallback
-                    await new Promise(r => setTimeout(r, 1200));
-                    window.location.href = 'account.html';
+                    throw new Error('Authentication is still loading. Please refresh and try again.');
                 }
             } catch (err) {
                 alertEl.classList.add('show');
@@ -912,7 +911,7 @@
             }
         });
 
-        // ── Social Auth (Clerk → Convex) ──────────────────────
+        // â”€â”€ Social Auth (Clerk -> Convex) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         async function handleOAuth(strategy, btnId) {
             const btn = document.getElementById(btnId);
             const alert = document.getElementById('auth-alert');
@@ -951,7 +950,7 @@
         document.getElementById('btn-google').addEventListener('click', () => handleOAuth('oauth_google', 'btn-google'));
         document.getElementById('btn-apple').addEventListener('click',  () => handleOAuth('oauth_apple',  'btn-apple'));
 
-        // ── Forgot Password ───────────────────────────────────
+        // â”€â”€ Forgot Password â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         document.getElementById('forgot-link').addEventListener('click', (e) => {
             e.preventDefault();
             const email = document.getElementById('email').value.trim();
@@ -972,7 +971,7 @@
         clerkScript.onload = async function () {
             try {
                 await window.Clerk.load();
-                // Already signed in — send straight to dashboard
+                // Already signed in  -  send straight to dashboard
                 if (window.Clerk.user) {
                     window.location.replace('account.html');
                     return;

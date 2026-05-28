@@ -1,0 +1,214 @@
+:root {
+  --ta-green: #064f3b;
+  --ta-green-2: #0b6b52;
+  --ta-blue: #102a43;
+  --ta-gold: #f4b740;
+  --ta-ink: #17212b;
+  --ta-muted: #667085;
+  --ta-bg: #f6f8f7;
+  --ta-line: #dbe4df;
+}
+
+* {
+  letter-spacing: 0;
+}
+
+body {
+  min-height: 100vh;
+  color: var(--ta-ink);
+  background: var(--ta-bg);
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+a {
+  text-decoration: none;
+}
+
+.navbar {
+  box-shadow: 0 10px 30px rgba(16, 42, 67, 0.08);
+}
+
+.brand-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--ta-green), var(--ta-gold));
+  color: #fff;
+  font-weight: 800;
+}
+
+.bg-brand {
+  background: var(--ta-green);
+}
+
+.text-brand {
+  color: var(--ta-green);
+}
+
+.btn-brand {
+  --bs-btn-bg: var(--ta-green);
+  --bs-btn-border-color: var(--ta-green);
+  --bs-btn-hover-bg: #043c2e;
+  --bs-btn-hover-border-color: #043c2e;
+  --bs-btn-color: #fff;
+  --bs-btn-hover-color: #fff;
+}
+
+.btn-accent {
+  --bs-btn-bg: var(--ta-gold);
+  --bs-btn-border-color: var(--ta-gold);
+  --bs-btn-hover-bg: #d99a20;
+  --bs-btn-hover-border-color: #d99a20;
+  --bs-btn-color: #17212b;
+  --bs-btn-hover-color: #17212b;
+}
+
+.hero {
+  color: #fff;
+  background:
+    linear-gradient(105deg, rgba(6, 79, 59, 0.95), rgba(16, 42, 67, 0.78)),
+    url("https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?auto=format&fit=crop&w=1600&q=80") center/cover;
+}
+
+.hero-inner {
+  min-height: 78vh;
+  display: flex;
+  align-items: center;
+  padding-block: 5rem 3rem;
+}
+
+.section-pad {
+  padding-block: 4rem;
+}
+
+.eyebrow {
+  color: var(--ta-gold);
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.event-card,
+.metric-card,
+.panel {
+  border: 1px solid var(--ta-line);
+  border-radius: 8px;
+  box-shadow: 0 12px 30px rgba(16, 42, 67, 0.06);
+}
+
+.event-card img {
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+}
+
+.category-tile {
+  border: 1px solid var(--ta-line);
+  border-radius: 8px;
+  background: #fff;
+  transition: transform 160ms ease, border-color 160ms ease;
+}
+
+.category-tile:hover {
+  transform: translateY(-2px);
+  border-color: var(--ta-gold);
+}
+
+.price-box {
+  background: #fff8e7;
+  border: 1px solid #f8dda2;
+  border-radius: 8px;
+}
+
+.dashboard-shell {
+  min-height: calc(100vh - 72px);
+}
+
+.sidebar {
+  background: #fff;
+  border-right: 1px solid var(--ta-line);
+}
+
+.sidebar .nav-link {
+  color: var(--ta-muted);
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.sidebar .nav-link:hover,
+.sidebar .nav-link.active {
+  color: var(--ta-green);
+  background: #eaf5f0;
+}
+
+.metric-card {
+  background: #fff;
+}
+
+.metric-card .metric-value {
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  font-weight: 800;
+  color: var(--ta-green);
+}
+
+.table thead th {
+  color: var(--ta-muted);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+}
+
+.ticket-shell {
+  max-width: 760px;
+  margin-inline: auto;
+  border: 1px solid var(--ta-line);
+  border-radius: 8px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.ticket-top {
+  color: #fff;
+  background: linear-gradient(135deg, var(--ta-green), var(--ta-blue));
+}
+
+.qr-box {
+  min-height: 190px;
+  display: grid;
+  place-items: center;
+  border: 1px dashed var(--ta-line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.status-box {
+  border-radius: 8px;
+  border: 1px solid var(--ta-line);
+}
+
+.form-control,
+.form-select,
+.btn,
+.card,
+.modal-content,
+.alert {
+  border-radius: 8px;
+}
+
+footer {
+  background: #071f19;
+  color: #dbe4df;
+}
+
+@media (max-width: 767.98px) {
+  .hero-inner {
+    min-height: auto;
+    padding-block: 4rem 2.5rem;
+  }
+
+  .sidebar {
+    border-right: 0;
+    border-bottom: 1px solid var(--ta-line);
+  }
+}

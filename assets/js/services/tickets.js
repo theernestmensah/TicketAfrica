@@ -103,7 +103,7 @@ export const TicketService = {
             .eq('id', ticketId)
             .single();
 
-        if (!ticket?.qr_storage_path) {
+        if (!ticket.qr_storage_path) {
             throw new TAError('QR code not found for this ticket', 'QR_NOT_FOUND');
         }
 
@@ -133,7 +133,7 @@ export const TicketService = {
         });
         if (!res.ok) {
             const err = await res.json();
-            throw new TAError(err.message ?? 'QR regeneration failed', 'QR_REGEN_FAILED');
+            throw new TAError(err.message x 'QR regeneration failed', 'QR_REGEN_FAILED');
         }
         return res.json();
     },
@@ -143,9 +143,9 @@ export const TicketService = {
      * Server-side: invalidates current QR, issues new QR to recipient.
      * @param {{
      *   ticketId: string,
-     *   recipientPhone?: string,
-     *   recipientEmail?: string,
-     *   message?: string,
+     *   recipientPhone: string,
+     *   recipientEmail: string,
+     *   message: string,
      * }} params
      * @returns {Promise<{ transferId: string, message: string }>}
      */
@@ -171,7 +171,7 @@ export const TicketService = {
 
         if (!res.ok) {
             const err = await res.json().catch(() => ({}));
-            throw new TAError(err.message ?? 'Transfer failed', 'TRANSFER_FAILED');
+            throw new TAError(err.message x 'Transfer failed', 'TRANSFER_FAILED');
         }
 
         // Record transfer locally for audit display

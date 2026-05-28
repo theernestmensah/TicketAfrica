@@ -1,12 +1,13 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My Account & Ticket Wallet — Ticket Africa</title>
-    <script type="module" src="/assets/js/db.js"></script>
+    <title>My Account & Ticket Wallet  -  Ticket Africa</title>
     <script src="assets/js/env.js"></script>
+    <script type="module" src="/assets/js/db.js"></script>
+    
     <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
     <link rel="stylesheet" href="assets/css/core.css" />
     <link rel="stylesheet" href="assets/css/mobile.css" />
@@ -680,7 +681,7 @@
                         <div class="form-group">
                             <label class="form-label">Related Event (Optional)</label>
                             <select class="form-control" id="support-event-select">
-                                <option value="">None — General enquiry</option>
+                                <option value="">None  -  General enquiry</option>
                                 <!-- Populated dynamically when tickets are loaded -->
                             </select>
                         </div>
@@ -758,9 +759,9 @@
                 if (!recipient) { if (window.TA) TA.toast('Please enter the recipient phone or email', 'warning'); return; }
                 this.disabled = true;
                 const oldContent = this.innerHTML;
-                this.textContent = 'Sending…';
+                this.textContent = 'Sending...';
                 setTimeout(() => {
-                    if (window.TA) TA.toast('Ticket transferred — recipient will receive their QR via SMS and email', 'success');
+                    if (window.TA) TA.toast('Ticket transferred  -  recipient will receive their QR via SMS and email', 'success');
                     this.disabled = false;
                     this.innerHTML = oldContent;
                     document.getElementById('transfer-recipient').value = '';
@@ -774,7 +775,7 @@
             });
         }); // end DOMContentLoaded
 
-        // ── Clerk: inject and initialize ──────────────────────────
+        // â”€â”€ Clerk: inject and initialize â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         const clerkScript = document.createElement('script');
         clerkScript.src = 'https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js';
         clerkScript.setAttribute('data-clerk-publishable-key', window.ENV.CLERK_PUBLISHABLE_KEY);
@@ -786,7 +787,7 @@
                 const user = window.Clerk.user;
 
                 if (!user) {
-                    // Not signed in — go to login
+                    // Not signed in  -  go to login
                     window.location.replace('login.html');
                     return;
                 }

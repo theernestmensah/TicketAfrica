@@ -1,4 +1,4 @@
-import { v } from "convex/values";
+﻿import { v } from "convex/values";
 import { internalMutation, query } from "./_generated/server";
 import { internal } from "./_generated/api";
 
@@ -44,8 +44,8 @@ export const syncClerkUser = internalMutation({
                 email: string;
                 first_name: string;
                 last_name: string;
-                phone?: string;
-                role?: "buyer" | "organizer" | "admin";
+                phone: string;
+                role: "buyer" | "organizer" | "admin";
             } = {
                 email: args.email,
                 first_name: args.first_name,

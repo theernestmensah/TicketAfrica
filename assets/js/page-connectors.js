@@ -442,18 +442,9 @@ async function loadWallet(email) {
 
     try {
         const orders = await window.ConvexDB.listOrdersByBuyer(email);
-        const ticketCards = (orders || []).flatMap(order => {
-            const actualTickets = order.tickets && order.tickets.length
-                ? order.tickets
-                : (order.items || []).flatMap(item => Array.from({ length: item.quantity || 1 }, (_, index) => ({
-                    _id: `${order._id}-${index}`,
-                    qr_code: `TKA-${String(order._id).slice(-8).toUpperCase()}`,
-                    status: order.status === 'paid' ? 'valid' : order.status,
-                    tier_name: item.tier_name || 'Ticket',
-                    purchased_at: order.paid_at || order.created_at || order._creationTime,
-                })));
-            return actualTickets.map(ticket => ({ order, ticket }));
-        });
+        const ticketCards = (orders || [])
+            .filter(order => order.status === 'paid')
+            .flatMap(order => (order.tickets || []).map(ticket => ({ order, ticket })));
 
         if (!ticketCards.length) {
             walletGrid.style.display = 'none';
@@ -474,17 +465,20 @@ async function loadWallet(email) {
                 : isUpcoming
                     ? `<span class="badge badge--success">Valid</span>`
                     : `<span class="badge badge--primary">${ticket.status || order.status || 'Active'}</span>`;
-            const ticketCode = ticket.qr_code || `TKA-${String(order._id).slice(-8).toUpperCase()}`;
+            const ticketNumber = ticket.ticket_number || `TKA-${String(order._id).slice(-8).toUpperCase()}`;
+            const scanCode = ticket.scan_token || ticket.qr_code || ticketNumber;
             const eventDate = order.event_date ? new Date(order.event_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : dateStr;
             const eventTitle = escapeHtml(order.event_title || order.event_id || 'Event');
             const eventVenue = escapeHtml([order.event_venue, order.event_city].filter(Boolean).join(', ') || 'Venue TBA');
             const ticketType = escapeHtml(ticket.tier_name || 'Ticket');
-            const safeCode = escapeHtml(ticketCode);
+            const safeNumber = escapeHtml(ticketNumber);
+            const safeScanCode = escapeHtml(scanCode);
+            const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(ticketNumber)}`;
             const downloadTitle = escapeHtml(order.event_title || 'Event');
             const downloadVenue = escapeHtml([order.event_venue, order.event_city].filter(Boolean).join(', ') || 'Venue TBA');
 
             return `
-            <div class="ticket-card ${isUsed ? 'ticket-card--used' : 'ticket-card--upcoming'}" data-ticket-code="${safeCode}">
+            <div class="ticket-card ${isUsed ? 'ticket-card--used' : 'ticket-card--upcoming'}" data-ticket-code="${safeScanCode}">
                 <div class="ticket-card__top">
                     ${statusBadge && `<div class="ticket-card__status-badge">${statusBadge}</div>`}
                     <div class="ticket-card__event-name">${eventTitle}</div>
@@ -498,20 +492,20 @@ async function loadWallet(email) {
                     </div>
                 </div>
                 <div class="ticket-card__bottom">
-                    <div class="ticket-info-row"><span>Ticket Code</span><span style="font-family:var(--font-mono);font-size:var(--text-xs);">${safeCode}</span></div>
+                    <div class="ticket-info-row"><span>Ticket No.</span><span style="font-family:var(--font-mono);font-size:var(--text-xs);">${safeNumber}</span></div>
                     <div class="ticket-info-row"><span>Ticket Type</span><span>${ticketType}</span></div>
                     <div class="ticket-info-row"><span>Order Ref</span><span style="font-family:var(--font-mono);font-size:var(--text-xs);">TKA-${String(order._id).slice(-8).toUpperCase()}</span></div>
                     <div class="ticket-info-row"><span>Total Paid</span><span>${moneyFromMinor(order.total_amount || 0, order.currency || 'GHS')}</span></div>
                 </div>
                 <div class="ticket-card__qr">
-                    <div class="ticket-qr-box" title="${ticketCode}" style="font-size:12px;line-height:1.35;text-align:center;font-family:var(--font-mono);word-break:break-all;">
-                        <iconify-icon icon="ph:qr-code"></iconify-icon>
-                        <span style="display:block;margin-top:4px;">${safeCode}</span>
+                    <div class="ticket-qr-box" title="${safeNumber}" style="font-size:12px;line-height:1.35;text-align:center;font-family:var(--font-mono);word-break:break-all;">
+                        <img src="${qrSrc}" alt="Ticket QR code" width="132" height="132" style="display:block;margin:0 auto 8px;border-radius:8px;background:#fff;padding:6px;">
+                        <span style="display:block;margin-top:4px;">${safeNumber}</span>
                     </div>
                 </div>
                 <div class="ticket-card__actions">
-                    <button class="btn btn--secondary btn--sm ticket-copy-btn" style="flex:1;" data-code="${safeCode}">Copy</button>
-                    <button class="btn btn--secondary btn--sm ticket-download-btn" style="flex:1;" data-code="${safeCode}" data-title="${downloadTitle}" data-type="${ticketType}" data-date="${eventDate}" data-venue="${downloadVenue}">Download</button>
+                    <button class="btn btn--secondary btn--sm ticket-copy-btn" style="flex:1;" data-code="${safeNumber}">Copy No.</button>
+                    <button class="btn btn--secondary btn--sm ticket-download-btn" style="flex:1;" data-code="${safeNumber}" data-title="${downloadTitle}" data-type="${ticketType}" data-date="${eventDate}" data-venue="${downloadVenue}">Download</button>
                     <button class="btn btn--ghost btn--sm" style="flex:1;" onclick="window.print()">Print</button>
                 </div>
             </div>`;
@@ -534,7 +528,7 @@ async function loadWallet(email) {
         const transferSelect = document.getElementById('transfer-ticket-select');
         if (transferSelect) {
             transferSelect.innerHTML = ticketCards.map(({ order, ticket }) =>
-                `<option value="${ticket._id}">${ticket.tier_name || 'Ticket'} - ${order.event_title || 'Event'} (${ticket.qr_code || 'pending code'})</option>`
+                `<option value="${ticket._id}">${ticket.tier_name || 'Ticket'} - ${order.event_title || 'Event'} (${ticket.ticket_number || ticket.qr_code || 'pending code'})</option>`
             ).join('') || '<option value="">No tickets available</option>';
         }
 
@@ -633,15 +627,10 @@ async function initScannerPage() {
             lookupBtn.disabled = true;
             lookupBtn.textContent = 'Checking…';
 
-            // If no event_id in URL, fall back to a demo simulation
             if (!eventIdParam) {
                 lookupBtn.disabled = false;
                 lookupBtn.textContent = 'Look Up';
-                const roll = Math.random();
-                const status = roll > 0.6 ? 'valid' : roll > 0.3 ? 'used' : 'invalid';
-                if (typeof window.simulateScan === 'function') window.simulateScan(status);
-                if (window.TA) TA.toast('Demo mode — launch from organizer dashboard for live scanning', 'info');
-                lookupInput.value = '';
+                if (window.TA) TA.toast('Open scanner from an event dashboard to check in tickets.', 'warning');
                 return;
             }
 
@@ -656,7 +645,11 @@ async function initScannerPage() {
                 const ticketType = result.tier_name || 'General';
 
                 if (typeof window.showResult === 'function') {
-                    window.showResult(status, name, ticketType);
+                    window.showResult(status, name, ticketType, {
+                        ticketNumber: result.ticket_number || code,
+                        eventTitle: result.event_title || '',
+                        scannedAt: result.scanned_at || '',
+                    });
                     if (window.counts) {
                         if (status === 'valid') window.counts.valid++;
                         else window.counts.invalid++;
@@ -665,17 +658,15 @@ async function initScannerPage() {
                 }
 
                 if (window.TA) {
-                    const msg = status === 'valid' ? `✓ Valid — ${name}` :
-                                status === 'used' ? `⚠ Already used — ${name}` : '✗ Invalid ticket code';
+                    const msg = status === 'valid' ? `Valid ticket - ${name}` :
+                                status === 'used' ? `Already used - ${name}` : 'Invalid ticket code';
                     TA.toast(msg, status === 'valid' ? 'success' : status === 'used' ? 'warning' : 'error');
                 }
 
             } catch (e) {
                 console.warn('[TA] Scanner checkIn error:', e);
-                const roll = Math.random();
-                const status = roll > 0.6 ? 'valid' : roll > 0.3 ? 'used' : 'invalid';
-                if (typeof window.simulateScan === 'function') window.simulateScan(status);
-                if (window.TA) TA.toast('Offline mode — using local validation', 'warning');
+                if (typeof window.showResult === 'function') window.showResult('invalid', 'Unknown Attendee', 'Unknown Ticket');
+                if (window.TA) TA.toast('Could not verify this ticket. Check your connection and try again.', 'error');
             }
 
             lookupBtn.disabled = false;

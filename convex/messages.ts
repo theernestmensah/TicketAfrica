@@ -1,4 +1,4 @@
-import { action, internalMutation, mutation, query } from "./_generated/server";
+﻿import { action, internalMutation, mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { api } from "./_generated/api";
 
@@ -65,7 +65,7 @@ export const markFailed = mutation({
         const message = await ctx.db.get(args.message_id);
         await ctx.db.patch(args.message_id, {
             status: "failed",
-            attempts: (message?.attempts || 0) + 1,
+            attempts: (message.attempts || 0) + 1,
             last_error: args.error,
         });
         return args.message_id;
@@ -130,7 +130,7 @@ export const deliverQueued = action({
             } catch (error: any) {
                 await ctx.runMutation(api.messages.markFailed, {
                     message_id: message._id,
-                    error: error?.message || String(error),
+                    error: error.message || String(error),
                 });
                 failed += 1;
             }
@@ -154,7 +154,7 @@ function renderHtmlMessage(message: any): string {
     const recipientName = message.recipient_name
         ? `<p style="margin:0 0 16px;">Hi ${escapeHtml(message.recipient_name)},</p>`
         : "";
-    const actionUrl = message.data?.wallet_link || message.data?.account_link || message.data?.events_link;
+    const actionUrl = message.data.wallet_link || message.data.account_link || message.data.events_link;
     const action = actionUrl
         ? `<p style="margin:24px 0;"><a href="${escapeHtml(actionUrl)}" style="background:#111827;color:#fff;text-decoration:none;padding:12px 18px;border-radius:8px;display:inline-block;font-weight:700;">Open Ticket Africa</a></p>`
         : "";

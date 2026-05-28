@@ -1,11 +1,12 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Create an Organizer account and start selling tickets across Africa." />
-    <title>Organizer Sign Up — Ticket Africa</title>
+    <title>Organizer Sign Up  -  Ticket Africa</title>
+    
     <script src="assets/js/env.js"></script>
     <script type="module" src="/assets/js/db.js"></script>
     <script src="assets/js/email-service.js"></script>
@@ -23,14 +24,14 @@
             overflow-x: hidden;
         }
 
-        /* ── Split Layout ── */
+        /* â”€â”€ Split Layout â”€â”€ */
         .auth-layout {
             display: grid;
             grid-template-columns: 1fr 1.2fr;
             min-height: 100vh;
         }
 
-        /* ── LEFT — Form Panel ── */
+        /* â”€â”€ LEFT  -  Form Panel â”€â”€ */
         .auth-form-panel {
             display: flex;
             flex-direction: column;
@@ -150,7 +151,7 @@
             margin-left: var(--space-2);
         }
 
-        /* Social buttons — branded */
+        /* Social buttons  -  branded */
         .social-buttons {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -501,7 +502,7 @@
         .btn-submit.loading .spinner { display: block; }
         .btn-submit.loading .btn-text { display: none; }
 
-        /* ── RIGHT — Visual Panel ── */
+        /* â”€â”€ RIGHT  -  Visual Panel â”€â”€ */
         .auth-visual {
             position: relative;
             overflow: hidden;
@@ -770,7 +771,7 @@
 <body>
     <div class="auth-layout">
 
-        <!-- ── LEFT: Form Panel ── -->
+        <!-- â”€â”€ LEFT: Form Panel â”€â”€ -->
         <div class="auth-form-panel">
             <div class="auth-form">
                 <!-- Nav -->
@@ -793,7 +794,7 @@
                     <div class="step-dot active" id="step-1"></div>
                     <div class="step-dot" id="step-2"></div>
                     <div class="step-dot" id="step-3"></div>
-                    <span class="step-label" id="step-label">Step 1 of 3 — Your info</span>
+                    <span class="step-label" id="step-label">Step 1 of 3  -  Your info</span>
                 </div>
 
                 <!-- Alert -->
@@ -855,18 +856,18 @@
                             <iconify-icon icon="hugeicons:globe" class="input-icon"></iconify-icon>
                             <select id="country" class="country-select" required>
                                 <option value="">Select your country</option>
-                                <option value="GH">🇬🇭 Ghana</option>
-                                <option value="NG">🇳🇬 Nigeria</option>
-                                <option value="KE">🇰🇪 Kenya</option>
-                                <option value="ZA">🇿🇦 South Africa</option>
-                                <option value="RW">🇷🇼 Rwanda</option>
-                                <option value="TZ">🇹🇿 Tanzania</option>
-                                <option value="UG">🇺🇬 Uganda</option>
-                                <option value="ET">🇪🇹 Ethiopia</option>
-                                <option value="SN">🇸🇳 Senegal</option>
-                                <option value="CI">🇨🇮 Côte d'Ivoire</option>
-                                <option value="CM">🇨🇲 Cameroon</option>
-                                <option value="TZ">🌍 Other Africa</option>
+                                <option value="GH">Ghana</option>
+                                <option value="NG">Nigeria</option>
+                                <option value="KE">Kenya</option>
+                                <option value="ZA">South Africa</option>
+                                <option value="RW">Rwanda</option>
+                                <option value="TZ">Tanzania</option>
+                                <option value="UG">Uganda</option>
+                                <option value="ET">Ethiopia</option>
+                                <option value="SN">Senegal</option>
+                                <option value="CI">Cote d'Ivoire</option>
+                                <option value="CM">Cameroon</option>
+                                <option value="OTHER">Other Africa</option>
                             </select>
                         </div>
                         <div class="input-error" id="country-error">Please select your country.</div>
@@ -877,13 +878,13 @@
                         <label class="input-label" for="phone">Phone number <span style="font-weight:400;text-transform:none;letter-spacing:normal;color:var(--color-text-muted);">(optional)</span></label>
                         <div class="phone-wrapper">
                             <select class="country-code-select" id="phone-code">
-                                <option value="+233">🇬🇭 +233</option>
-                                <option value="+234">🇳🇬 +234</option>
-                                <option value="+254">🇰🇪 +254</option>
-                                <option value="+27">🇿🇦 +27</option>
-                                <option value="+250">🇷🇼 +250</option>
-                                <option value="+255">🇹🇿 +255</option>
-                                <option value="+256">🇺🇬 +256</option>
+                                <option value="+233">+233</option>
+                                <option value="+234">+234</option>
+                                <option value="+254">+254</option>
+                                <option value="+27">+27</option>
+                                <option value="+250">+250</option>
+                                <option value="+255">+255</option>
+                                <option value="+256">+256</option>
                                 <option value="+1">+1</option>
                                 <option value="+44">+44</option>
                             </select>
@@ -954,7 +955,7 @@
             </div>
         </div>
 
-        <!-- ── RIGHT: Visual Panel ── -->
+        <!-- â”€â”€ RIGHT: Visual Panel â”€â”€ -->
         <div class="auth-visual">
             <div class="auth-visual__orb auth-visual__orb--1"></div>
             <div class="auth-visual__orb auth-visual__orb--2"></div>
@@ -971,17 +972,17 @@
 
                 <div class="benefit-list">
                     <div class="benefit">
-                        <div class="benefit__icon benefit__icon--purple">🎟️</div>
+                        <div class="benefit__icon benefit__icon--purple">#</div>
                         <div>
                             <div class="benefit__title">Instant E-Tickets</div>
-                            <div class="benefit__desc">QR-code tickets delivered instantly after purchase — no printing needed.</div>
+                            <div class="benefit__desc">QR-code tickets delivered instantly after purchase  -  no printing needed.</div>
                         </div>
                     </div>
                     <div class="benefit">
                         <div class="benefit__icon benefit__icon--pink"><iconify-icon inline icon="ph:money-fill"></iconify-icon></div>
                         <div>
                             <div class="benefit__title">Local Currency Pricing</div>
-                            <div class="benefit__desc">Pay in GH₵, ₦, KSh, ZAR and more. No hidden conversion fees.</div>
+                            <div class="benefit__desc">Pay in GHS, NGN, KSh, ZAR and more. No hidden conversion fees.</div>
                         </div>
                     </div>
                     <div class="benefit">
@@ -1015,7 +1016,7 @@
                         <div class="visual-testimonial__avatar"><iconify-icon inline icon="ph:sparkle-fill"></iconify-icon></div>
                         <div>
                             <div class="visual-testimonial__name">Ama Serwaa</div>
-                            <div class="visual-testimonial__role">Event Goer · Accra, Ghana</div>
+                            <div class="visual-testimonial__role">Event Goer  -  Accra, Ghana</div>
                         </div>
                     </div>
                 </div>
@@ -1023,13 +1024,13 @@
         </div>
     </div>
 
-    <script src="assets/js/env.js"></script><script src="assets/js/core.js"></script>
+    <script src="assets/js/core.js"></script>
     <script>
         /* =============================================================
-           Ticket Africa — Sign Up Page Logic
+           Ticket Africa  -  Sign Up Page Logic
            ============================================================= */
 
-        // ── Password Toggle ──────────────────────────────────────
+        // â”€â”€ Password Toggle â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         const pwdInput = document.getElementById('password');
         const pwdToggle = document.getElementById('pwd-toggle');
         const pwdIcon = document.getElementById('pwd-icon');
@@ -1040,7 +1041,7 @@
             pwdIcon.setAttribute('icon', shown ? 'hugeicons:view' : 'hugeicons:view-off-slash');
         });
 
-        // ── Password Strength ────────────────────────────────────
+        // â”€â”€ Password Strength â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         const strengthBar = document.getElementById('pwd-strength');
         const strengthLabel = document.getElementById('pwd-strength-label');
         const segments = [document.getElementById('seg-1'), document.getElementById('seg-2'),
@@ -1086,7 +1087,7 @@
             strengthLabel.style.color = colors[score] || 'var(--color-text-muted)';
         });
 
-        // ── Phone code auto-update based on country ───────────────
+        // â”€â”€ Phone code auto-update based on country â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         const countryToCode = {
             GH: '+233', NG: '+234', KE: '+254', ZA: '+27',
             RW: '+250', TZ: '+255', UG: '+256'
@@ -1102,7 +1103,7 @@
             }
         });
 
-        // ── Step indicator ───────────────────────────────────────
+        // â”€â”€ Step indicator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         const fields = ['fname', 'lname', 'email', 'country', 'password'];
         function updateSteps() {
             const fFilled = document.getElementById('fname').value && document.getElementById('lname').value;
@@ -1116,13 +1117,13 @@
 
             if (pFilled) {
                 s1.className = 'step-dot done'; s2.className = 'step-dot done'; s3.className = 'step-dot active';
-                label.textContent = 'Step 3 of 3 — Security';
+                label.textContent = 'Step 3 of 3  -  Security';
             } else if (eFilled) {
                 s1.className = 'step-dot done'; s2.className = 'step-dot active'; s3.className = 'step-dot';
-                label.textContent = 'Step 2 of 3 — Contact';
+                label.textContent = 'Step 2 of 3  -  Contact';
             } else {
                 s1.className = 'step-dot active'; s2.className = 'step-dot'; s3.className = 'step-dot';
-                label.textContent = 'Step 1 of 3 — Your info';
+                label.textContent = 'Step 1 of 3  -  Your info';
             }
         }
 
@@ -1130,7 +1131,7 @@
             document.getElementById(id)?.addEventListener('input', updateSteps);
         });
 
-        // ── Validation ───────────────────────────────────────────
+        // â”€â”€ Validation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         function setError(groupId, show) {
             document.getElementById(groupId)?.classList.toggle('has-error', show);
             return !show;
@@ -1138,7 +1139,7 @@
 
         function validateEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
 
-        // ── Form Submit ───────────────────────────────────────
+        // â”€â”€ Form Submit â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         document.getElementById('signup-form').addEventListener('submit', async function (e) {
             e.preventDefault();
 
@@ -1246,7 +1247,7 @@
             }
         });
 
-        // ── Social Auth (Clerk → Convex) ─────────────────────────
+        // â”€â”€ Social Auth (Clerk -> Convex) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         async function handleOAuth(strategy, btnId) {
             const btn = document.getElementById(btnId);
             const alertEl = document.getElementById('auth-alert');
@@ -1294,7 +1295,7 @@
         clerkScript.onload = async function () {
             try {
                 await window.Clerk.load();
-                // Already signed in — send straight to dashboard
+                // Already signed in  -  send straight to dashboard
                 if (window.Clerk.user) {
                     window.location.replace('organizer-dashboard.html');
                     return;

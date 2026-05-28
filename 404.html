@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex" />
+  <title>Page Not Found - Ticket Africa</title>
+  <script src="assets/js/env.js"></script>
+  <script type="module" src="/assets/js/db.js"></script>
+  <link rel="stylesheet" href="assets/css/core.css" />
+  <link rel="stylesheet" href="assets/css/nav-footer.css" />
+  <link rel="stylesheet" href="assets/css/mobile.css" />
+  <style>
+    .error-shell {
+      min-height: calc(100vh - 68px);
+      display: grid;
+      place-items: center;
+      padding: calc(68px + var(--space-12)) var(--space-4) var(--space-12);
+      background:
+        radial-gradient(circle at 18% 22%, rgba(var(--color-secondary-rgb), 0.16), transparent 30%),
+        linear-gradient(135deg, var(--color-bg) 0%, var(--color-bg-elevated) 100%);
+    }
+
+    .error-panel {
+      width: min(720px, 100%);
+      text-align: center;
+    }
+
+    .error-code {
+      font-family: var(--font-display);
+      font-size: clamp(4rem, 12vw, 8rem);
+      line-height: 1;
+      font-weight: 800;
+      color: var(--color-secondary);
+      margin-bottom: var(--space-4);
+    }
+
+    .error-actions {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-3);
+      flex-wrap: wrap;
+      margin-top: var(--space-8);
+    }
+  </style>
+</head>
+<body>
+  <div id="nav-root"></div>
+  <main class="error-shell">
+    <section class="error-panel">
+      <div class="error-code">404</div>
+      <h1 class="display-3">Page not found</h1>
+      <p class="text-secondary" style="margin-top:var(--space-4);">
+        The link may be broken, expired, or moved.
+      </p>
+      <div class="error-actions">
+        <a class="btn btn--primary btn--lg" href="events.html">Browse Events</a>
+        <a class="btn btn--secondary btn--lg" href="index.html">Go Home</a>
+      </div>
+    </section>
+  </main>
+  <div id="footer-root"></div>
+  <script src="assets/js/core.js"></script>
+  <script src="assets/js/nav.js"></script>
+  <script src="assets/js/layout.js"></script>
+</body>
+</html>

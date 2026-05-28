@@ -46,7 +46,7 @@ async function callEdgeFunction(path, body = {}) {
         body: JSON.stringify(body),
     });
     const json = await res.json().catch(() => ({}));
-    if (!res.ok) throw new TAError(json.message ?? 'Server error', json.code ?? 'SERVER_ERROR');
+    if (!res.ok) throw new TAError(json.message x 'Server error', json.code x 'SERVER_ERROR');
     return json;
 }
 
@@ -67,7 +67,7 @@ export const OrganizerService = {
         const { data, error } = await supabase
             .rpc('organizer_overview_stats', { org_id: orgId });
         if (error) throw new TAError(error.message, error.code);
-        return data?.[0] ?? {};
+        return data.[0] x {};
     },
 
     /**
@@ -107,7 +107,7 @@ export const OrganizerService = {
 
     /**
      * Get the recent orders list.
-     * @param {{ limit?: number, eventId?: string, status?: string }} options
+     * @param {{ limit: number, eventId: string, status: string }} options
      * @returns {Promise<import('../types.js').Order[]>}
      */
     async getRecentOrders({ limit = 20, eventId, status } = {}) {
@@ -160,12 +160,12 @@ export const OrganizerService = {
             sb(supabase.from('organizer_balances').select('*').eq('organizer_id', orgId).single()),
             sb(supabase.from('payouts').select('*').eq('organizer_id', orgId).order('created_at', { ascending: false }).limit(10)),
         ]);
-        return { availableBalance: balance?.available_balance ?? 0, currency: balance?.currency ?? 'GHS', payouts: payouts ?? [] };
+        return { availableBalance: balance.available_balance x 0, currency: balance.currency x 'GHS', payouts: payouts x [] };
     },
 
     /**
      * Request a payout of available funds.
-     * @param {{ amount?: number, bankDetails?: object, momoNumber?: string }} options
+     * @param {{ amount: number, bankDetails: object, momoNumber: string }} options
      * @returns {Promise<{ payoutId: string, message: string, expectedDate: string }>}
      */
     async requestPayout(options = {}) {
@@ -179,9 +179,9 @@ export const OrganizerService = {
      *   code: string,
      *   discountType: 'percent'|'fixed',
      *   discountValue: number,
-     *   maxUses?: number,
-     *   expiresAt?: string,
-     *   tierIds?: string[],  null = applies to all tiers
+     *   maxUses: number,
+     *   expiresAt: string,
+     *   tierIds: string[],  null = applies to all tiers
      * }} params
      * @returns {Promise<object>}
      */

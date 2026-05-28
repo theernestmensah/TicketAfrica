@@ -93,7 +93,7 @@ export const RealtimeService = {
      * Used on the checkout page to detect when the MoMo push is approved.
      *
      * @param {string} orderId
-     * @param {(order: { status: string, completedAt?: string }) => void} onUpdate
+     * @param {(order: { status: string, completedAt: string }) => void} onUpdate
      * @returns {() => void} Unsubscribe function
      */
     watchOrderStatus(orderId, onUpdate) {

@@ -1,12 +1,13 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description"
-        content="Afrobeats Night: Grand Finale — Buy tickets for this event at Accra Sports Stadium. Multiple ticket tiers available with mobile money payment." />
-    <title>Afrobeats Night: Grand Finale — Ticket Africa</title>
+        content="Selected Event  -  Buy tickets for this event at Accra Sports Stadium. Multiple ticket tiers available with mobile money payment." />
+    <title>Selected Event  -  Ticket Africa</title>
+    <script src="assets/js/env.js"></script>
     <script type="module" src="/assets/js/db.js"></script>
     <link rel="stylesheet" href="assets/css/core.css" />
     <link rel="stylesheet" href="assets/css/mobile.css" />
@@ -52,6 +53,7 @@
             bottom: var(--space-8);
             left: var(--space-8);
             right: var(--space-8);
+            z-index: 2;
         }
 
         .event-cover__title {
@@ -447,33 +449,116 @@
         }
 
         @media(max-width:640px) {
+            .event-breadcrumb {
+                margin-top: 64px !important;
+                padding: var(--space-3) 0 !important;
+            }
+
+            .event-breadcrumb__inner {
+                flex-wrap: wrap;
+                align-items: flex-start !important;
+                row-gap: var(--space-1) !important;
+                line-height: 1.35;
+            }
+
+            .event-breadcrumb__inner span {
+                flex-basis: 100%;
+                color: var(--color-text-secondary) !important;
+            }
+
+            .event-detail-layout {
+                padding-top: var(--space-5);
+                padding-bottom: var(--space-10);
+            }
+
             .event-meta-grid {
                 grid-template-columns: 1fr;
             }
 
             .event-cover {
                 height: 280px;
-                font-size: 5rem;
+                margin-top: var(--space-5);
+                margin-bottom: var(--space-6);
+                border-radius: var(--radius-xl);
+                font-size: 3.5rem;
             }
+
+            .event-cover > iconify-icon {
+                position: absolute;
+                top: 38%;
+                right: var(--space-8);
+                left: auto;
+                transform: none;
+                font-size: 3.5rem !important;
+                opacity: 0.22;
+                max-width: 96px;
+                max-height: 96px;
+                z-index: 1;
+            }
+
+            .event-cover__info {
+                left: var(--space-5);
+                right: var(--space-5);
+                bottom: var(--space-5);
+            }
+
+            .event-cover__title {
+                font-size: 1.45rem;
+                line-height: 1.2;
+            }
+
+            .ticket-sidebar {
+                position: static;
+            }
+
+            .ticket-tier__header {
+                align-items: flex-start;
+                gap: var(--space-3);
+            }
+
+            .ticket-tier__price {
+                white-space: nowrap;
+            }
+
+            [style*="font-size:var(--text-sm);color:var(--color-text-muted);"] {
+                min-width: 0;
+            }
+        }
+
+        body:not(.event-ready) .event-detail-layout {
+            display: none;
         }
     </style>
 </head>
 
 <body>
     <div id="nav-root"></div>
+    <script>
+        (function () {
+            const params = new URLSearchParams(window.location.search);
+            if (!params.get('slug') && !params.get('id')) {
+                document.addEventListener('DOMContentLoaded', function () {
+                    const container = document.querySelector('.container');
+                    if (container) {
+                        container.innerHTML = '<div style="min-height:55vh;display:flex;align-items:center;justify-content:center;text-align:center;"><div><h1 class="h2" style="margin-bottom:var(--space-3);">Select an event</h1><p style="color:var(--color-text-muted);margin-bottom:var(--space-6);">Choose a live event from the events page to view ticket details.</p><a href="events.html" class="btn btn--primary">Browse Events</a></div></div>';
+                    }
+                });
+            }
+        })();
+    </script>
 
     <!-- Breadcrumb -->
-    <div
+    <div class="event-breadcrumb"
         style="background:var(--color-bg-elevated);border-bottom:1px solid var(--color-border);padding:var(--space-4) 0;margin-top:68px;">
         <div class="container">
-            <div
+            <div class="event-breadcrumb__inner"
                 style="display:flex;align-items:center;gap:var(--space-2);font-size:var(--text-sm);color:var(--color-text-muted);">
                 <a href="index.html" style="color:var(--color-text-muted);transition:color var(--transition-fast);"
                     id="bc-home">Home</a>
                 <iconify-icon icon="hugeicons:arrow-right-01" style="width:12px;height:12px;"></iconify-icon>
                 <a href="events.html" style="color:var(--color-text-muted);" id="bc-events">Events</a>
                 <iconify-icon icon="hugeicons:arrow-right-01" style="width:12px;height:12px;"></iconify-icon>
-                <span style="color:var(--color-text-primary);">Afrobeats Night: Grand Finale</span>
+                <span style="color:var(--color-text-primary);">Selected Event</span>
             </div>
         </div>
     </div>
@@ -494,7 +579,7 @@
                                     style="color:var(--color-error);font-size:1.2em;vertical-align:middle;"></iconify-icon>
                                 Hot</span>
                         </div>
-                        <div class="event-cover__title">Afrobeats Night: Grand Finale ft. Stonebwoy</div>
+                        <div class="event-cover__title">Event Details</div>
                         <div style="display:flex;gap:var(--space-4);flex-wrap:wrap;">
                             <div
                                 style="display:flex;align-items:center;gap:4px;font-size:var(--text-sm);color:rgba(255,255,255,0.75);">
@@ -521,7 +606,7 @@
                             <div>
                                 <div class="event-meta-item__label">Date & Time</div>
                                 <div class="event-meta-item__value">Saturday, 15 March 2026</div>
-                                <div style="font-size:var(--text-xs);color:var(--color-text-muted);">Doors 6:30 PM ·
+                                <div style="font-size:var(--text-xs);color:var(--color-text-muted);">Doors 6:30 PM  - 
                                     Show 8:00 PM</div>
                             </div>
                         </div>
@@ -550,7 +635,7 @@
                             </div>
                             <div>
                                 <div class="event-meta-item__label">Category</div>
-                                <div class="event-meta-item__value">Afrobeats / Live Concert</div>
+                                <div class="event-meta-item__value">Live Event</div>
                                 <div style="font-size:var(--text-xs);color:var(--color-text-muted);">18+ event. ID
                                     required at gate.</div>
                             </div>
@@ -563,11 +648,8 @@
                     <div class="detail-section__title">About This Event</div>
                     <div style="color:var(--color-text-secondary);line-height:1.8;font-size:var(--text-base);">
                         <p style="margin-bottom:var(--space-4);">The most anticipated night of the year returns.
-                            Afrobeats Night: Grand Finale brings together Ghana's biggest musical talent for one
-                            unforgettable evening at Accra Sports Stadium. Headlining the night is international
-                            superstar <strong style="color:var(--color-text-primary);">Stonebwoy</strong>, supported by
-                            an explosive lineup of Afrobeats, Highlife, and Dancehall acts.</p>
-                        <p style="margin-bottom:var(--space-4);">This is not just a concert — it is a cultural
+                            Selected Event details will load from the organiser's published event record.</p>
+                        <p style="margin-bottom:var(--space-4);">This is not just a concert  -  it is a cultural
                             celebration. Expect state-of-the-art production, pyrotechnics, and a crowd energy that will
                             define 2026. Gates open at 6:30 PM. Main act begins at 10:00 PM. Supporting acts from 8:00
                             PM.</p>
@@ -589,7 +671,7 @@
                     <div class="venue-map" id="venue-map">
                         <iconify-icon icon="hugeicons:location-01"
                             style="width:32px;height:32px;color:var(--color-text-muted);"></iconify-icon>
-                        <span>Accra Sports Stadium, Accra — Open in Maps</span>
+                        <span>Accra Sports Stadium, Accra  -  Open in Maps</span>
                     </div>
                     <div style="margin-top:var(--space-4);display:flex;flex-direction:column;gap:var(--space-2);">
                         <div style="font-size:var(--text-sm);color:var(--color-text-muted);"><iconify-icon
@@ -599,7 +681,7 @@
                         <div style="font-size:var(--text-sm);color:var(--color-text-muted);"><iconify-icon inline icon="ph:bus-fill"></iconify-icon> Accessible by Metro Mass
                             Transit, trotro, taxi, and Uber</div>
                         <div style="font-size:var(--text-sm);color:var(--color-text-muted);"><iconify-icon inline icon="ph:parking-circle-fill"></iconify-icon> Parking available
-                            on-site — arrive early</div>
+                            on-site  -  arrive early</div>
                     </div>
                 </div>
 
@@ -610,7 +692,7 @@
                         <div class="organizer-avatar"><iconify-icon icon="ph:mask-happy-fill"></iconify-icon></div>
                         <div>
                             <div class="organizer-name">LiveNation Ghana Ltd</div>
-                            <div class="organizer-events">84 events hosted · Est. 2018</div>
+                            <div class="organizer-events">84 events hosted  -  Est. 2018</div>
                             <div class="organizer-verified">
                                 <iconify-icon icon="hugeicons:check-circle"
                                     style="width:12px;height:12px;"></iconify-icon>
@@ -659,7 +741,7 @@
                         <div class="ticket-tier__radio"></div>
                         <div class="ticket-tier__header">
                             <span class="ticket-tier__name">General Admission</span>
-                            <span class="ticket-tier__price">GH₵ 150</span>
+                            <span class="ticket-tier__price">GHS 150</span>
                         </div>
                         <div class="ticket-tier__desc">Standing floor access. First-come, first-served. No seat
                             assignment.</div>
@@ -670,7 +752,7 @@
                         <div class="ticket-tier__radio"></div>
                         <div class="ticket-tier__header">
                             <span class="ticket-tier__name">VIP Section</span>
-                            <span class="ticket-tier__price">GH₵ 350</span>
+                            <span class="ticket-tier__price">GHS 350</span>
                         </div>
                         <div class="ticket-tier__desc">Dedicated VIP area with elevated view, private bar access, and
                             priority entry. Assigned seating.</div>
@@ -684,7 +766,7 @@
                         <div class="ticket-tier__radio"></div>
                         <div class="ticket-tier__header">
                             <span class="ticket-tier__name">VIP Table (8 pax)</span>
-                            <span class="ticket-tier__price">GH₵ 2,500</span>
+                            <span class="ticket-tier__price">GHS 2,500</span>
                         </div>
                         <div class="ticket-tier__desc">Private table for 8 people. Complimentary bottle service.
                             Dedicated host.</div>
@@ -698,7 +780,7 @@
                         <div class="ticket-tier__radio"></div>
                         <div class="ticket-tier__header">
                             <span class="ticket-tier__name">Platinum Backstage</span>
-                            <span class="ticket-tier__price" style="color:var(--color-text-muted);">GH₵ 1,800</span>
+                            <span class="ticket-tier__price" style="color:var(--color-text-muted);">GHS 1,800</span>
                         </div>
                         <div class="ticket-tier__desc">Backstage meet & greet, exclusive merchandise pack. Sold out.
                         </div>
@@ -712,7 +794,7 @@
                         style="font-size:var(--text-sm);font-weight:600;color:var(--color-text-secondary);margin-bottom:var(--space-3);">
                         Quantity (max 6 per order)</div>
                     <div class="qty-selector">
-                        <button class="qty-btn" id="qty-minus">−</button>
+                        <button class="qty-btn" id="qty-minus">-</button>
                         <div class="qty-value" id="qty-display">2</div>
                         <button class="qty-btn" id="qty-plus">+</button>
                     </div>
@@ -721,20 +803,20 @@
                 <!-- Order Summary -->
                 <div class="order-summary" id="order-summary">
                     <div class="order-summary__title">Order Summary</div>
-                    <div class="order-row"><span>VIP Section × 2</span><span id="subtotal">GH₵ 700.00</span></div>
-                    <div class="order-row"><span>Service fee (5%)</span><span id="service-fee">GH₵ 35.00</span></div>
-                    <div class="order-row"><span>SMS delivery</span><span>GH₵ 1.00</span></div>
-                    <div class="order-row order-total"><span>Total</span><span id="total">GH₵ 736.00</span></div>
+                    <div class="order-row"><span>VIP Section x 2</span><span id="subtotal">GHS 700.00</span></div>
+                    <div class="order-row"><span>Service fee (5%)</span><span id="service-fee">GHS 35.00</span></div>
+                    <div class="order-row"><span>SMS delivery</span><span>GHS 1.00</span></div>
+                    <div class="order-row order-total"><span>Total</span><span id="total">GHS 736.00</span></div>
                 </div>
 
                 <!-- CTA -->
                 <div style="margin-top:var(--space-5);display:flex;flex-direction:column;gap:var(--space-3);">
                     <a href="checkout.html" class="btn btn--primary btn--full btn--lg" id="buy-now-btn">
                         <iconify-icon icon="hugeicons:ticket-01" style="width:18px;height:18px;"></iconify-icon>
-                        Buy Tickets — GH₵ 736.00
+                        Buy Tickets  -  GHS 736.00
                     </a>
                     <button class="btn btn--ghost btn--full" id="add-to-wallet-btn"
-                        onclick="TA.toast('Add to wallet — sign in first','info')">
+                        onclick="TA.toast('Add to wallet  -  sign in first','info')">
                         <iconify-icon icon="hugeicons:credit-card" style="width:16px;height:16px;"></iconify-icon>
                         Save for Later
                     </button>
@@ -746,7 +828,7 @@
                         style="display:flex;align-items:center;gap:var(--space-2);font-size:var(--text-xs);color:var(--color-text-muted);">
                         <iconify-icon icon="hugeicons:shield-01"
                             style="width:14px;height:14px;color:var(--color-success);"></iconify-icon>
-                        100% authentic QR tickets — guaranteed
+                        100% authentic QR tickets  -  guaranteed
                     </div>
                     <div
                         style="display:flex;align-items:center;gap:var(--space-2);font-size:var(--text-xs);color:var(--color-text-muted);">
@@ -784,11 +866,11 @@
     <script src="assets/js/page-connectors.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // ── Countdown (static fallback) ──
+            // â”€â”€ Countdown (static fallback) â”€â”€
             const cd = document.getElementById('countdown-display');
             if (cd) TA.countdown(cd, '2026-03-15T20:00:00');
 
-            // ── Ticket tier selection (works for both static and dynamic tiers) ──
+            // â”€â”€ Ticket tier selection (works for both static and dynamic tiers) â”€â”€
             let selectedPrice = 350;
             let selectedTierId = null;
             let selectedTierName = 'Ticket';
@@ -810,10 +892,19 @@
                 if (t) t.textContent = 'GH\u20B5 ' + total.toFixed(2);
                 if (row) row.textContent = selectedTierName + ' \u00D7 ' + qty;
                 if (btn) {
+                    const eventId = document.getElementById('event-cover')?.dataset.eventId || '';
+                    if (!eventId || !selectedTierId) {
+                        btn.textContent = 'Select an available ticket';
+                        btn.href = '#';
+                        btn.setAttribute('aria-disabled', 'true');
+                        return;
+                    }
+
                     btn.textContent = 'Buy Tickets \u2014 GH\u20B5 ' + total.toFixed(2);
+                    btn.removeAttribute('aria-disabled');
                     // Pass order info in URL
                     const params = new URLSearchParams({
-                        event: document.getElementById('event-cover')?.dataset.eventId || '',
+                        event: eventId,
                         tier: selectedTierId || '',
                         tier_name: selectedTierName,
                         qty: qty,
@@ -846,13 +937,24 @@
                 if (qty < maxQty) { qty++; document.getElementById('qty-display').textContent = qty; updateSummary(); }
             });
 
-            // ── Dynamic Convex data load ──
+            // â”€â”€ Dynamic Convex data load â”€â”€
+            function showEventUnavailable() {
+                const container = document.querySelector('.container');
+                if (container) {
+                    container.innerHTML = '<div style="min-height:55vh;display:flex;align-items:center;justify-content:center;text-align:center;"><div><h1 class="h2" style="margin-bottom:var(--space-3);">Event unavailable</h1><p style="color:var(--color-text-muted);margin-bottom:var(--space-6);">This event is not available or may have been removed.</p><a href="events.html" class="btn btn--primary">Browse Events</a></div></div>';
+                }
+            }
+
             function loadFromConvex() {
                 const slug = new URLSearchParams(window.location.search).get('slug');
                 if (!slug || !window.ConvexDB) return;
 
                 window.ConvexDB.getEventBySlug(slug).then(function (event) {
-                    if (!event) return;
+                    if (!event) {
+                        showEventUnavailable();
+                        return;
+                    }
+                    document.body.classList.add('event-ready');
 
                     // Update page title & meta
                     document.title = event.title + ' \u2014 Ticket Africa';
@@ -947,6 +1049,13 @@
             // Static fallback for initial render
             attachTierListeners();
             updateSummary();
+
+            document.getElementById('buy-now-btn')?.addEventListener('click', function (e) {
+                if (this.getAttribute('aria-disabled') === 'true') {
+                    e.preventDefault();
+                    TA.toast('Ticket options are still loading. Please wait a moment.', 'info');
+                }
+            });
         });
 
     </script>
