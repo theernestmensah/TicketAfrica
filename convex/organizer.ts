@@ -1,6 +1,7 @@
 ﻿import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
+import { action, internalMutation, internalQuery } from "./_generated/server";
 
 async function getCurrentUser(ctx: any) {
     const identity = await ctx.auth.getUserIdentity();
@@ -29,6 +30,92 @@ async function assertEventOrgAccess(ctx: any, eventId: any) {
     if (!event) throw new Error("Event not found.");
     await assertOrgAccess(ctx, event.org_id);
     return event;
+}
+
+function scanResponse(
+    status: "valid" | "used" | "invalid",
+    message: string,
+    details: {
+        owner?: any;
+        tier?: any;
+        event?: any;
+        ticket?: any;
+        scannedAt?: string;
+    } = {}
+) {
+    return {
+        status,
+        message,
+        owner_name: details.owner ? `${details.owner.first_name} ${details.owner.last_name}` : "Guest",
+        tier_name: details.tier?.name || "General Admission",
+        ticket_number: details.ticket?.ticket_number || details.ticket?.qr_code,
+        event_title: details.event?.title || "Unknown Event",
+        scanned_at: details.scannedAt ?? details.ticket?.scanned_at,
+    };
+}
+
+function signedLedgerAmount(entry: any) {
+    return entry.direction === "credit" ? entry.amount : -entry.amount;
+}
+
+function toMajorAmount(minorAmount: number) {
+    return (minorAmount / 100).toFixed(2);
+}
+
+function moolreChannelForPayout(method: string, provider?: string) {
+    const normalized = (provider || "").toLowerCase();
+    if (method === "bank") return "2";
+    if (normalized.includes("telecel") || normalized.includes("vodafone")) return "6";
+    if (normalized.includes("airtel") || normalized.includes("tigo") || normalized === "at") return "7";
+    return "1";
+}
+
+async function getOrganizerBalance(ctx: any, orgId: any) {
+    const entries = await ctx.db
+        .query("ledger_entries")
+        .withIndex("by_org_account", (q: any) => q.eq("org_id", orgId).eq("account", "organizer"))
+        .collect();
+
+    const pendingPayouts = await ctx.db
+        .query("payouts")
+        .withIndex("by_org", (q: any) => q.eq("org_id", orgId))
+        .collect();
+
+    const ledgerNet = entries.reduce((sum: number, entry: any) => sum + signedLedgerAmount(entry), 0);
+    const reserved = pendingPayouts
+        .filter((p: any) => p.status === "pending" || p.status === "processing")
+        .reduce((sum: number, p: any) => sum + (p.gross_amount || p.amount || 0), 0);
+
+    return {
+        ledger_net: ledgerNet,
+        reserved,
+        available: Math.max(0, ledgerNet),
+        currency: entries[0]?.currency || "GHS",
+    };
+}
+
+async function logScanEvent(ctx: any, args: {
+    eventId: any;
+    ticketId?: any;
+    scannerId?: any;
+    gate?: string;
+    source?: "camera" | "manual" | "unknown";
+    submittedCode: string;
+    result: "valid" | "used" | "invalid" | "wrong_event" | "refunded";
+    message: string;
+    scannedAt: string;
+}) {
+    await ctx.db.insert("scan_events", {
+        event_id: args.eventId,
+        ticket_id: args.ticketId,
+        scanner_id: args.scannerId,
+        gate: args.gate?.trim() || undefined,
+        source: args.source || "unknown",
+        submitted_code: args.submittedCode.slice(0, 160),
+        result: args.result,
+        message: args.message,
+        scanned_at: args.scannedAt,
+    });
 }
 
 async function findTicketByCode(ctx: any, code: string) {
@@ -269,6 +356,26 @@ export const listPayoutsByOrg = query({
     },
 });
 
+export const getPayoutBalance = query({
+    args: { org_id: v.id("organizations") },
+    handler: async (ctx, args) => {
+        await assertOrgAccess(ctx, args.org_id);
+        return await getOrganizerBalance(ctx, args.org_id);
+    },
+});
+
+export const listLedgerByOrg = query({
+    args: { org_id: v.id("organizations"), limit: v.optional(v.number()) },
+    handler: async (ctx, args) => {
+        await assertOrgAccess(ctx, args.org_id);
+        return await ctx.db
+            .query("ledger_entries")
+            .withIndex("by_org", (q) => q.eq("org_id", args.org_id))
+            .order("desc")
+            .take(args.limit || 50);
+    },
+});
+
 export const requestPayout = mutation({
     args: {
         org_id: v.id("organizations"),
@@ -283,17 +390,207 @@ export const requestPayout = mutation({
     },
     handler: async (ctx, args) => {
         await assertOrgAccess(ctx, args.org_id);
+        const balance = await getOrganizerBalance(ctx, args.org_id);
+        const payoutFee = Number(process.env.MOOLRE_PAYOUT_FEE_MINOR || 0);
+        const grossAmount = args.amount + payoutFee;
+        if (args.amount < 100) throw new Error("Payout amount is too small.");
+        if (grossAmount > balance.available) {
+            throw new Error("Payout amount exceeds your available balance after fees.");
+        }
+
         const ref = "TA-PAY-" + Date.now().toString(36).toUpperCase();
-        return await ctx.db.insert("payouts", {
+        const payoutId = await ctx.db.insert("payouts", {
             ...args,
+            gross_amount: grossAmount,
+            payout_fee: payoutFee,
             status: "pending",
             reference: ref,
             requested_at: new Date().toISOString(),
         });
+
+        const ledgerBase = {
+            org_id: args.org_id,
+            payout_id: payoutId,
+            currency: args.currency,
+            reference: ref,
+            created_at: new Date().toISOString(),
+        };
+        await ctx.db.insert("ledger_entries", {
+            ...ledgerBase,
+            type: "payout_reserve",
+            account: "organizer",
+            direction: "debit",
+            amount: args.amount,
+            description: "Organizer payout reserved",
+        });
+        if (payoutFee > 0) {
+            await ctx.db.insert("ledger_entries", {
+                ...ledgerBase,
+                type: "payout_fee",
+                account: "organizer",
+                direction: "debit",
+                amount: payoutFee,
+                description: "Moolre payout fee deducted from organizer balance",
+            });
+        }
+
+        return payoutId;
     },
 });
 
 // â”€â”€ Attendee Messages â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+export const getPayoutForProcessing = internalQuery({
+    args: { payout_id: v.id("payouts") },
+    handler: async (ctx, args) => {
+        const payout = await ctx.db.get(args.payout_id);
+        if (!payout) throw new Error("Payout not found.");
+        await assertOrgAccess(ctx, payout.org_id);
+        return payout;
+    },
+});
+
+export const markPayoutProcessing = internalMutation({
+    args: { payout_id: v.id("payouts"), reference: v.string() },
+    handler: async (ctx, args) => {
+        const payout = await ctx.db.get(args.payout_id);
+        if (!payout) throw new Error("Payout not found.");
+        await ctx.db.patch(args.payout_id, {
+            status: "processing",
+            reference: args.reference,
+        });
+        return { success: true };
+    },
+});
+
+export const markPayoutCompleted = internalMutation({
+    args: {
+        payout_id: v.id("payouts"),
+        reference: v.string(),
+    },
+    handler: async (ctx, args) => {
+        const payout = await ctx.db.get(args.payout_id);
+        if (!payout) throw new Error("Payout not found.");
+        await ctx.db.patch(args.payout_id, {
+            status: "completed",
+            reference: args.reference,
+            processed_at: new Date().toISOString(),
+        });
+        return { success: true };
+    },
+});
+
+export const markPayoutFailed = internalMutation({
+    args: {
+        payout_id: v.id("payouts"),
+        reference: v.string(),
+    },
+    handler: async (ctx, args) => {
+        const payout = await ctx.db.get(args.payout_id);
+        if (!payout) throw new Error("Payout not found.");
+        await ctx.db.patch(args.payout_id, {
+            status: "failed",
+            reference: args.reference,
+            processed_at: new Date().toISOString(),
+        });
+        const ledgerBase = {
+            org_id: payout.org_id,
+            payout_id: args.payout_id,
+            currency: payout.currency,
+            reference: args.reference,
+            created_at: new Date().toISOString(),
+        };
+        await ctx.db.insert("ledger_entries", {
+            ...ledgerBase,
+            type: "payout_reserve",
+            account: "organizer",
+            direction: "credit",
+            amount: payout.amount,
+            description: "Failed payout reserve released",
+        });
+        if ((payout.payout_fee || 0) > 0) {
+            await ctx.db.insert("ledger_entries", {
+                ...ledgerBase,
+                type: "payout_fee",
+                account: "organizer",
+                direction: "credit",
+                amount: payout.payout_fee,
+                description: "Failed payout fee released",
+            });
+        }
+        return { success: true };
+    },
+});
+
+export const processMoolrePayout = action({
+    args: { payout_id: v.id("payouts") },
+    handler: async (ctx, args): Promise<{ success: boolean; reference: string; message: string }> => {
+        const apiUser = process.env.MOOLRE_API_USER;
+        const apiKey = process.env.MOOLRE_API_KEY;
+        const accountNumber = process.env.MOOLRE_ACCOUNT_NUMBER;
+        const baseUrl = process.env.MOOLRE_BASE_URL || "https://api.moolre.com";
+        if (!apiUser) throw new Error("MOOLRE_API_USER is not configured.");
+        if (!apiKey) throw new Error("MOOLRE_API_KEY is not configured.");
+        if (!accountNumber) throw new Error("MOOLRE_ACCOUNT_NUMBER is not configured.");
+
+        const payout = await ctx.runQuery(internal.organizer.getPayoutForProcessing, {
+            payout_id: args.payout_id,
+        });
+        if (payout.status !== "pending") {
+            return {
+                success: payout.status === "completed",
+                reference: payout.reference || "",
+                message: `Payout is already ${payout.status}.`,
+            };
+        }
+
+        const reference = payout.reference || `TA-PAY-${Date.now().toString(36).toUpperCase()}`;
+        await ctx.runMutation(internal.organizer.markPayoutProcessing, {
+            payout_id: args.payout_id,
+            reference,
+        });
+
+        const res = await fetch(`${baseUrl}/open/transact/transfer`, {
+            method: "POST",
+            headers: {
+                "content-type": "application/json",
+                "X-API-USER": apiUser,
+                "X-API-KEY": apiKey,
+            },
+            body: JSON.stringify({
+                type: 1,
+                channel: moolreChannelForPayout(payout.method, payout.account_details.provider),
+                currency: payout.currency,
+                amount: toMajorAmount(payout.amount),
+                receiver: payout.account_details.number,
+                sublistid: payout.method === "bank" ? payout.account_details.provider : undefined,
+                externalref: reference,
+                reference: `Ticket Africa payout ${reference}`,
+                accountnumber: accountNumber,
+            }),
+        });
+        const body = await res.json().catch(() => null);
+        const successful = res.ok && String(body?.status) === "1";
+        if (!successful) {
+            await ctx.runMutation(internal.organizer.markPayoutFailed, {
+                payout_id: args.payout_id,
+                reference,
+            });
+            throw new Error(body?.message || `Moolre transfer failed with ${res.status}`);
+        }
+
+        await ctx.runMutation(internal.organizer.markPayoutCompleted, {
+            payout_id: args.payout_id,
+            reference,
+        });
+
+        return {
+            success: true,
+            reference,
+            message: Array.isArray(body?.message) ? body.message.join(" ") : body?.message || "Payout sent.",
+        };
+    },
+});
 
 export const listMessagesByOrg = query({
     args: { org_id: v.id("organizations") },
@@ -363,13 +660,18 @@ export const sendAttendeeMessage = mutation({
                 template_key: "attendee_update",
                 data: {
                     attendee_message_id: messageId.toString(),
-                    event_title: event.title || "your event",
+                    event_title: event?.title || "your event",
                     channel: args.channel,
                 },
             });
         }
 
-        return messageId;
+        return {
+            message_id: messageId,
+            sent_to: paidRecipients.size,
+            queued_email: args.channel === "email" || args.channel === "both" ? paidRecipients.size : 0,
+            queued_sms: args.channel === "sms" ? paidRecipients.size : 0,
+        };
     },
 });
 
@@ -439,14 +741,33 @@ export const getOrgAnalytics = query({
     },
 });
 export const checkInTicket = mutation({
-    args: { qr_code: v.string(), event_id: v.id("events") },
+    args: {
+        qr_code: v.string(),
+        event_id: v.id("events"),
+        gate: v.optional(v.string()),
+        source: v.optional(v.union(v.literal("camera"), v.literal("manual"), v.literal("unknown"))),
+    },
     handler: async (ctx, args) => {
         await assertEventOrgAccess(ctx, args.event_id);
         const scanner = await getCurrentUser(ctx);
-        const ticket = await findTicketByCode(ctx, args.qr_code);
+        const submittedCode = args.qr_code.trim();
+        const now = new Date().toISOString();
+        const ticket = await findTicketByCode(ctx, submittedCode);
 
         if (!ticket || ticket.event_id !== args.event_id) {
-            return { status: "invalid", message: "Ticket not found for this event." };
+            const message = ticket ? "Ticket belongs to a different event." : "Ticket not found for this event.";
+            await logScanEvent(ctx, {
+                eventId: args.event_id,
+                ticketId: ticket?._id,
+                scannerId: scanner._id,
+                gate: args.gate,
+                source: args.source,
+                submittedCode,
+                result: ticket ? "wrong_event" : "invalid",
+                message,
+                scannedAt: now,
+            });
+            return { status: "invalid", message };
         }
 
         const owner = ticket.owner_id ? await ctx.db.get(ticket.owner_id) : null;
@@ -454,44 +775,83 @@ export const checkInTicket = mutation({
         const event = await ctx.db.get(ticket.event_id);
 
         if (ticket.status === "scanned") {
-            return { 
-                status: "used", 
-                message: "This ticket has already been used.",
-                owner_name: owner ? `${owner.first_name} ${owner.last_name}` : "Guest",
-                tier_name: (tier as any).name || "General Admission",
-                ticket_number: ticket.ticket_number || ticket.qr_code,
-                event_title: event?.title || "Unknown Event",
-                scanned_at: ticket.scanned_at 
-            };
+            const message = "This ticket has already been used.";
+            await logScanEvent(ctx, {
+                eventId: args.event_id,
+                ticketId: ticket._id,
+                scannerId: scanner._id,
+                gate: args.gate,
+                source: args.source,
+                submittedCode,
+                result: "used",
+                message,
+                scannedAt: now,
+            });
+            return scanResponse("used", message, { owner, tier, event, ticket });
         }
 
         if (ticket.status !== "valid") {
-            return {
-                status: "invalid",
-                message: "Ticket is no longer valid.",
-                owner_name: owner ? `${owner.first_name} ${owner.last_name}` : "Guest",
-                tier_name: (tier as any).name || "General Admission",
-                ticket_number: ticket.ticket_number || ticket.qr_code,
-                event_title: event?.title || "Unknown Event",
-            };
+            const message = "Ticket is no longer valid.";
+            await logScanEvent(ctx, {
+                eventId: args.event_id,
+                ticketId: ticket._id,
+                scannerId: scanner._id,
+                gate: args.gate,
+                source: args.source,
+                submittedCode,
+                result: ticket.status === "refunded" ? "refunded" : "invalid",
+                message,
+                scannedAt: now,
+            });
+            return scanResponse("invalid", message, { owner, tier, event, ticket });
         }
 
-        const now = new Date().toISOString();
         await ctx.db.patch(ticket._id, {
             status: "scanned",
             scanned_at: now,
             scanned_by: scanner._id,
         });
 
-        return { 
-            status: "valid", 
-            message: "Ticket verified successfully.",
-            owner_name: owner ? `${owner.first_name} ${owner.last_name}` : "Guest",
-            tier_name: (tier as any).name || "General Admission",
-            ticket_number: ticket.ticket_number || ticket.qr_code,
-            event_title: event?.title || "Unknown Event",
-            scanned_at: now
-        };
+        const message = "Ticket verified successfully.";
+        await logScanEvent(ctx, {
+            eventId: args.event_id,
+            ticketId: ticket._id,
+            scannerId: scanner._id,
+            gate: args.gate,
+            source: args.source,
+            submittedCode,
+            result: "valid",
+            message,
+            scannedAt: now,
+        });
+
+        return scanResponse("valid", message, { owner, tier, event, ticket, scannedAt: now });
+    },
+});
+
+export const listScanEventsByEvent = query({
+    args: {
+        event_id: v.id("events"),
+        limit: v.optional(v.number()),
+    },
+    handler: async (ctx, args) => {
+        await assertEventOrgAccess(ctx, args.event_id);
+        const limit = Math.min(Math.max(args.limit || 50, 1), 200);
+        const scans = await ctx.db
+            .query("scan_events")
+            .withIndex("by_event", (q) => q.eq("event_id", args.event_id))
+            .order("desc")
+            .take(limit);
+
+        return await Promise.all(scans.map(async (scan) => {
+            const ticket = scan.ticket_id ? await ctx.db.get(scan.ticket_id) : null;
+            const scanner = scan.scanner_id ? await ctx.db.get(scan.scanner_id) : null;
+            return {
+                ...scan,
+                ticket_number: ticket?.ticket_number || null,
+                scanner_name: scanner ? `${scanner.first_name} ${scanner.last_name}` : null,
+            };
+        }));
     },
 });
 

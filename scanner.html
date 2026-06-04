@@ -7,6 +7,8 @@
     <title>Ticket Scanner  -  Ticket Africa</title>
     <script src="assets/js/env.js"></script>
     <script type="module" src="/assets/js/db.js"></script>
+    <script src="assets/vendor/html5-qrcode.min.js" defer></script>
+    <script src="assets/vendor/html5-qrcode.browser.js" defer></script>
     <link rel="stylesheet" href="assets/css/core.css" />
     <link rel="stylesheet" href="assets/css/mobile.css" />
     <style>
@@ -707,6 +709,7 @@
         <div class="scanner-camera" id="scanner-camera">
             <div class="camera-placeholder">
                 <div class="camera-feed" id="camera-feed">
+                    <div id="qr-reader" style="position:absolute;inset:0;z-index:1;display:none;"></div>
                     <div style="text-align:center;z-index:2;position:relative;">
                         <div style="font-size:72px;margin-bottom:16px;opacity:0.3;"><iconify-icon icon="hugeicons:camera-01"></iconify-icon></div>
                         <div style="font-size:14px;color:rgba(255,255,255,0.4);">Camera inactive</div>
@@ -787,7 +790,7 @@
                     id="btn-export-log">Export Log</button>
                 <button class="btn"
                     style="flex:1;background:#8B5CF6;color:white;font-size:13px;padding:10px;border-radius:8px;font-weight:600;"
-                    id="btn-sync">Sync Sync</button>
+                    id="btn-sync">Sync</button>
             </div>
         </div>
     </div>
@@ -882,10 +885,11 @@
             });
 
             document.getElementById('btn-camera').addEventListener('click', function () {
-                const cf = document.getElementById('camera-feed');
-                cf.style.background = 'linear-gradient(135deg,#050505,#0d0d0d)';
-                cf.querySelector('div').style.display = 'none';
-                window.TA && TA.toast('Use manual ticket lookup until camera scanning is enabled.', 'info');
+                if (window.TicketAfricaScanner && window.TicketAfricaScanner.startCamera) {
+                    window.TicketAfricaScanner.startCamera();
+                } else {
+                    window.TA && TA.toast('Scanner is still loading. Try again in a moment.', 'info');
+                }
             });
 
             document.getElementById('btn-sync').addEventListener('click', function () {

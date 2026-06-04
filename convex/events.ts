@@ -481,6 +481,18 @@ export const addRealDemoEvents = mutation({
     },
 });
 
+export const bootstrapLaunchData = mutation({
+    args: {
+        confirmation: v.string(),
+    },
+    handler: async (_ctx, args) => {
+        if (args.confirmation !== "BOOTSTRAP_TICKET_AFRICA_LAUNCH") {
+            throw new Error("Invalid launch bootstrap confirmation.");
+        }
+        return { inserted_events: 0, inserted_tiers: 0, disabled: true };
+    },
+});
+
 // â”€â”€ Admin Utilities â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export const deleteAllEvents = mutation({

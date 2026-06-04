@@ -936,10 +936,12 @@
                 document.getElementById('stat-events').textContent = activeEvents;
                 document.getElementById('stat-attendees').textContent = totalSold.toLocaleString();
                 document.getElementById('sidebar-event-count').textContent = (events || []).length;
-                // Update available payout balance card
-                const paidRev = (events || []).reduce((s, e) => s + (e.gross_revenue ?? ((e.tickets_sold ?? 0) * (e.base_price ?? 0))), 0);
+                // Update available payout balance card from the settlement ledger.
                 const payoutEl = document.getElementById('payout-balance');
-                if (payoutEl) payoutEl.textContent = 'GHS ' + (paidRev / 100).toLocaleString('en-GH', { minimumFractionDigits: 2 });
+                if (payoutEl && window.ConvexDB.getPayoutBalance) {
+                    const balance = await window.ConvexDB.getPayoutBalance(_currentOrgId);
+                    payoutEl.textContent = (balance.currency || 'GHS') + ' ' + (balance.available / 100).toLocaleString('en-GH', { minimumFractionDigits: 2 });
+                }
                 // Keep organizer-features in sync
                 window.__setEvents(events || []);
             } catch (e) { console.error('[refreshEvents]', e); }

@@ -292,20 +292,44 @@ async function loadPayouts() {
     if (!window.ConvexDB) return;
     const container = document.getElementById('payouts-container');
     try {
-        const payouts = await window.ConvexDB.listPayoutsByOrg(_orgId);
+        const [payouts, balance, ledger] = await Promise.all([
+            window.ConvexDB.listPayoutsByOrg(_orgId),
+            window.ConvexDB.getPayoutBalance ? window.ConvexDB.getPayoutBalance(_orgId) : Promise.resolve(null),
+            window.ConvexDB.listLedgerByOrg ? window.ConvexDB.listLedgerByOrg(_orgId, 12) : Promise.resolve([]),
+        ]);
+        const payoutBalanceEl = document.getElementById('payout-balance');
+        if (payoutBalanceEl && balance) {
+            payoutBalanceEl.textContent = fmtCurrency(balance.available, balance.currency || 'GHS');
+        }
+        const amountInput = document.getElementById('po-amount');
+        if (amountInput && balance) {
+            amountInput.max = String(balance.available);
+            amountInput.placeholder = `Available: ${balance.available} minor units`;
+        }
+        const ledgerRows = (ledger || []).map(entry => `<tr>
+            <td style="font-size:12px;">${entry.type.replace(/_/g, ' ')}</td>
+            <td>${entry.direction === 'credit' ? '+' : '-'}${fmtCurrency(entry.amount, entry.currency)}</td>
+            <td style="font-size:12px;">${entry.account}</td>
+            <td style="font-size:12px;color:rgba(255,255,255,0.4);">${fmtDate(entry.created_at)}</td>
+        </tr>`);
+        const ledgerHtml = ledgerRows.length
+            ? `<div style="margin-bottom:18px;"><div style="font-size:12px;font-weight:700;color:rgba(255,255,255,0.55);margin-bottom:8px;text-transform:uppercase;">Settlement Ledger</div>${renderTable(['Entry', 'Amount', 'Account', 'Date'], ledgerRows)}</div>`
+            : '';
         if (!payouts || !payouts.length) {
-            container.innerHTML = emptyState('hugeicons:money-send-02', 'No payouts yet', 'Submit a payout request to receive your earnings.');
+            container.innerHTML = ledgerHtml + emptyState('hugeicons:money-send-02', 'No payouts yet', 'Submit a payout request to receive your earnings.');
             return;
         }
         const rows = payouts.map(p => `<tr>
             <td class="td-value">${fmtCurrency(p.amount, p.currency)}</td>
+            <td style="font-size:12px;">${p.payout_fee ? fmtCurrency(p.payout_fee, p.currency) : 'No fee'}</td>
             <td style="font-size:12px;">${p.method === 'momo' ? 'Mobile Money' : p.method === 'bank' ? 'Bank Transfer' : 'USSD'}</td>
             <td style="font-size:12px;">${p.account_details.provider || ''} · ${p.account_details.number}<br><span style="color:rgba(255,255,255,0.4);">${p.account_details.name}</span></td>
             <td>${statusChip(p.status, PAYOUT_STATUS)}</td>
             <td style="font-size:12px;color:rgba(255,255,255,0.4);">${p.reference || '—'}</td>
             <td style="font-size:12px;color:rgba(255,255,255,0.4);">${fmtDate(p.requested_at)}</td>
+            <td>${p.status === 'pending' ? `<button class="btn btn--secondary btn--sm" onclick="processPayout('${p._id}')">Send</button>` : ''}</td>
         </tr>`);
-        container.innerHTML = renderTable(['Amount', 'Method', 'Account', 'Status', 'Reference', 'Requested'], rows);
+        container.innerHTML = ledgerHtml + renderTable(['Net Amount', 'Fee', 'Method', 'Account', 'Status', 'Reference', 'Requested', 'Action'], rows);
     } catch (e) {
         container.innerHTML = emptyState('hugeicons:money-send-02', 'Could not load payouts', '');
     }
@@ -316,7 +340,7 @@ async function submitPayoutRequest() {
     const amount = parseInt(document.getElementById('po-amount')?.value || '0');
     const number = document.getElementById('po-number')?.value?.trim();
     const name = document.getElementById('po-name')?.value?.trim();
-    if (!amount || amount < 100) return window.TA?.toast('Enter a valid amount (min 100).', 'error');
+    if (!amount || amount < 100) return window.TA?.toast('Enter a valid amount in minor units (min 100).', 'error');
     if (!number || !name) return window.TA?.toast('Account number and name are required.', 'error');
     try {
         await window.ConvexDB.requestPayout({
@@ -338,8 +362,21 @@ async function submitPayoutRequest() {
     }
 }
 
+async function processPayout(payoutId) {
+    if (!window.ConvexDB?.processMoolrePayout) return window.TA?.toast('Payout processor is not connected.', 'error');
+    try {
+        const result = await window.ConvexDB.processMoolrePayout(payoutId);
+        window.TA?.toast(result?.message || 'Payout sent through Moolre.', 'success');
+        loadPayouts();
+    } catch (e) {
+        window.TA?.toast('Payout failed: ' + (e.message || 'Unknown error'), 'error');
+        loadPayouts();
+    }
+}
+
 window.loadPayouts = loadPayouts;
 window.submitPayoutRequest = submitPayoutRequest;
+window.processPayout = processPayout;
 
 /* ── PROMO CODES ──────────────────────────────────────── */
 function togglePromoForm() {
@@ -475,16 +512,8 @@ async function sendMessage() {
     } catch { }
 
     const sentTo = orders.length;
-    const eventTitle = eventId
-        ? (orders[0]?.event_title || 'Your Event')
-        : 'All Events';
-
-    // Determine org label for email footer
-    const orgLabel = document.getElementById('dash-user-org')?.textContent || 'Ticket Africa Organizer';
-
     try {
-        // 1. Save message log to Convex (always)
-        await window.ConvexDB.sendAttendeeMessage({
+        const messageResult = await window.ConvexDB.sendAttendeeMessage({
             org_id: _orgId,
             event_id: eventId || undefined,
             subject,
@@ -492,6 +521,25 @@ async function sendMessage() {
             channel,
             sent_to: sentTo,
         });
+
+        if ((channel === 'email' || channel === 'both') && sentTo > 0) {
+            try {
+                const delivery = await window.ConvexDB.deliverQueuedMessages(Math.max(sentTo, 25));
+                window.TA?.toast(`Message queued to ${messageResult.sent_to || sentTo} attendees. Brevo sent ${delivery.sent}/${delivery.processed}.`, delivery.failed ? 'warning' : 'success');
+            } catch (deliveryErr) {
+                console.warn('[TA] Brevo delivery error:', deliveryErr);
+                window.TA?.toast(`Message queued to ${messageResult.sent_to || sentTo} attendees. Configure Brevo to send emails.`, 'warning');
+            }
+        } else if (channel === 'sms') {
+            window.TA?.toast(`Message logged to ${messageResult.sent_to || sentTo} attendees. SMS provider is not configured yet.`, 'warning');
+        } else {
+            window.TA?.toast(`Message logged to ${messageResult.sent_to || sentTo} attendees.`, 'success');
+        }
+
+        document.getElementById('msg-subject').value = '';
+        document.getElementById('msg-body').value = '';
+        loadMessages();
+        return;
 
         // 2. If email channel selected, send via TAMail
         if (window.TAMail && (channel === 'email' || channel === 'both') && orders.length > 0) {

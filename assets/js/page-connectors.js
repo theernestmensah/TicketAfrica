@@ -473,7 +473,7 @@ async function loadWallet(email) {
             const ticketType = escapeHtml(ticket.tier_name || 'Ticket');
             const safeNumber = escapeHtml(ticketNumber);
             const safeScanCode = escapeHtml(scanCode);
-            const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(ticketNumber)}`;
+            const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(scanCode)}`;
             const downloadTitle = escapeHtml(order.event_title || 'Event');
             const downloadVenue = escapeHtml([order.event_venue, order.event_city].filter(Boolean).join(', ') || 'Venue TBA');
 
@@ -614,64 +614,151 @@ async function initScannerPage() {
     // Get event_id from URL param for context
     const params = new URLSearchParams(window.location.search);
     const eventIdParam = params.get('event_id') || params.get('event') || '';
+    const gateParam = params.get('gate') || 'Gate A';
+    let html5QrCode = null;
+    let cameraRunning = false;
+    let lastScannedCode = '';
+    let lastScannedAt = 0;
 
     // Override the lookup button to use Convex
     const lookupBtn = document.getElementById('lookup-btn');
     const lookupInput = document.getElementById('lookup-input');
 
-    if (lookupBtn && lookupInput) {
-        lookupBtn.addEventListener('click', async function() {
-            const code = lookupInput.value.trim();
-            if (!code) return;
+    async function handleTicketCode(rawCode, source = 'manual') {
+        const code = String(rawCode || '').trim();
+        if (!code) return;
 
+        if (lookupBtn) {
             lookupBtn.disabled = true;
-            lookupBtn.textContent = 'Checking…';
+            lookupBtn.textContent = 'Checking...';
+        }
 
-            if (!eventIdParam) {
+        if (!eventIdParam) {
+            if (lookupBtn) {
                 lookupBtn.disabled = false;
                 lookupBtn.textContent = 'Look Up';
-                if (window.TA) TA.toast('Open scanner from an event dashboard to check in tickets.', 'warning');
-                return;
             }
+            if (window.TA) TA.toast('Open scanner from an event dashboard to check in tickets.', 'warning');
+            return;
+        }
 
-            try {
-                const result = await window.ConvexDB.checkInTicket({
-                    qr_code: code,
-                    event_id: eventIdParam,
+        try {
+            const result = await window.ConvexDB.checkInTicket({
+                qr_code: code,
+                event_id: eventIdParam,
+                gate: gateParam,
+                source: source,
+            });
+
+            const status = result.status === 'valid' ? 'valid' : result.status === 'used' ? 'used' : 'invalid';
+            const name = result.owner_name || 'Unknown Attendee';
+            const ticketType = result.tier_name || 'General';
+
+            if (typeof window.showResult === 'function') {
+                window.showResult(status, name, ticketType, {
+                    ticketNumber: result.ticket_number || code,
+                    eventTitle: result.event_title || '',
+                    scannedAt: result.scanned_at || '',
                 });
-
-                const status = result.status === 'valid' ? 'valid' : result.status === 'used' ? 'used' : 'invalid';
-                const name = result.owner_name || 'Unknown Attendee';
-                const ticketType = result.tier_name || 'General';
-
-                if (typeof window.showResult === 'function') {
-                    window.showResult(status, name, ticketType, {
-                        ticketNumber: result.ticket_number || code,
-                        eventTitle: result.event_title || '',
-                        scannedAt: result.scanned_at || '',
-                    });
-                    if (window.counts) {
-                        if (status === 'valid') window.counts.valid++;
-                        else window.counts.invalid++;
-                        if (typeof window.updateStats === 'function') window.updateStats();
-                    }
+                if (window.counts) {
+                    if (status === 'valid') window.counts.valid++;
+                    else window.counts.invalid++;
+                    if (typeof window.updateStats === 'function') window.updateStats();
                 }
-
-                if (window.TA) {
-                    const msg = status === 'valid' ? `Valid ticket - ${name}` :
-                                status === 'used' ? `Already used - ${name}` : 'Invalid ticket code';
-                    TA.toast(msg, status === 'valid' ? 'success' : status === 'used' ? 'warning' : 'error');
-                }
-
-            } catch (e) {
-                console.warn('[TA] Scanner checkIn error:', e);
-                if (typeof window.showResult === 'function') window.showResult('invalid', 'Unknown Attendee', 'Unknown Ticket');
-                if (window.TA) TA.toast('Could not verify this ticket. Check your connection and try again.', 'error');
             }
 
-            lookupBtn.disabled = false;
-            lookupBtn.textContent = 'Look Up';
-            lookupInput.value = '';
+            if (window.TA) {
+                const msg = status === 'valid' ? `Valid ticket - ${name}` :
+                            status === 'used' ? `Already used - ${name}` : 'Invalid ticket code';
+                TA.toast(msg, status === 'valid' ? 'success' : status === 'used' ? 'warning' : 'error');
+            }
+
+        } catch (e) {
+            console.warn('[TA] Scanner checkIn error:', e);
+            if (typeof window.showResult === 'function') window.showResult('invalid', 'Unknown Attendee', 'Unknown Ticket');
+            if (window.TA) TA.toast('Could not verify this ticket. Check your connection and try again.', 'error');
+        } finally {
+            if (lookupBtn) {
+                lookupBtn.disabled = false;
+                lookupBtn.textContent = 'Look Up';
+            }
+            if (lookupInput) lookupInput.value = '';
+        }
+    }
+
+    function getScannerErrorMessage(error) {
+        const message = typeof error === 'string'
+            ? error
+            : error?.message || 'Could not start camera.';
+        if (/notallowed|permission|denied/i.test(message)) {
+            return 'Camera permission was blocked. Allow camera access, or use manual lookup.';
+        }
+        if (/notfound|no camera|devices? not found/i.test(message)) {
+            return 'No camera was found on this device. Use manual lookup for check-in.';
+        }
+        if (/secure|https|localhost/i.test(message)) {
+            return 'Camera access requires HTTPS or localhost.';
+        }
+        return message || 'Could not start camera. Use manual lookup or check browser permissions.';
+    }
+
+    async function startCameraScanner() {
+        const reader = document.getElementById('qr-reader');
+        const feed = document.getElementById('camera-feed');
+        if (!reader || !feed) return;
+        if (!eventIdParam) {
+            if (window.TA) TA.toast('Open scanner from an event dashboard before starting the camera.', 'warning');
+            return;
+        }
+        const Html5QrcodeClass = window.Html5Qrcode || window.__Html5QrcodeLibrary__?.Html5Qrcode || null;
+        if (!Html5QrcodeClass) {
+            if (window.TA) TA.toast('Camera scanner library is still loading. Try again in a moment.', 'info');
+            return;
+        }
+        if (cameraRunning) {
+            await html5QrCode.stop().catch(() => {});
+            reader.style.display = 'none';
+            cameraRunning = false;
+            if (window.TA) TA.toast('Camera scanner paused', 'info');
+            return;
+        }
+
+        html5QrCode = html5QrCode || new Html5QrcodeClass('qr-reader');
+        reader.style.display = 'block';
+        const intro = feed.querySelector(':scope > div:not(#qr-reader):not(.scan-frame):not(.scan-line)');
+        if (intro) intro.style.display = 'none';
+
+        try {
+            await html5QrCode.start(
+                { facingMode: 'environment' },
+                { fps: 8, qrbox: { width: 240, height: 240 } },
+                async (decodedText) => {
+                    const now = Date.now();
+                    if (decodedText === lastScannedCode && now - lastScannedAt < 4000) return;
+                    lastScannedCode = decodedText;
+                    lastScannedAt = now;
+                    await handleTicketCode(decodedText, 'camera');
+                }
+            );
+            cameraRunning = true;
+            if (window.TA) TA.toast('Camera scanner active', 'success');
+        } catch (e) {
+            console.warn('[TA] Camera scanner error:', e);
+            reader.style.display = 'none';
+            const intro = feed.querySelector(':scope > div:not(#qr-reader):not(.scan-frame):not(.scan-line)');
+            if (intro) intro.style.display = '';
+            if (window.TA) TA.toast(getScannerErrorMessage(e), 'error');
+        }
+    }
+
+    window.TicketAfricaScanner = {
+        handleCode: handleTicketCode,
+        startCamera: startCameraScanner,
+    };
+
+    if (lookupBtn && lookupInput) {
+        lookupBtn.addEventListener('click', function() {
+            handleTicketCode(lookupInput.value);
         }, { once: false });
     }
 

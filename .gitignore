@@ -21,3 +21,6 @@ dist/
 node_modules/
 assets/js/env.js
 
+# Legacy localStorage MVP snapshot
+ticket-africa/
+

@@ -82,6 +82,28 @@ export default defineSchema({
     .index("by_ticket_number", ["ticket_number"])
     .index("by_order", ["order_id"]),
 
+    scan_events: defineTable({
+        event_id: v.id("events"),
+        ticket_id: v.optional(v.id("tickets")),
+        scanner_id: v.optional(v.id("users")),
+        gate: v.optional(v.string()),
+        source: v.union(v.literal("camera"), v.literal("manual"), v.literal("unknown")),
+        submitted_code: v.string(),
+        result: v.union(
+            v.literal("valid"),
+            v.literal("used"),
+            v.literal("invalid"),
+            v.literal("wrong_event"),
+            v.literal("refunded")
+        ),
+        message: v.string(),
+        scanned_at: v.string(),
+    })
+    .index("by_event", ["event_id"])
+    .index("by_ticket", ["ticket_id"])
+    .index("by_scanner", ["scanner_id"])
+    .index("by_event_result", ["event_id", "result"]),
+
     // â”€â”€ Orders (each purchase transaction) â”€â”€
     orders: defineTable({
         event_id: v.id("events"),
@@ -141,6 +163,8 @@ export default defineSchema({
         org_id: v.id("organizations"),
         amount: v.number(),         // minor units
         currency: v.string(),
+        gross_amount: v.optional(v.number()),
+        payout_fee: v.optional(v.number()),
         method: v.union(v.literal("momo"), v.literal("bank"), v.literal("ussd")),
         account_details: v.object({
             provider: v.optional(v.string()),  // e.g. "MTN", "Vodafone", "GCB"
@@ -152,6 +176,40 @@ export default defineSchema({
         requested_at: v.string(),
         processed_at: v.optional(v.string()),
     }).index("by_org", ["org_id"]),
+
+    ledger_entries: defineTable({
+        org_id: v.optional(v.id("organizations")),
+        event_id: v.optional(v.id("events")),
+        order_id: v.optional(v.string()),
+        payout_id: v.optional(v.id("payouts")),
+        type: v.union(
+            v.literal("ticket_sale"),
+            v.literal("ticket_africa_fee"),
+            v.literal("sms_delivery_fee"),
+            v.literal("moolre_buyer_fee"),
+            v.literal("moolre_collection_fee"),
+            v.literal("payout_reserve"),
+            v.literal("payout_fee"),
+            v.literal("refund")
+        ),
+        account: v.union(
+            v.literal("organizer"),
+            v.literal("ticket_africa"),
+            v.literal("moolre"),
+            v.literal("buyer")
+        ),
+        direction: v.union(v.literal("credit"), v.literal("debit")),
+        amount: v.number(),
+        currency: v.string(),
+        reference: v.optional(v.string()),
+        description: v.string(),
+        created_at: v.string(),
+    })
+    .index("by_org", ["org_id"])
+    .index("by_order", ["order_id"])
+    .index("by_payout", ["payout_id"])
+    .index("by_org_account", ["org_id", "account"])
+    .index("by_type", ["type"]),
 
     // â”€â”€ Attendee Messages (broadcast) â”€â”€
     attendee_messages: defineTable({

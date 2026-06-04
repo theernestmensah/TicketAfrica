@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "vite build && node scripts/copy-static.js",
     "preview": "vite preview",
+    "check:prod": "node scripts/check-production-readiness.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

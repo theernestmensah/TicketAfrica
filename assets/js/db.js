@@ -20,7 +20,7 @@ import { ConvexHttpClient } from "https://esm.sh/convex@1.32.0/browser";
 })();
 
 // -- Convex Config ---------------------------------------------------------
-const CONVEX_URL = window.ENV?.CONVEX_URL || 'https://gallant-greyhound-48.convex.cloud';
+const CONVEX_URL = window.ENV?.CONVEX_URL || 'https://zealous-ptarmigan-734.convex.cloud';
 const convex = new ConvexHttpClient(CONVEX_URL);
 
 async function syncConvexAuth() {
@@ -144,6 +144,9 @@ window.ConvexDB = {
     listOrdersByBuyer: function(buyer_email) { return window.ConvexDB.query("organizer:listOrdersByBuyer", { buyer_email: buyer_email }); },
     createOrder: function(args) { return window.ConvexDB.mutation("organizer:createOrder", args); },
     createCheckout: function(args) { return window.ConvexDB.mutation("payments:createCheckout", args); },
+    getPaymentReference: function(args) { return window.ConvexDB.query("payments:getPaymentReference", args); },
+    initiateMoolrePaymentLink: function(args) { return window.ConvexDB.action("payments:initiateMoolrePaymentLink", args); },
+    verifyMoolrePayment: function(args) { return window.ConvexDB.action("payments:verifyMoolrePayment", args); },
     setPaystackReference: function(args) { return window.ConvexDB.mutation("payments:setPaystackReference", args); },
     verifyPaystackPayment: function(args) { return window.ConvexDB.action("payments:verifyPaystackPayment", args); },
     verifyPaystackReference: function(args) { return window.ConvexDB.action("payments:verifyPaystackReference", args); },
@@ -162,7 +165,10 @@ window.ConvexDB = {
 
     // -- Payouts --
     listPayoutsByOrg: function(org_id) { return window.ConvexDB.query("organizer:listPayoutsByOrg", { org_id: org_id }); },
+    getPayoutBalance: function(org_id) { return window.ConvexDB.query("organizer:getPayoutBalance", { org_id: org_id }); },
+    listLedgerByOrg: function(org_id, limit) { return window.ConvexDB.query("organizer:listLedgerByOrg", { org_id: org_id, limit: limit || 50 }); },
     requestPayout: function(args) { return window.ConvexDB.mutation("organizer:requestPayout", args); },
+    processMoolrePayout: function(payout_id) { return window.ConvexDB.action("organizer:processMoolrePayout", { payout_id: payout_id }); },
 
     // -- Analytics --
     getOrgAnalytics: function(org_id) { return window.ConvexDB.query("organizer:getOrgAnalytics", { org_id: org_id }); },
@@ -170,6 +176,7 @@ window.ConvexDB = {
     // -- Tickets --
     checkInTicket: function(args) { return window.ConvexDB.mutation("organizer:checkInTicket", args); },
     verifyTicket: function(qr_code) { return window.ConvexDB.query("organizer:verifyTicket", { qr_code: qr_code }); },
+    listScanEventsByEvent: function(event_id, limit) { return window.ConvexDB.query("organizer:listScanEventsByEvent", { event_id: event_id, limit: limit || 50 }); },
 
     // -- Polls --
     listPollsByOrg: function(org_id) { return window.ConvexDB.query("events:listPollsByOrg", { org_id: org_id }); },

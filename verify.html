@@ -7,6 +7,8 @@
     <title>Verify Ticket Authenticity  -  Ticket Africa</title>
     <script src="assets/js/env.js"></script>
     <script type="module" src="/assets/js/db.js"></script>
+    <script src="assets/vendor/html5-qrcode.min.js" defer></script>
+    <script src="assets/vendor/html5-qrcode.browser.js" defer></script>
     <link rel="stylesheet" href="assets/css/core.css" />
     <link rel="stylesheet" href="assets/css/mobile.css" />
     <link rel="stylesheet" href="assets/css/nav-footer.css" />
@@ -35,6 +37,41 @@
         .verify-result {
             max-width: 560px;
             margin: var(--space-8) auto;
+            display: none;
+        }
+
+        .qr-reader-panel {
+            display: none;
+            margin-top: var(--space-5);
+            overflow: hidden;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            background: var(--color-bg-elevated);
+        }
+
+        #verify-qr-reader {
+            width: 100%;
+            min-height: 280px;
+        }
+
+        .qr-reader-status {
+            padding: var(--space-3) var(--space-4);
+            border-top: 1px solid var(--color-border);
+            color: var(--color-text-muted);
+            font-size: var(--text-sm);
+            line-height: 1.5;
+            text-align: left;
+        }
+
+        .qr-reader-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-3);
+            padding: var(--space-4);
+            border-top: 1px solid var(--color-border);
+        }
+
+        .qr-reader-file {
             display: none;
         }
 
@@ -168,6 +205,15 @@
                     <iconify-icon icon="hugeicons:grid" style="width:16px;height:16px;"></iconify-icon>
                     Scan QR Code with Camera
                 </button>
+                <div class="qr-reader-panel" id="verify-qr-panel">
+                    <div id="verify-qr-reader"></div>
+                    <div class="qr-reader-status" id="verify-qr-status">Camera scanner is ready.</div>
+                    <div class="qr-reader-actions">
+                        <button class="btn btn--secondary btn--full" id="upload-qr-btn" type="button">Upload QR Image</button>
+                        <button class="btn btn--secondary btn--full" id="close-qr-btn" type="button">Close Scanner</button>
+                    </div>
+                    <input class="qr-reader-file" id="qr-file-input" type="file" accept="image/*" capture="environment" />
+                </div>
             </div>
 
             <!-- Result area -->
@@ -202,6 +248,192 @@
     <script src="assets/js/layout.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            let html5QrCode = null;
+            let cameraRunning = false;
+            let qrLibraryWaiter = null;
+
+            function escapeHtml(value) {
+                return String(value ?? '').replace(/[&<>"']/g, function (char) {
+                    return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char];
+                });
+            }
+
+            function waitForConvex() {
+                if (window.ConvexDB) return Promise.resolve();
+                return new Promise(function (resolve, reject) {
+                    const timer = setTimeout(function () {
+                        reject(new Error('Ticket database did not finish loading.'));
+                    }, 8000);
+                    window.addEventListener('convex-ready', function () {
+                        clearTimeout(timer);
+                        resolve();
+                    }, { once: true });
+                });
+            }
+
+            function setScannerStatus(message, type) {
+                const status = document.getElementById('verify-qr-status');
+                if (!status) return;
+                status.textContent = message;
+                status.style.color = type === 'error'
+                    ? '#EF4444'
+                    : type === 'success'
+                        ? '#22C55E'
+                        : 'var(--color-text-muted)';
+            }
+
+            function getHtml5QrcodeClass() {
+                return window.Html5Qrcode || window.__Html5QrcodeLibrary__?.Html5Qrcode || null;
+            }
+
+            function getErrorMessage(error, fallback) {
+                if (!error) return fallback;
+                if (typeof error === 'string') return error;
+                if (error.message) return error.message;
+                return fallback;
+            }
+
+            function getCameraErrorMessage(error) {
+                const message = getErrorMessage(error, 'Could not start camera.');
+                if (/notallowed|permission|denied/i.test(message)) {
+                    return 'Camera permission was blocked. Allow camera access in the browser, or upload a QR image instead.';
+                }
+                if (/notfound|no camera|devices? not found/i.test(message)) {
+                    return 'No camera was found on this device. Upload a QR image or enter the ticket code manually.';
+                }
+                if (/secure|https|localhost/i.test(message)) {
+                    return 'Camera access requires HTTPS or localhost. Open this page on localhost or the live HTTPS site.';
+                }
+                return message || 'Could not start camera. Upload a QR image or use manual verification.';
+            }
+
+            function waitForQrLibrary() {
+                if (getHtml5QrcodeClass()) return Promise.resolve();
+                if (qrLibraryWaiter) return qrLibraryWaiter;
+                qrLibraryWaiter = new Promise(function (resolve, reject) {
+                    let done = false;
+                    let interval = null;
+                    let timeout = null;
+                    const finish = function () {
+                        if (done) return;
+                        const Html5QrcodeClass = getHtml5QrcodeClass();
+                        if (!Html5QrcodeClass) return;
+                        done = true;
+                        clearInterval(interval);
+                        clearTimeout(timeout);
+                        window.removeEventListener('html5-qrcode-ready', finish);
+                        window.removeEventListener('html5-qrcode-error', fail);
+                        resolve();
+                    };
+                    const fail = function () {
+                        if (done) return;
+                        done = true;
+                        clearInterval(interval);
+                        clearTimeout(timeout);
+                        window.removeEventListener('html5-qrcode-ready', finish);
+                        window.removeEventListener('html5-qrcode-error', fail);
+                        reject(new Error('QR scanner library did not finish loading.'));
+                    };
+                    interval = setInterval(function () {
+                        finish();
+                    }, 150);
+                    timeout = setTimeout(fail, 8000);
+                    window.addEventListener('html5-qrcode-ready', finish);
+                    window.addEventListener('html5-qrcode-error', fail);
+                    finish();
+                });
+                return qrLibraryWaiter;
+            }
+
+            function resetCameraButton() {
+                const btn = document.getElementById('scan-qr-btn');
+                if (btn) {
+                    btn.innerHTML = '<iconify-icon icon="hugeicons:grid" style="width:16px;height:16px;"></iconify-icon> Scan QR Code with Camera';
+                }
+            }
+
+            async function stopCameraScanner() {
+                if (cameraRunning && html5QrCode) {
+                    await html5QrCode.stop().catch(() => {});
+                }
+                cameraRunning = false;
+                resetCameraButton();
+            }
+
+            async function handleDecodedCode(decodedText) {
+                const code = String(decodedText || '').trim();
+                if (!code) return;
+                document.getElementById('ticket-ref-input').value = code;
+                await stopCameraScanner();
+                document.getElementById('verify-qr-panel').style.display = 'none';
+                setScannerStatus('QR code captured. Verifying ticket...', 'success');
+                await verifyCode(code);
+            }
+
+            async function verifyCode(rawRef) {
+                const ref = String(rawRef || '').trim();
+                const resultDiv = document.getElementById('verify-result');
+                if (!ref) { TA.toast('Enter a ticket reference code', 'warning'); return; }
+
+                await waitForConvex();
+                const result = await window.ConvexDB.verifyTicket(ref);
+
+                resultDiv.style.display = 'block';
+
+                if (result.valid) {
+                    const safeRef = escapeHtml(ref.toUpperCase());
+                    const safeMessage = escapeHtml(result.message || 'Ticket verified.');
+                    const safeEventTitle = escapeHtml(result.event_title || 'Unknown Event');
+                    const safeTicketType = escapeHtml(result.ticket_type || 'General Admission');
+                    const safeAttendee = escapeHtml(result.attendee_name || 'Guest');
+                    const dateStr = result.event_date
+                        ? new Date(result.event_date).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })
+                        : '-';
+                    const usedWarning = result.already_used
+                        ? `<div style="margin-top:var(--space-4);padding:var(--space-3);background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:var(--radius-md);font-size:var(--text-sm);color:#F59E0B;">
+                            Warning: This ticket has already been scanned at ${result.scanned_at ? escapeHtml(new Date(result.scanned_at).toLocaleString()) : 'an earlier time'}.
+                          </div>` : '';
+                    resultDiv.innerHTML = `
+                    <div class="result-panel ${result.already_used ? 'result-panel--invalid' : 'result-panel--valid'}">
+                      <div class="result-icon-large ${result.already_used ? 'result-icon-large--invalid' : 'result-icon-large--valid'}">
+                        <iconify-icon icon="${result.already_used ? 'hugeicons:alert-02' : 'hugeicons:tick-01'}" style="width:40px;height:40px;"></iconify-icon>
+                      </div>
+                      <h2 style="color:${result.already_used ? '#F59E0B' : '#22C55E'};margin-bottom:8px;">
+                        ${result.already_used ? 'Warning: Ticket Already Used' : 'Authentic Ticket'}
+                      </h2>
+                      <p style="color:var(--color-text-muted);font-size:var(--text-sm);">${safeMessage}</p>
+                      ${usedWarning}
+                      <div class="ticket-detail-grid">
+                        <div class="ticket-detail-item"><div class="ticket-detail-item__label">Reference</div><div class="ticket-detail-item__value" style="font-family:var(--font-mono);">${safeRef}</div></div>
+                        <div class="ticket-detail-item"><div class="ticket-detail-item__label">Status</div><div class="ticket-detail-item__value" style="color:${result.already_used ? '#F59E0B' : '#22C55E'};">${result.already_used ? 'Already Used' : 'Valid'}</div></div>
+                        <div class="ticket-detail-item"><div class="ticket-detail-item__label">Event</div><div class="ticket-detail-item__value">${safeEventTitle}</div></div>
+                        <div class="ticket-detail-item"><div class="ticket-detail-item__label">Ticket Type</div><div class="ticket-detail-item__value">${safeTicketType}</div></div>
+                        <div class="ticket-detail-item"><div class="ticket-detail-item__label">Date</div><div class="ticket-detail-item__value">${escapeHtml(dateStr)}</div></div>
+                        <div class="ticket-detail-item"><div class="ticket-detail-item__label">Registered To</div><div class="ticket-detail-item__value">${safeAttendee}</div></div>
+                      </div>
+                    </div>`;
+                } else {
+                    resultDiv.innerHTML = `
+                    <div class="result-panel result-panel--invalid">
+                      <div class="result-icon-large result-icon-large--invalid">
+                        <iconify-icon icon="hugeicons:cancel-01" style="width:40px;height:40px;"></iconify-icon>
+                      </div>
+                      <h2 style="color:#EF4444;margin-bottom:8px;"><iconify-icon inline icon="ph:x-bold"></iconify-icon> Ticket Not Found</h2>
+                      <p style="color:var(--color-text-muted);font-size:var(--text-sm);max-width:360px;margin:0 auto;line-height:1.7;">No ticket matching <strong style="font-family:var(--font-mono);">${escapeHtml(ref)}</strong> was found in our system. This ticket may be counterfeit, or the reference may be misspelled.</p>
+                      <div style="margin-top:var(--space-6);padding:var(--space-4);background:rgba(239,68,68,0.06);border-radius:var(--radius-lg);text-align:left;">
+                        <p style="font-size:var(--text-sm);font-weight:600;color:#EF4444;margin-bottom:8px;">What to do:</p>
+                        <ul style="list-style:none;display:flex;flex-direction:column;gap:6px;">
+                          <li style="font-size:var(--text-sm);color:var(--color-text-muted);">Check your SMS or email for the correct reference</li>
+                          <li style="font-size:var(--text-sm);color:var(--color-text-muted);">Contact us via <a href="contact.html" style="color:var(--color-text-primary);">support</a> with your purchase receipt</li>
+                          <li style="font-size:var(--text-sm);color:var(--color-text-muted);">Do not use this ticket - it may be fraudulent</li>
+                        </ul>
+                      </div>
+                    </div>`;
+                }
+
+                resultDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+
             document.getElementById('verify-btn').addEventListener('click', async function () {
                 const ref = document.getElementById('ticket-ref-input').value.trim();
                 if (!ref) { TA.toast('Enter a ticket reference code', 'warning'); return; }
@@ -210,60 +442,7 @@
                 this.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-color:rgba(255,255,255,0.3);border-top-color:white;"></div>';
 
                 try {
-                    await new Promise(r => window.ConvexDB ? r() : window.addEventListener('convex-ready', r, { once: true }));
-                    const result = await window.ConvexDB.verifyTicket(ref);
-
-                    const resultDiv = document.getElementById('verify-result');
-                    resultDiv.style.display = 'block';
-
-                    if (result.valid) {
-                        const dateStr = result.event_date
-                            ? new Date(result.event_date).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })
-                            : ' - ';
-                        const usedWarning = result.already_used
-                            ? `<div style="margin-top:var(--space-4);padding:var(--space-3);background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:var(--radius-md);font-size:var(--text-sm);color:#F59E0B;">
-                                Warning This ticket has already been scanned at ${result.scanned_at ? new Date(result.scanned_at).toLocaleString() : 'an earlier time'}.
-                              </div>` : '';
-                        resultDiv.innerHTML = `
-                        <div class="result-panel ${result.already_used ? 'result-panel--invalid' : 'result-panel--valid'}">
-                          <div class="result-icon-large ${result.already_used ? 'result-icon-large--invalid' : 'result-icon-large--valid'}">
-                            <iconify-icon icon="${result.already_used ? 'hugeicons:alert-02' : 'hugeicons:tick-01'}" style="width:40px;height:40px;"></iconify-icon>
-                          </div>
-                          <h2 style="color:${result.already_used ? '#F59E0B' : '#22C55E'};margin-bottom:8px;">
-                            ${result.already_used ? 'Warning Ticket Already Used' : 'OK Authentic Ticket'}
-                          </h2>
-                          <p style="color:var(--color-text-muted);font-size:var(--text-sm);">${result.message}</p>
-                          ${usedWarning}
-                          <div class="ticket-detail-grid">
-                            <div class="ticket-detail-item"><div class="ticket-detail-item__label">Reference</div><div class="ticket-detail-item__value" style="font-family:var(--font-mono);">${ref.toUpperCase()}</div></div>
-                            <div class="ticket-detail-item"><div class="ticket-detail-item__label">Status</div><div class="ticket-detail-item__value" style="color:${result.already_used ? '#F59E0B' : '#22C55E'};">${result.already_used ? 'Already Used' : 'Valid'}</div></div>
-                            <div class="ticket-detail-item"><div class="ticket-detail-item__label">Event</div><div class="ticket-detail-item__value">${result.event_title}</div></div>
-                            <div class="ticket-detail-item"><div class="ticket-detail-item__label">Ticket Type</div><div class="ticket-detail-item__value">${result.ticket_type}</div></div>
-                            <div class="ticket-detail-item"><div class="ticket-detail-item__label">Date</div><div class="ticket-detail-item__value">${dateStr}</div></div>
-                            <div class="ticket-detail-item"><div class="ticket-detail-item__label">Registered To</div><div class="ticket-detail-item__value">${result.attendee_name}</div></div>
-                          </div>
-                        </div>`;
-                    } else {
-                        resultDiv.innerHTML = `
-                        <div class="result-panel result-panel--invalid">
-                          <div class="result-icon-large result-icon-large--invalid">
-                            <iconify-icon icon="hugeicons:cancel-01" style="width:40px;height:40px;"></iconify-icon>
-                          </div>
-                          <h2 style="color:#EF4444;margin-bottom:8px;"><iconify-icon inline icon="ph:x-bold"></iconify-icon> Ticket Not Found</h2>
-                          <p style="color:var(--color-text-muted);font-size:var(--text-sm);max-width:360px;margin:0 auto;line-height:1.7;">No ticket matching <strong style="font-family:var(--font-mono);">${ref}</strong> was found in our system. This ticket may be counterfeit, or the reference may be misspelled.</p>
-                          <div style="margin-top:var(--space-6);padding:var(--space-4);background:rgba(239,68,68,0.06);border-radius:var(--radius-lg);text-align:left;">
-                            <p style="font-size:var(--text-sm);font-weight:600;color:#EF4444;margin-bottom:8px;">What to do:</p>
-                            <ul style="list-style:none;display:flex;flex-direction:column;gap:6px;">
-                              <li style="font-size:var(--text-sm);color:var(--color-text-muted);">-> Check your SMS or email for the correct reference</li>
-                              <li style="font-size:var(--text-sm);color:var(--color-text-muted);">-> Contact us via <a href="contact.html" style="color:var(--color-text-primary);">support</a> with your purchase receipt</li>
-                              <li style="font-size:var(--text-sm);color:var(--color-text-muted);">-> Do not use this ticket  -  it may be fraudulent</li>
-                            </ul>
-                          </div>
-                        </div>`;
-                    }
-
-                    resultDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
+                    await verifyCode(ref);
                 } catch (e) {
                     console.warn('[TA] Verify error:', e);
                     const resultDiv = document.getElementById('verify-result');
@@ -287,8 +466,79 @@
                 if (e.key === 'Enter') document.getElementById('verify-btn').click();
             });
 
-            document.getElementById('scan-qr-btn').addEventListener('click', function () {
-                TA.toast('Camera scanner requires device permission  -  full integration coming', 'info');
+            document.getElementById('scan-qr-btn').addEventListener('click', async function () {
+                const panel = document.getElementById('verify-qr-panel');
+
+                if (cameraRunning) {
+                    await stopCameraScanner();
+                    panel.style.display = 'none';
+                    setScannerStatus('Camera scanner paused.', 'info');
+                    TA.toast('Camera scanner paused', 'info');
+                    return;
+                }
+
+                panel.style.display = 'block';
+                setScannerStatus('Starting camera. Your browser may ask for permission...', 'info');
+
+                try {
+                    await waitForQrLibrary();
+                    const Html5QrcodeClass = getHtml5QrcodeClass();
+                    if (!window.isSecureContext) {
+                        throw new Error('Camera access requires HTTPS or localhost.');
+                    }
+                    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                        throw new Error('This browser does not expose camera access. Upload a QR image instead.');
+                    }
+
+                    html5QrCode = html5QrCode || new Html5QrcodeClass('verify-qr-reader');
+                    await html5QrCode.start(
+                        { facingMode: 'environment' },
+                        { fps: 8, qrbox: { width: 240, height: 240 } },
+                        async (decodedText) => {
+                            await handleDecodedCode(decodedText);
+                        }
+                    );
+                    cameraRunning = true;
+                    this.textContent = 'Stop Camera';
+                    setScannerStatus('Camera active. Hold the ticket QR code inside the square.', 'success');
+                    TA.toast('Camera scanner active', 'success');
+                } catch (e) {
+                    console.warn('[TA] Verify camera error:', e);
+                    await stopCameraScanner();
+                    setScannerStatus(getCameraErrorMessage(e), 'error');
+                    TA.toast('Could not start camera. Upload a QR image or use manual verification.', 'error');
+                }
+            });
+
+            document.getElementById('close-qr-btn').addEventListener('click', async function () {
+                await stopCameraScanner();
+                document.getElementById('verify-qr-panel').style.display = 'none';
+            });
+
+            document.getElementById('upload-qr-btn').addEventListener('click', async function () {
+                document.getElementById('qr-file-input').click();
+            });
+
+            document.getElementById('qr-file-input').addEventListener('change', async function () {
+                const file = this.files && this.files[0];
+                if (!file) return;
+                const panel = document.getElementById('verify-qr-panel');
+                panel.style.display = 'block';
+                setScannerStatus('Reading QR image...', 'info');
+                try {
+                    await waitForQrLibrary();
+                    const Html5QrcodeClass = getHtml5QrcodeClass();
+                    await stopCameraScanner();
+                    html5QrCode = html5QrCode || new Html5QrcodeClass('verify-qr-reader');
+                    const decodedText = await html5QrCode.scanFile(file, true);
+                    await handleDecodedCode(decodedText);
+                } catch (e) {
+                    console.warn('[TA] QR image decode error:', e);
+                    setScannerStatus('Could not read a QR code from that image. Try a clearer photo or enter the code manually.', 'error');
+                    TA.toast('Could not read that QR image', 'error');
+                } finally {
+                    this.value = '';
+                }
             });
         });
     </script>

@@ -69,7 +69,7 @@
                     try {
                         // Lazy-load the Convex client to upsert the user
                         const { ConvexHttpClient } = await import('https://esm.sh/convex@1.32.0/browser');
-                        const convex = new ConvexHttpClient(window.ENV?.CONVEX_URL || 'https://gallant-greyhound-48.convex.cloud');
+                        const convex = new ConvexHttpClient(window.ENV?.CONVEX_URL || 'https://zealous-ptarmigan-734.convex.cloud');
                         if (window.Clerk.session) {
                             const token = await window.Clerk.session.getToken({ template: 'convex' });
                             convex.setAuth(token);

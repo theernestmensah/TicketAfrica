@@ -36,7 +36,8 @@ copyDir(path.join(root, 'assets'), path.join(dist, 'assets'), (relative) => {
 
 const env = {
   CLERK_PUBLISHABLE_KEY: process.env.VITE_CLERK_PUBLISHABLE_KEY || process.env.CLERK_PUBLISHABLE_KEY || 'pk_test_ZGl2aW5lLWZyb2ctMjUuY2xlcmsuYWNjb3VudHMuZGV2JA',
-  CONVEX_URL: process.env.VITE_CONVEX_URL || process.env.CONVEX_URL || 'https://gallant-greyhound-48.convex.cloud',
+  CONVEX_URL: process.env.VITE_CONVEX_URL || process.env.CONVEX_URL || 'https://zealous-ptarmigan-734.convex.cloud',
+  CONVEX_SITE_URL: process.env.VITE_CONVEX_SITE_URL || process.env.CONVEX_SITE_URL || (process.env.VITE_CONVEX_URL || process.env.CONVEX_URL || 'https://zealous-ptarmigan-734.convex.cloud').replace('.convex.cloud', '.convex.site'),
   PAYSTACK_PUBLIC_KEY: process.env.VITE_PAYSTACK_PUBLIC_KEY || process.env.PAYSTACK_PUBLIC_KEY || 'pk_live_a8683a0baf2ce8c65b95eace335a3958ebf4df2a',
 };
 

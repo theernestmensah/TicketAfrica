@@ -53,7 +53,7 @@
   <script>
     function getReference() {
       const params = new URLSearchParams(window.location.search);
-      return params.get('reference') || params.get('trxref') || params.get('ref');
+      return params.get('reference') || params.get('trxref') || params.get('ref') || params.get('externalref');
     }
 
     function getOrderId() {
@@ -77,18 +77,27 @@
     }
 
     document.addEventListener('DOMContentLoaded', async () => {
-      const reference = getReference();
+      let reference = getReference();
       const order_id = getOrderId();
-      if (!reference) {
-        finish('Payment reference missing', 'We could not find a transaction reference in this callback URL.');
-        return;
-      }
+      const provider = new URLSearchParams(window.location.search).get('provider') || 'moolre';
       try {
         await waitForConvex();
-        if (order_id) {
-          await window.ConvexDB.verifyPaystackPayment({ order_id, reference });
+        if (!reference && order_id) {
+          const payment = await window.ConvexDB.getPaymentReference({ order_id });
+          reference = payment?.reference;
+        }
+        if (!reference) {
+          finish('Payment reference missing', 'We could not find a transaction reference for this order.');
+          return;
+        }
+        if (provider === 'paystack') {
+          if (order_id) {
+            await window.ConvexDB.verifyPaystackPayment({ order_id, reference });
+          } else {
+            await window.ConvexDB.verifyPaystackReference({ reference });
+          }
         } else {
-          await window.ConvexDB.verifyPaystackReference({ reference });
+          await window.ConvexDB.verifyMoolrePayment({ order_id: order_id || undefined, reference });
         }
         finish('Payment confirmed', 'Your transaction has been verified. Your tickets will appear in your account.');
       } catch (error) {

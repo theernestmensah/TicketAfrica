@@ -143,4 +143,34 @@ http.route({
     }),
 });
 
+http.route({
+    path: "/moolre/webhook",
+    method: "POST",
+    handler: httpAction(async (ctx, request) => {
+        let event;
+        try {
+            event = await request.json();
+        } catch {
+            return new Response("Invalid JSON", { status: 400 });
+        }
+
+        const data = event?.data || {};
+        const reference = data.externalref || data.reference || event?.externalref || event?.reference;
+        if (!reference) {
+            return new Response("Missing payment reference", { status: 400 });
+        }
+
+        try {
+            await ctx.runAction(internal.payments.verifyMoolreReferenceInternal, {
+                reference,
+            });
+        } catch (error: any) {
+            console.error("[Moolre] Webhook verification failed:", error?.message || error);
+            return new Response("Verification failed", { status: 500 });
+        }
+
+        return new Response("OK", { status: 200 });
+    }),
+});
+
 export default http;
