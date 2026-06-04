@@ -568,10 +568,10 @@ async function loadPurchaseHistory(email) {
                     <div class="order-row__img"><iconify-icon icon="hugeicons:ticket-01"></iconify-icon></div>
                     <div style="flex:1;min-width:0;">
                         <div class="order-row__name">${order.event_title || 'Event Ticket'}</div>
-                        <div class="order-row__meta">${dateStr} · ${(order.items || []).map(i => `${i.tier_name||'Ticket'} ×${i.quantity||1}`).join(', ') || '1 ticket'}</div>
+                        <div class="order-row__meta">${dateStr} - ${(order.items || []).map(i => `${i.tier_name || 'Ticket'} x${i.quantity || 1}`).join(', ') || '1 ticket'}</div>
                     </div>
                     <div>
-                        <div class="order-row__amount">GH₵ ${amount}</div>
+                        <div class="order-row__amount">GHS ${amount}</div>
                         <div class="order-row__ref" style="color:${statusColor};">${(order.status || 'confirmed').charAt(0).toUpperCase() + (order.status||'confirmed').slice(1)}</div>
                     </div>
                 </div>`;
@@ -589,7 +589,7 @@ async function loadPurchaseHistory(email) {
                         const d = new Date(o._creationTime || 0).toLocaleDateString();
                         const tickets = (o.items||[]).map(i=>`${i.tier_name}x${i.quantity}`).join('+');
                         const amt = ((o.total_amount||0)/100).toFixed(2);
-                        return `"${d}","${o.event_title||''}","${tickets}","GH₵${amt}","${o.status||''}"`;
+                        return `"${d}","${o.event_title || ''}","${tickets}","GHS ${amt}","${o.status || ''}"`;
                     })
                 ].join('\n');
                 const blob = new Blob([csv], { type: 'text/csv' });

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -7,7 +7,7 @@
     <title>My Account & Ticket Wallet  -  Ticket Africa</title>
     <script src="assets/js/env.js"></script>
     <script type="module" src="/assets/js/db.js"></script>
-    
+
     <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
     <link rel="stylesheet" href="assets/css/core.css" />
     <link rel="stylesheet" href="assets/css/mobile.css" />
@@ -122,27 +122,25 @@
 
         /* Ticket card */
         .ticket-card {
-            background: rgba(var(--color-primary-rgb), 0.85);
-            /* Deep charcoal */
+            background: #191919;
             backdrop-filter: blur(24px);
             border: 1px solid rgba(212, 175, 55, 0.2);
-            /* Ultra-thin gold border */
             border-radius: var(--radius-2xl);
             overflow: hidden;
             position: relative;
             transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
-            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.8), 0 0 1px 1px rgba(212, 175, 55, 0.15) inset;
+            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.24), 0 0 1px 1px rgba(212, 175, 55, 0.15) inset;
             transform-style: preserve-3d;
         }
 
         .ticket-card:hover {
             transform: translateY(-8px) rotateX(2deg) rotateY(2deg);
-            box-shadow: 0 32px 80px rgba(0, 0, 0, 0.9), 0 0 8px 1px rgba(212, 175, 55, 0.25) inset, var(--shadow-glow);
+            box-shadow: 0 32px 80px rgba(0, 0, 0, 0.32), 0 0 8px 1px rgba(212, 175, 55, 0.25) inset, var(--shadow-glow);
             border-color: rgba(212, 175, 55, 0.4);
         }
 
         .ticket-card--upcoming {
-            border-color: var(--color-text-primary);
+            border-color: var(--color-secondary);
         }
 
         .ticket-card--used {
@@ -151,20 +149,20 @@
 
         .ticket-card__top {
             padding: var(--space-5);
-            background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+            background: linear-gradient(135deg, #191919, #0f0f0f);
             position: relative;
             min-height: 100px;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
-            color: var(--color-text-primary);
+            color: #ffffff;
         }
 
         .ticket-card__event-name {
             font-family: var(--font-display);
             font-size: var(--text-base);
             font-weight: 800;
-            color: var(--color-text-primary);
+            color: #ffffff;
             line-height: 1.3;
         }
 
@@ -242,7 +240,7 @@
         .ticket-qr-box {
             width: 100px;
             height: 100px;
-            background: var(--color-bg-input);
+            background: #ffffff;
             border: 1px solid var(--color-border);
             border-radius: var(--radius-md);
             display: flex;
@@ -250,7 +248,7 @@
             justify-content: center;
             font-size: 3.5rem;
             padding: 6px;
-            color: var(--color-text-primary);
+            color: #191919;
         }
 
         .ticket-card__actions {
@@ -258,6 +256,23 @@
             gap: var(--space-2);
             padding: 0 var(--space-5) var(--space-5);
             background: var(--color-bg-card);
+        }
+
+        [data-theme="light"] .ticket-card__bottom,
+        [data-theme="light"] .ticket-card__qr,
+        [data-theme="light"] .ticket-card__actions {
+            background: #ffffff;
+        }
+
+        [data-theme="light"] .account-nav__avatar {
+            background: #191919;
+            color: #ffffff;
+        }
+
+        [data-theme="light"] .order-row__img {
+            background: #191919;
+            color: #ffffff;
+            border-color: rgba(25, 25, 25, 0.2);
         }
 
         /* Page sections */
@@ -801,7 +816,7 @@
             });
         }); // end DOMContentLoaded
 
-        // â”€â”€ Clerk: inject and initialize â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // Clerk: inject and initialize
         const clerkScript = document.createElement('script');
         clerkScript.src = 'https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js';
         clerkScript.setAttribute('data-clerk-publishable-key', window.ENV.CLERK_PUBLISHABLE_KEY);
