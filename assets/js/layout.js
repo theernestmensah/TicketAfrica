@@ -399,15 +399,32 @@
     if (!clerk) return; // Wait for clerk-ready
 
     const loginBtn = document.getElementById('nav-login');
+    const mobileLoginBtn = document.getElementById('mob-login');
     const signupBtn = document.getElementById('nav-signup');
     const userBtnDiv = document.getElementById('clerk-user-button');
 
-    if (!loginBtn && !userBtnDiv) return; // Wait for DOM inject
+    if (!loginBtn && !mobileLoginBtn && !userBtnDiv) return; // Wait for DOM inject
+
+    const openSignIn = (e) => {
+      e.preventDefault();
+      const drawer = document.getElementById('nav-mobile-drawer');
+      const overlay = document.getElementById('nav-mobile-overlay');
+      if (drawer) drawer.classList.remove('open');
+      if (overlay) overlay.classList.remove('active');
+      document.body.style.overflow = '';
+
+      if (clerk?.openSignIn) {
+        clerk.openSignIn();
+      } else {
+        window.location.href = '/login.html';
+      }
+    };
 
     // Update UI based on auth state
     const updateAuthUI = () => {
       if (clerk.user) {
         if (loginBtn) loginBtn.style.display = 'none';
+        if (mobileLoginBtn) mobileLoginBtn.style.display = 'none';
         if (signupBtn) signupBtn.style.display = 'none';
         if (userBtnDiv) {
           userBtnDiv.style.display = 'block';
@@ -416,11 +433,11 @@
       } else {
         if (loginBtn) {
           loginBtn.style.display = 'inline-flex';
-          // Hijack login to open Clerk modal instead of custom page for now
-          loginBtn.onclick = (e) => {
-            e.preventDefault();
-            clerk.openSignIn();
-          };
+          loginBtn.onclick = openSignIn;
+        }
+        if (mobileLoginBtn) {
+          mobileLoginBtn.style.display = 'flex';
+          mobileLoginBtn.onclick = openSignIn;
         }
         if (signupBtn) {
           signupBtn.style.display = 'inline-flex';
