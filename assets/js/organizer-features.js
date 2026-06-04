@@ -48,12 +48,12 @@ function populateEventSelectors() {
 }
 
 /* ── Helper: format currency ──────────────────────────── */
-function fmtCurrency(amount, currency = 'GH₵') {
+function fmtCurrency(amount, currency = 'GHS') {
     return currency + ' ' + (amount / 100).toLocaleString('en-GH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 function fmtDate(iso) {
-    if (!iso) return '—';
+    if (!iso) return '-';
     return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
@@ -91,7 +91,7 @@ function emptyState(icon, title, desc) {
 function renderTable(cols, rows) {
     if (!rows.length) return '';
     const head = cols.map(c => `<th>${c}</th>`).join('');
-    return `<div style="overflow-x:auto;">
+    return `<div class="table-shell">
         <table class="events-table">
             <thead><tr>${head}</tr></thead>
             <tbody>${rows.join('')}</tbody>
@@ -120,12 +120,12 @@ function renderOrders(orders) {
         return;
     }
     const rows = orders.map(o => `<tr>
-        <td><div style="font-weight:600;font-size:13px;">${o.buyer_name}</div><div style="font-size:12px;color:rgba(255,255,255,0.4);">${o.buyer_email}</div></td>
-        <td style="font-size:12px;color:rgba(255,255,255,0.5);">${o.event_title || '—'}</td>
-        <td>${o.items ? o.items.map(i => `${i.quantity}× ${i.tier_name}`).join('<br>') : '—'}</td>
+        <td><div class="td-title">${o.buyer_name}</div><div class="td-meta">${o.buyer_email}</div></td>
+        <td class="td-meta">${o.event_title || '-'}</td>
+        <td>${o.items ? o.items.map(i => `${i.quantity}x ${i.tier_name}`).join('<br>') : '-'}</td>
         <td class="td-value">${fmtCurrency(o.total_amount, o.currency)}</td>
         <td>${statusChip(o.status, ORDER_STATUS)}</td>
-        <td style="font-size:12px;color:rgba(255,255,255,0.4);">${fmtDate(o.created_at)}</td>
+        <td class="td-meta">${fmtDate(o.created_at)}</td>
     </tr>`);
     container.innerHTML = renderTable(['Buyer', 'Event', 'Tickets', 'Amount', 'Status', 'Date'], rows);
 }
@@ -171,14 +171,14 @@ function renderAttendees(orders) {
     }
     const rows = orders.map(o => `<tr>
         <td>
-            <div style="font-weight:600;font-size:13px;">${o.buyer_name}</div>
-            <div style="font-size:12px;color:rgba(255,255,255,0.4);">${o.buyer_email}</div>
+            <div class="td-title">${o.buyer_name}</div>
+            <div class="td-meta">${o.buyer_email}</div>
         </td>
-        <td style="font-size:12px;color:rgba(255,255,255,0.5);">${o.event_title || '—'}</td>
-        <td>${o.items ? o.items.map(i => `<div style="font-size:12px;">${i.quantity}× <strong>${i.tier_name}</strong></div>`).join('') : '—'}</td>
-        <td style="font-size:12px;color:rgba(255,255,255,0.4);">${o.buyer_phone || '—'}</td>
+        <td class="td-meta">${o.event_title || '-'}</td>
+        <td>${o.items ? o.items.map(i => `<div class="td-meta">${i.quantity}x <strong>${i.tier_name}</strong></div>`).join('') : '-'}</td>
+        <td class="td-meta">${o.buyer_phone || '-'}</td>
         <td>${statusChip(o.status, ORDER_STATUS)}</td>
-        <td style="font-size:12px;color:rgba(255,255,255,0.4);">${fmtDate(o.created_at)}</td>
+        <td class="td-meta">${fmtDate(o.created_at)}</td>
     </tr>`);
     container.innerHTML = renderTable(['Name', 'Event', 'Tickets', 'Phone', 'Status', 'Date'], rows);
 }
@@ -258,7 +258,7 @@ function drawRevenueChart(dailyData) {
         ctx.fillStyle = 'rgba(255,255,255,0.3)';
         ctx.font = '10px Inter, sans-serif';
         ctx.textAlign = 'right';
-        ctx.fillText('GH₵' + val, pad.left - 6, y + 4);
+        ctx.fillText('GHS' + val, pad.left - 6, y + 4);
     }
 
     // Bars
@@ -307,13 +307,13 @@ async function loadPayouts() {
             amountInput.placeholder = `Available: ${balance.available} minor units`;
         }
         const ledgerRows = (ledger || []).map(entry => `<tr>
-            <td style="font-size:12px;">${entry.type.replace(/_/g, ' ')}</td>
+            <td class="td-meta">${entry.type.replace(/_/g, ' ')}</td>
             <td>${entry.direction === 'credit' ? '+' : '-'}${fmtCurrency(entry.amount, entry.currency)}</td>
-            <td style="font-size:12px;">${entry.account}</td>
-            <td style="font-size:12px;color:rgba(255,255,255,0.4);">${fmtDate(entry.created_at)}</td>
+            <td class="td-meta">${entry.account}</td>
+            <td class="td-meta">${fmtDate(entry.created_at)}</td>
         </tr>`);
         const ledgerHtml = ledgerRows.length
-            ? `<div style="margin-bottom:18px;"><div style="font-size:12px;font-weight:700;color:rgba(255,255,255,0.55);margin-bottom:8px;text-transform:uppercase;">Settlement Ledger</div>${renderTable(['Entry', 'Amount', 'Account', 'Date'], ledgerRows)}</div>`
+            ? `<div class="panel__body"><div class="dash-label" style="margin-bottom:10px;">Settlement Ledger</div>${renderTable(['Entry', 'Amount', 'Account', 'Date'], ledgerRows)}</div>`
             : '';
         if (!payouts || !payouts.length) {
             container.innerHTML = ledgerHtml + emptyState('hugeicons:money-send-02', 'No payouts yet', 'Submit a payout request to receive your earnings.');
@@ -321,13 +321,13 @@ async function loadPayouts() {
         }
         const rows = payouts.map(p => `<tr>
             <td class="td-value">${fmtCurrency(p.amount, p.currency)}</td>
-            <td style="font-size:12px;">${p.payout_fee ? fmtCurrency(p.payout_fee, p.currency) : 'No fee'}</td>
-            <td style="font-size:12px;">${p.method === 'momo' ? 'Mobile Money' : p.method === 'bank' ? 'Bank Transfer' : 'USSD'}</td>
-            <td style="font-size:12px;">${p.account_details.provider || ''} · ${p.account_details.number}<br><span style="color:rgba(255,255,255,0.4);">${p.account_details.name}</span></td>
+            <td class="td-meta">${p.payout_fee ? fmtCurrency(p.payout_fee, p.currency) : 'No fee'}</td>
+            <td class="td-meta">${p.method === 'momo' ? 'Mobile Money' : p.method === 'bank' ? 'Bank Transfer' : 'USSD'}</td>
+            <td class="td-meta">${p.account_details.provider || ''} - ${p.account_details.number}<br>${p.account_details.name}</td>
             <td>${statusChip(p.status, PAYOUT_STATUS)}</td>
-            <td style="font-size:12px;color:rgba(255,255,255,0.4);">${p.reference || '—'}</td>
-            <td style="font-size:12px;color:rgba(255,255,255,0.4);">${fmtDate(p.requested_at)}</td>
-            <td>${p.status === 'pending' ? `<button class="btn btn--secondary btn--sm" onclick="processPayout('${p._id}')">Send</button>` : ''}</td>
+            <td class="td-meta">${p.reference || '-'}</td>
+            <td class="td-meta">${fmtDate(p.requested_at)}</td>
+            <td>${p.status === 'pending' ? `<button class="dash-mini-button" onclick="processPayout('${p._id}')">Send</button>` : ''}</td>
         </tr>`);
         container.innerHTML = ledgerHtml + renderTable(['Net Amount', 'Fee', 'Method', 'Account', 'Status', 'Reference', 'Requested', 'Action'], rows);
     } catch (e) {
@@ -346,7 +346,7 @@ async function submitPayoutRequest() {
         await window.ConvexDB.requestPayout({
             org_id: _orgId,
             amount,
-            currency: 'GH₵',
+            currency: 'GHS',
             method: document.getElementById('po-method').value,
             account_details: {
                 provider: document.getElementById('po-provider').value,
@@ -401,15 +401,17 @@ async function loadPromos() {
             return;
         }
         const rows = promos.map(p => `<tr>
-            <td><span style="font-family:monospace;font-size:14px;font-weight:700;color:#8b5cf6;letter-spacing:0.08em;">${p.code}</span></td>
-            <td style="font-size:13px;">${p.discount_type === 'percent' ? p.discount_value + '%' : fmtCurrency(p.discount_value)} off</td>
-            <td style="font-size:12px;color:rgba(255,255,255,0.5);">${p.event_title}</td>
-            <td style="font-size:13px;">${p.uses}${p.max_uses ? ' / ' + p.max_uses : ' / ∞'}</td>
+            <td><span class="code-chip">${p.code}</span></td>
+            <td>${p.discount_type === 'percent' ? p.discount_value + '%' : fmtCurrency(p.discount_value)} off</td>
+            <td class="td-meta">${p.event_title || 'All Events'}</td>
+            <td>${p.uses}${p.max_uses ? ' / ' + p.max_uses : ' / unlimited'}</td>
             <td>${p.expires_at ? fmtDate(p.expires_at) : 'Never'}</td>
-            <td>${p.active ? '<span style="color:#22c55e;font-size:11px;font-weight:700;">ACTIVE</span>' : '<span style="color:#ef4444;font-size:11px;font-weight:700;">OFF</span>'}</td>
-            <td style="white-space:nowrap;">
-                ${p.active ? `<button onclick="deactivatePromo('${p._id}')" style="font-size:11px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:6px;padding:4px 10px;color:#f59e0b;cursor:pointer;margin-right:4px;">Deactivate</button>` : ''}
-                <button onclick="deletePromo('${p._id}')" style="font-size:11px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:6px;padding:4px 10px;color:#ef4444;cursor:pointer;">Delete</button>
+            <td>${statusChip(p.active ? 'active' : 'off', { active: { label: 'Active', color: '#22c55e', bg: 'rgba(34,197,94,0.12)' }, off: { label: 'Off', color: '#ef4444', bg: 'rgba(239,68,68,0.12)' } })}</td>
+            <td>
+                <div class="inline-actions">
+                    ${p.active ? `<button onclick="deactivatePromo('${p._id}')" class="dash-mini-button dash-mini-button--warn">Deactivate</button>` : ''}
+                    <button onclick="deletePromo('${p._id}')" class="dash-mini-button dash-mini-button--danger">Delete</button>
+                </div>
             </td>
         </tr>`);
         container.innerHTML = renderTable(['Code', 'Discount', 'Event', 'Uses', 'Expires', 'Status', ''], rows);
@@ -476,13 +478,13 @@ async function loadMessages() {
             container.innerHTML = emptyState('hugeicons:notification-03', 'No messages sent yet', 'Send your first message to attendees.');
             return;
         }
-        container.innerHTML = msgs.map(m => `<div style="padding:16px 20px;border-bottom:1px solid rgba(255,255,255,0.06);">
-            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
-                <div style="font-size:13px;font-weight:700;">${m.subject}</div>
-                <span style="font-size:11px;background:rgba(139,92,246,0.12);color:#8b5cf6;padding:2px 8px;border-radius:12px;text-transform:uppercase;font-weight:700;">${m.channel}</span>
+        container.innerHTML = msgs.map(m => `<div class="message-card">
+            <div class="message-card__head">
+                <div class="message-card__subject">${m.subject}</div>
+                ${statusChip(m.channel, { email: { label: 'Email', color: '#38bdf8', bg: 'rgba(56,189,248,0.12)' }, sms: { label: 'SMS', color: '#f59e0b', bg: 'rgba(245,158,11,0.12)' }, both: { label: 'Email + SMS', color: '#22c55e', bg: 'rgba(34,197,94,0.12)' } })}
             </div>
-            <div style="font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:8px;line-height:1.5;">${m.body.substring(0, 120)}${m.body.length > 120 ? '…' : ''}</div>
-            <div style="font-size:11px;color:rgba(255,255,255,0.3);">Sent to <strong>${m.sent_to}</strong> attendees · ${fmtDate(m.sent_at)} · ${m.event_title}</div>
+            <div class="message-card__body">${m.body.substring(0, 140)}${m.body.length > 140 ? '...' : ''}</div>
+            <div class="message-card__meta">Sent to <strong>${m.sent_to}</strong> attendees - ${fmtDate(m.sent_at)} - ${m.event_title || 'All Events'}</div>
         </div>`).join('');
     } catch (e) {
         container.innerHTML = emptyState('hugeicons:notification-03', 'Could not load messages', '');
@@ -500,7 +502,7 @@ async function sendMessage() {
 
     // Disable the button while sending
     const sendBtn = document.querySelector('[onclick="sendMessage()"]');
-    if (sendBtn) { sendBtn.disabled = true; sendBtn.textContent = 'Sending…'; }
+    if (sendBtn) { sendBtn.disabled = true; sendBtn.textContent = 'Sending...'; }
 
     // Collect recipients from orders
     let orders = [];
@@ -539,30 +541,6 @@ async function sendMessage() {
         document.getElementById('msg-subject').value = '';
         document.getElementById('msg-body').value = '';
         loadMessages();
-        return;
-
-        // 2. If email channel selected, send via TAMail
-        if (window.TAMail && (channel === 'email' || channel === 'both') && orders.length > 0) {
-            const attendees = orders.map(o => ({ email: o.buyer_email, name: o.buyer_name }));
-            try {
-                const result = await window.TAMail.broadcastToAttendees(attendees, {
-                    event_name: eventTitle,
-                    subject,
-                    message: body,
-                    org_name: orgLabel,
-                });
-                window.TA?.toast(`✓ Message logged & ${result.sent}/${result.total} emails sent!`, 'success');
-            } catch (emailErr) {
-                // Email delivery failed but DB record saved — still inform user
-                window.TA?.toast(`Message logged to ${sentTo} attendees. (Email delivery: configure EmailJS to enable)`, 'info');
-            }
-        } else {
-            window.TA?.toast(`Message sent to ${sentTo} attendees!`, 'success');
-        }
-
-        document.getElementById('msg-subject').value = '';
-        document.getElementById('msg-body').value = '';
-        loadMessages();
     } catch (e) {
         window.TA?.toast('Failed: ' + (e.message || 'Unknown error'), 'error');
     } finally {
@@ -592,14 +570,16 @@ async function loadStaff() {
             return;
         }
         const rows = staff.map(s => `<tr>
-            <td><div style="font-weight:600;font-size:13px;">${s.name}</div><div style="font-size:12px;color:rgba(255,255,255,0.4);">${s.invited_email}</div></td>
-            <td style="font-size:13px;">${ROLE_LABELS[s.role] || s.role}</td>
-            <td style="font-size:12px;color:rgba(255,255,255,0.5);">${s.event_title || 'All Events'}</td>
+            <td><div class="td-title">${s.name}</div><div class="td-meta">${s.invited_email}</div></td>
+            <td>${ROLE_LABELS[s.role] || s.role}</td>
+            <td class="td-meta">${s.event_title || 'All Events'}</td>
             <td>${statusChip(s.status, STAFF_STATUS)}</td>
-            <td style="font-size:12px;color:rgba(255,255,255,0.4);">${fmtDate(s.invited_at)}</td>
-            <td style="white-space:nowrap;">
-                ${s.status !== 'revoked' ? `<button onclick="revokeStaffMember('${s._id}')" style="font-size:11px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:6px;padding:4px 10px;color:#f59e0b;cursor:pointer;margin-right:6px;">Revoke</button>` : ''}
-                <button onclick="removeStaffMember('${s._id}')" style="font-size:11px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:6px;padding:4px 10px;color:#ef4444;cursor:pointer;">Remove</button>
+            <td class="td-meta">${fmtDate(s.invited_at)}</td>
+            <td>
+                <div class="inline-actions">
+                    ${s.status !== 'revoked' ? `<button onclick="revokeStaffMember('${s._id}')" class="dash-mini-button dash-mini-button--warn">Revoke</button>` : ''}
+                    <button onclick="removeStaffMember('${s._id}')" class="dash-mini-button dash-mini-button--danger">Remove</button>
+                </div>
             </td>
         </tr>`);
         container.innerHTML = renderTable(['Member', 'Role', 'Event', 'Status', 'Invited', ''], rows);
@@ -671,9 +651,8 @@ function addPollOptionRow() {
     const container = document.getElementById('poll-options-list');
     const input = document.createElement('input');
     input.type = 'text';
-    input.className = 'poll-option-input';
+    input.className = 'poll-option-input dash-input';
     input.placeholder = `Option ${container.children.length + 1}`;
-    input.style.cssText = "width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 12px;color:#f0f0f5;font-size:13px;outline:none;";
     container.appendChild(input);
 }
 
@@ -694,13 +673,15 @@ async function loadPolls() {
             return;
         }
         const rows = polls.map(p => `<tr>
-            <td><div style="font-weight:600;font-size:13px;">${p.title}</div><div style="font-size:12px;color:rgba(255,255,255,0.4);">${p.description.substring(0, 50)}...</div></td>
+            <td><div class="td-title">${p.title}</div><div class="td-meta">${p.description.substring(0, 64)}${p.description.length > 64 ? '...' : ''}</div></td>
             <td>${statusChip(p.status, POLL_STATUS)}</td>
-            <td style="font-size:12px;color:rgba(255,255,255,0.4);">${fmtDate(p.start_date)} - ${fmtDate(p.end_date)}</td>
-            <td style="white-space:nowrap;">
-                ${p.status === 'draft' ? `<button onclick="setPollStatus('${p._id}', 'active')" style="font-size:11px;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);border-radius:6px;padding:4px 10px;color:#22c55e;cursor:pointer;margin-right:6px;">Activate</button>` : ''}
-                ${p.status === 'active' ? `<button onclick="setPollStatus('${p._id}', 'completed')" style="font-size:11px;background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.3);border-radius:6px;padding:4px 10px;color:#8b5cf6;cursor:pointer;margin-right:6px;">Complete</button>` : ''}
-                <button onclick="handleDeletePoll('${p._id}')" style="font-size:11px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:6px;padding:4px 10px;color:#ef4444;cursor:pointer;">Delete</button>
+            <td class="td-meta">${fmtDate(p.start_date)} - ${fmtDate(p.end_date)}</td>
+            <td>
+                <div class="inline-actions">
+                    ${p.status === 'draft' ? `<button onclick="setPollStatus('${p._id}', 'active')" class="dash-mini-button dash-mini-button--success">Activate</button>` : ''}
+                    ${p.status === 'active' ? `<button onclick="setPollStatus('${p._id}', 'completed')" class="dash-mini-button">Complete</button>` : ''}
+                    <button onclick="handleDeletePoll('${p._id}')" class="dash-mini-button dash-mini-button--danger">Delete</button>
+                </div>
             </td>
         </tr>`);
         container.innerHTML = renderTable(['Poll', 'Status', 'Duration', 'Actions'], rows);
@@ -772,7 +753,7 @@ const _sectionLoaders = {
     staff: loadStaff,
 };
 
-// Patch showSection — lazy-capture the original so it works regardless
+// Patch showSection - lazy-capture the original so it works regardless
 // of script load order (organizer-features.js loads before the inline script
 // that defines showSection, so we must not capture it at module parse time).
 let _origShowSection = null;
