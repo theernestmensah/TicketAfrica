@@ -203,6 +203,7 @@
     <script>
         /* Shared dashboard state */
         let _currentOrgId = null;
+        let _currentClerkUser = null;
 
         function getTimeGreeting() {
             const hour = new Date().getHours();
@@ -416,6 +417,43 @@
         function waitForConvexDB() {
             if (window.ConvexDB) return Promise.resolve();
             return new Promise(resolve => window.addEventListener('convex-ready', resolve, { once: true }));
+        }
+
+        async function ensureOrganizerOrgId() {
+            if (_currentOrgId) return _currentOrgId;
+
+            await waitForConvexDB();
+
+            const clerkUser = _currentClerkUser || window.Clerk?.user;
+            if (!clerkUser) {
+                throw new Error('Please sign in as an organizer before creating an event.');
+            }
+
+            const email = clerkUser.primaryEmailAddress?.emailAddress || '';
+            const userId = await window.ConvexDB.upsertUser({
+                clerk_id: clerkUser.id,
+                email,
+                first_name: clerkUser.firstName || '',
+                last_name: clerkUser.lastName || '',
+                role: 'organizer',
+            });
+
+            const org = await window.ConvexDB.getOrCreateOrg({
+                owner_id: userId,
+                name: (clerkUser.firstName || 'My') + ' Events',
+                email,
+            });
+
+            if (!org?._id) {
+                throw new Error('Could not load your organization. Please refresh and try again.');
+            }
+
+            _currentOrgId = org._id;
+            if (typeof window.__setOrgId === 'function') {
+                window.__setOrgId(_currentOrgId);
+            }
+
+            return _currentOrgId;
         }
 
     </script>
@@ -744,13 +782,10 @@
                     });
                 }
 
-                // Wait up to 8 seconds for org ID to be populated by Clerk+Convex init
+                // Resolve the organizer record on demand. This covers brand-new organizers with no events yet.
                 if (!_currentOrgId) {
                     btn.textContent = 'Loading your account...';
-                    await new Promise((resolve, reject) => {
-                        const t = setTimeout(() => reject(new Error('Could not load your organisation. Please refresh.')), 8000);
-                        const poll = setInterval(() => { if (_currentOrgId) { clearInterval(poll); clearTimeout(t); resolve(); } }, 200);
-                    });
+                    await ensureOrganizerOrgId();
                 }
 
                 btn.textContent = 'Creating...';
@@ -984,6 +1019,7 @@
                 const clerk = await waitForClerkSdk();
                 await clerk.load();
                 const clerkUser = clerk.user;
+                _currentClerkUser = clerkUser || null;
 
                 if (!clerkUser) {
                     organizerAuthResolved = true;
