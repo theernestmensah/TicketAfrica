@@ -395,55 +395,28 @@
         window.__setOrgId = window.__setOrgId || function(id) { if (id) _currentOrgId = id; };
         window.__setEvents = window.__setEvents || function() {};
 
-        /* -- Wait for Clerk -- */
-        window.addEventListener('clerk-ready', () => {
-            const clerk = window.Clerk;
+        let organizerAuthResolved = false;
 
-            if (!clerk.user) {
-                // Show auth gate
-                document.getElementById('auth-gate').classList.add('show');
-                document.getElementById('auth-gate-signin').addEventListener('click', () => {
-                    clerk.openSignIn({ redirectUrl: window.location.href });
-                });
-                return;
+        function showOrganizerAuthGate() {
+            const gate = document.getElementById('auth-gate');
+            if (gate) {
+                gate.classList.add('show');
+                gate.style.display = '';
             }
+        }
 
-            // Signed in - populate user info from Clerk directly
-            const clerkUser = clerk.user;
-            const clerkUserData = {
-                first_name: clerkUser.firstName,
-                last_name: clerkUser.lastName,
-                image_url: clerkUser.imageUrl
-            };
-
-            // Get events from Convex when ready - scoped to this organizer's org
-            window.addEventListener('convex-ready', async () => {
-                try {
-                    // _currentOrgId may not be set yet if the new init hasn't run;
-                    // delegate to the new Clerk init block which handles upsertUser + getOrCreateOrg
-                } catch (e) { }
-            });
-
-            // If convex is already ready - defer to new init block
-            if (window.ConvexDB) {
-                // new Clerk init block handles this
-            } else {
-                // Clerk ready but no convex yet - still render user
-                setTimeout(() => {
-                    if (document.getElementById('stat-tickets').textContent === '0') {
-                        initDashboard(clerkUserData, []);
-                    }
-                }, 3000);
+        function hideOrganizerAuthGate() {
+            const gate = document.getElementById('auth-gate');
+            if (gate) {
+                gate.classList.remove('show');
+                gate.style.display = 'none';
             }
-        });
+        }
 
-        // If Clerk never fires, fail closed and keep the auth gate visible.
-        setTimeout(() => {
-            if (!window.Clerk) {
-                console.warn('[Dashboard] Clerk not detected. Redirecting to organizer login.');
-                window.location.replace('organizer-login.html');
-            }
-        }, 4000);
+        function waitForConvexDB() {
+            if (window.ConvexDB) return Promise.resolve();
+            return new Promise(resolve => window.addEventListener('convex-ready', resolve, { once: true }));
+        }
 
     </script>
 
@@ -984,26 +957,42 @@
         // Re-expose _showSectionBase in case organizer-features.js ran first
         if (typeof _showSectionBase === 'function') window._showSectionBase = _showSectionBase;
 
-        /* -- Clerk: inject and initialize -- */
-        const clerkScript = document.createElement('script');
-        clerkScript.src = 'https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js';
-        clerkScript.setAttribute('data-clerk-publishable-key', window.ENV.CLERK_PUBLISHABLE_KEY);
-        clerkScript.async = true;
-        clerkScript.crossOrigin = 'anonymous';
-        clerkScript.onload = async function () {
+        /* -- Clerk: initialize once and decide dashboard access -- */
+        async function waitForClerkSdk() {
+            if (window.Clerk) return window.Clerk;
+
+            let clerkScript = document.getElementById('clerk-sdk');
+            if (!clerkScript) {
+                clerkScript = document.createElement('script');
+                clerkScript.id = 'clerk-sdk';
+                clerkScript.src = 'https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js';
+                clerkScript.setAttribute('data-clerk-publishable-key', window.ENV.CLERK_PUBLISHABLE_KEY);
+                clerkScript.async = true;
+                clerkScript.crossOrigin = 'anonymous';
+                document.head.appendChild(clerkScript);
+            }
+
+            for (let i = 0; i < 80; i++) {
+                if (window.Clerk) return window.Clerk;
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+            throw new Error('Clerk SDK did not load.');
+        }
+
+        async function initializeOrganizerDashboard() {
             try {
-                await window.Clerk.load();
-                const clerkUser = window.Clerk.user;
+                const clerk = await waitForClerkSdk();
+                await clerk.load();
+                const clerkUser = clerk.user;
 
                 if (!clerkUser) {
-                    // Not signed in - send to login
-                    window.location.replace('organizer-login.html');
+                    organizerAuthResolved = true;
+                    showOrganizerAuthGate();
                     return;
                 }
 
-                // Hide auth gate, show dashboard
-                const gate = document.getElementById('auth-gate');
-                if (gate) gate.style.display = 'none';
+                organizerAuthResolved = true;
+                hideOrganizerAuthGate();
 
                 // Populate sidebar user card
                 const clerkUserData = {
@@ -1026,17 +1015,14 @@
                     soBtn.textContent = 'Sign Out';
                     soBtn.style.cssText = 'margin-top:10px;width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:9px 12px;color:rgba(255,255,255,0.45);font-size:12px;cursor:pointer;';
                     soBtn.addEventListener('click', async () => {
-                        await window.Clerk.signOut();
+                        await clerk.signOut();
                         window.location.replace('organizer-login.html');
                     });
                     sidebarBottom.appendChild(soBtn);
                 }
 
                 async function loadData() {
-                    // Wait for ConvexDB if it hasn't fired yet (module scripts load async)
-                    if (!window.ConvexDB) {
-                        await new Promise(resolve => window.addEventListener('convex-ready', resolve, { once: true }));
-                    }
+                    await waitForConvexDB();
                     try {
                         const userId = await window.ConvexDB.upsertUser({
                             clerk_id: clerkUser.id,
@@ -1069,14 +1055,23 @@
                     }
                 }
 
-                window.addEventListener('convex-ready', loadData);
-                if (window.ConvexDB) loadData();
+                await loadData();
 
             } catch (e) {
                 console.error('[Dashboard] Clerk init error:', e);
+                organizerAuthResolved = true;
+                showOrganizerAuthGate();
             }
-        };
-        document.body.appendChild(clerkScript);
+        }
+
+        initializeOrganizerDashboard();
+
+        setTimeout(() => {
+            if (!organizerAuthResolved) {
+                console.warn('[Dashboard] Auth still loading after timeout; showing organizer sign-in gate.');
+                showOrganizerAuthGate();
+            }
+        }, 12000);
 
         /* -- Mobile navigation helpers -- */
         function mobileSwitchSection(name, btn) {
