@@ -1184,15 +1184,7 @@
                         unsafeMetadata: { role: 'buyer' },
                     });
 
-                    // 2. Send welcome email immediately (fire-and-forget)
-                    if (window.TAMail) {
-                        window.TAMail.sendWelcomeUser({
-                            to_email: email,
-                            to_name: fname,
-                        }).catch(function() {}); // silent fail
-                    }
-
-                    // 3. If email verification is needed, send and collect the code
+                    // 2. If email verification is needed, send and collect the code
                     if (signUpAttempt.status === 'missing_requirements' &&
                         signUpAttempt.unverifiedFields?.includes('email_address')) {
                         await signUpAttempt.prepareEmailAddressVerification({ strategy: 'email_code' });

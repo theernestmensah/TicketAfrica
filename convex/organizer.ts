@@ -825,6 +825,30 @@ export const checkInTicket = mutation({
             scannedAt: now,
         });
 
+        if (owner?.email) {
+            await ctx.runMutation(internal.messages.enqueue, {
+                type: "ticket_scanned",
+                channel: "email",
+                recipient_email: owner.email,
+                recipient_phone: owner.phone,
+                recipient_name: owner.first_name,
+                user_id: owner._id,
+                org_id: event?.org_id,
+                event_id: ticket.event_id,
+                order_id: ticket.order_id,
+                subject: `Your ticket was scanned for ${event?.title || "your event"}`,
+                body: "Your Ticket Africa QR ticket was successfully scanned at entry.",
+                template_key: "ticket_scanned",
+                data: {
+                    event_title: event?.title || "Your Event",
+                    ticket_number: ticket.ticket_number,
+                    scanned_at: now,
+                    gate: args.gate,
+                    wallet_link: "/account.html",
+                },
+            });
+        }
+
         return scanResponse("valid", message, { owner, tier, event, ticket, scannedAt: now });
     },
 });

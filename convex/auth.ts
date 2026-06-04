@@ -69,20 +69,23 @@ export const syncClerkUser = internalMutation({
             joined_at: new Date().toISOString()
         });
 
+        const isOrganizer = role === "organizer";
         await ctx.runMutation(internal.messages.enqueue, {
-            type: "welcome_buyer",
+            type: isOrganizer ? "welcome_organizer" : "welcome_buyer",
             channel: "email",
             recipient_email: args.email.trim().toLowerCase(),
             recipient_phone: args.phone,
             recipient_name: args.first_name,
             user_id: userId,
-            subject: "Welcome to Ticket Africa",
-            body: `Hi ${args.first_name}, welcome to Ticket Africa. Your account is ready.`,
-            template_key: "welcome_buyer",
+            subject: isOrganizer ? "Welcome to Ticket Africa for Organizers" : "Welcome to Ticket Africa",
+            body: isOrganizer
+                ? `Hi ${args.first_name}, welcome to Ticket Africa. Your organizer account is ready. You can create your first event, add ticket tiers, and prepare for your first buyers.`
+                : `Hi ${args.first_name}, welcome to Ticket Africa. Your account is ready. When organizers publish events, you can discover them, pay locally, and receive secure QR-code tickets.`,
+            template_key: isOrganizer ? "welcome_organizer" : "welcome_buyer",
             data: {
                 first_name: args.first_name,
                 last_name: args.last_name,
-                account_link: "/account.html",
+                account_link: isOrganizer ? "/organizer-dashboard.html" : "/account.html",
                 events_link: "/events.html",
             },
         });

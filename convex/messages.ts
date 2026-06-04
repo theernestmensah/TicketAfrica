@@ -6,6 +6,8 @@ const messageType = v.union(
     v.literal("welcome_buyer"),
     v.literal("welcome_organizer"),
     v.literal("ticket_confirmation"),
+    v.literal("event_created"),
+    v.literal("ticket_scanned"),
     v.literal("event_reminder"),
     v.literal("attendee_update"),
     v.literal("newsletter"),
@@ -217,17 +219,129 @@ function escapeHtml(value: unknown): string {
         .replace(/"/g, "&quot;");
 }
 
+function formatMoney(minorAmount: unknown, currency: unknown): string {
+    const amount = Number(minorAmount || 0) / 100;
+    return `${escapeHtml(currency || "GHS")} ${amount.toLocaleString("en-GH", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    })}`;
+}
+
+function formatDate(value: unknown): string {
+    if (!value) return "";
+    const date = new Date(String(value));
+    if (Number.isNaN(date.getTime())) return String(value);
+    return date.toLocaleString("en-GB", {
+        dateStyle: "medium",
+        timeStyle: "short",
+    });
+}
+
+function messageContent(message: any) {
+    const data = message.data || {};
+    const eventTitle = escapeHtml(data.event_title || "your event");
+    const eventDate = formatDate(data.event_date);
+    const eventVenue = escapeHtml(data.event_venue || "");
+    const ticketNumber = escapeHtml(data.ticket_number || "");
+    const scannedAt = formatDate(data.scanned_at);
+
+    switch (message.type) {
+        case "welcome_organizer":
+            return {
+                heading: "Your organizer account is ready",
+                intro: "You can now create your first real event, add ticket tiers, and prepare your launch.",
+                details: [
+                    "Start with the event name, date, venue, and description.",
+                    "Add ticket tiers before publishing.",
+                    "Use the scanner on event day to verify QR tickets.",
+                ],
+                actionLabel: "Open Organizer Dashboard",
+                actionUrl: data.account_link || "/organizer-dashboard.html",
+                footer: "You are receiving this because you created a Ticket Africa organizer account.",
+            };
+        case "welcome_buyer":
+            return {
+                heading: "Your Ticket Africa account is ready",
+                intro: "When organizers publish events, you can discover them, pay locally, and receive secure QR-code tickets.",
+                details: [
+                    "Browse events when they go live.",
+                    "Keep purchased tickets in your wallet.",
+                    "Show your QR code at the gate for verification.",
+                ],
+                actionLabel: "Browse Events",
+                actionUrl: data.events_link || "/events.html",
+                footer: "You are receiving this because you created a Ticket Africa attendee account.",
+            };
+        case "ticket_confirmation":
+            return {
+                heading: `Your tickets for ${eventTitle}`,
+                intro: "Your order is confirmed. Your QR tickets are now available in your Ticket Africa wallet.",
+                details: [
+                    eventDate ? `Event date: ${eventDate}` : "",
+                    eventVenue ? `Venue: ${eventVenue}` : "",
+                    `Total paid: ${formatMoney(data.total_amount, data.currency)}`,
+                ].filter(Boolean),
+                actionLabel: "Open My Tickets",
+                actionUrl: data.wallet_link || "/account.html",
+                footer: "You are receiving this because you bought a Ticket Africa event ticket.",
+            };
+        case "event_created":
+            return {
+                heading: "Event draft created",
+                intro: `${eventTitle} has been created as a draft. Add ticket tiers and review the details before publishing.`,
+                details: [
+                    eventDate ? `Event date: ${eventDate}` : "",
+                    eventVenue ? `Venue: ${eventVenue}` : "",
+                    "Status: Draft",
+                ].filter(Boolean),
+                actionLabel: "Manage Event",
+                actionUrl: data.dashboard_link || "/organizer-dashboard.html",
+                footer: "You are receiving this because you created an event on Ticket Africa.",
+            };
+        case "ticket_scanned":
+            return {
+                heading: "Your ticket was scanned",
+                intro: `Your ticket for ${eventTitle} was successfully scanned at entry.`,
+                details: [
+                    ticketNumber ? `Ticket: ${ticketNumber}` : "",
+                    scannedAt ? `Scanned at: ${scannedAt}` : "",
+                    data.gate ? `Gate: ${escapeHtml(data.gate)}` : "",
+                ].filter(Boolean),
+                actionLabel: "Open My Tickets",
+                actionUrl: data.wallet_link || "/account.html",
+                footer: "You are receiving this because a Ticket Africa QR ticket assigned to you was scanned.",
+            };
+        case "attendee_update":
+            return {
+                heading: eventTitle,
+                intro: escapeHtml(message.subject),
+                details: [escapeHtml(message.body)],
+                actionLabel: "Open Ticket Africa",
+                actionUrl: data.account_link || data.events_link || "/account.html",
+                footer: "You are receiving this because you bought or registered for this event.",
+            };
+        default:
+            return {
+                heading: escapeHtml(message.subject),
+                intro: escapeHtml(message.body),
+                details: [],
+                actionLabel: "Open Ticket Africa",
+                actionUrl: data.wallet_link || data.account_link || data.events_link,
+                footer: "You are receiving this because you use Ticket Africa.",
+            };
+    }
+}
+
 function renderHtmlMessage(message: any): string {
-    const title = escapeHtml(message.subject);
-    const body = escapeHtml(message.body).replace(/\n/g, "<br>");
-    const eventTitle = escapeHtml(message.data?.event_title || "Your Ticket Africa event");
-    const isAttendeeUpdate = message.type === "attendee_update";
-    const recipientName = message.recipient_name
-        ? `<p style="margin:0 0 16px;">Hi ${escapeHtml(message.recipient_name)},</p>`
+    const content = messageContent(message);
+    const recipientName = message.recipient_name ? `Hi ${escapeHtml(message.recipient_name)},` : "Hi,";
+    const details = content.details.length
+        ? `<div style="margin:22px 0;border:1px solid #e5e7eb;background:#f9fafb;padding:16px 18px;">
+            ${content.details.map((detail: string) => `<p style="font-size:14px;line-height:1.55;color:#374151;margin:0 0 8px;">${detail}</p>`).join("")}
+          </div>`
         : "";
-    const actionUrl = message.data.wallet_link || message.data.account_link || message.data.events_link;
-    const action = actionUrl
-        ? `<p style="margin:24px 0;"><a href="${escapeHtml(actionUrl)}" style="background:#111827;color:#fff;text-decoration:none;padding:12px 18px;border-radius:8px;display:inline-block;font-weight:700;">Open Ticket Africa</a></p>`
+    const action = content.actionUrl
+        ? `<p style="margin:24px 0;"><a href="${escapeHtml(content.actionUrl)}" style="background:#111827;color:#fff;text-decoration:none;padding:12px 18px;border-radius:8px;display:inline-block;font-weight:700;">${escapeHtml(content.actionLabel)}</a></p>`
         : "";
 
     return `
@@ -238,13 +352,12 @@ function renderHtmlMessage(message: any): string {
       <div style="height:6px;background:#111827;margin-bottom:28px;"></div>
       <div style="text-align:center;font-size:24px;font-weight:800;color:#111827;margin-bottom:36px;">Ticket Africa</div>
       <div style="background:#ffffff;border:1px solid #e5e7eb;padding:32px 28px;">
-        <h1 style="font-size:26px;line-height:1.25;margin:0 0 28px;color:#111827;text-align:center;">${isAttendeeUpdate ? eventTitle : title}</h1>
-        ${recipientName}
-        ${isAttendeeUpdate ? `<p style="font-size:16px;line-height:1.6;margin:0 0 18px;color:#111827;font-weight:700;font-style:italic;">Important information about your event!</p>` : ""}
-        ${isAttendeeUpdate ? `<h2 style="font-size:16px;line-height:1.4;margin:0 0 14px;color:#111827;">${title}</h2>` : ""}
-        <p style="font-size:16px;line-height:1.65;margin:0;color:#374151;">${body}</p>
+        <h1 style="font-size:26px;line-height:1.25;margin:0 0 28px;color:#111827;text-align:center;">${content.heading}</h1>
+        <p style="margin:0 0 16px;">${recipientName}</p>
+        <p style="font-size:16px;line-height:1.65;margin:0;color:#374151;">${content.intro}</p>
+        ${details}
         ${action}
-        <p style="font-size:12px;line-height:1.5;color:#6b7280;margin:32px 0 0;border-top:1px solid #e5e7eb;padding-top:16px;">You are receiving this because you bought or registered for a Ticket Africa event.</p>
+        <p style="font-size:12px;line-height:1.5;color:#6b7280;margin:32px 0 0;border-top:1px solid #e5e7eb;padding-top:16px;">${escapeHtml(content.footer)}</p>
       </div>
     </div>
   </body>

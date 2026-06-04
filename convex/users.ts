@@ -1,5 +1,6 @@
 ﻿import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
+import { internal } from "./_generated/api";
 
 // Get a user by their Clerk ID
 export const getByClerkId = query({
@@ -49,7 +50,7 @@ export const upsertUser = mutation({
             return existing._id;
         }
 
-        return await ctx.db.insert("users", {
+        const userId = await ctx.db.insert("users", {
             clerk_id: args.clerk_id,
             email: args.email,
             first_name: args.first_name,
@@ -58,6 +59,29 @@ export const upsertUser = mutation({
             role,
             joined_at: new Date().toISOString(),
         });
+
+        const isOrganizer = role === "organizer";
+        await ctx.runMutation(internal.messages.enqueue, {
+            type: isOrganizer ? "welcome_organizer" : "welcome_buyer",
+            channel: "email",
+            recipient_email: args.email.trim().toLowerCase(),
+            recipient_phone: args.phone,
+            recipient_name: args.first_name,
+            user_id: userId,
+            subject: isOrganizer ? "Welcome to Ticket Africa for Organizers" : "Welcome to Ticket Africa",
+            body: isOrganizer
+                ? `Hi ${args.first_name}, welcome to Ticket Africa. Your organizer account is ready. You can create your first event, add ticket tiers, and prepare for your first buyers.`
+                : `Hi ${args.first_name}, welcome to Ticket Africa. Your account is ready. When organizers publish events, you can discover them, pay locally, and receive secure QR-code tickets.`,
+            template_key: isOrganizer ? "welcome_organizer" : "welcome_buyer",
+            data: {
+                first_name: args.first_name,
+                last_name: args.last_name,
+                account_link: isOrganizer ? "/organizer-dashboard.html" : "/account.html",
+                events_link: "/events.html",
+            },
+        });
+
+        return userId;
     },
 });
 

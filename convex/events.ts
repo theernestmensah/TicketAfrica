@@ -1,5 +1,6 @@
 ﻿import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
+import { internal } from "./_generated/api";
 
 async function getCurrentUser(ctx: any) {
     const identity = await ctx.auth.getUserIdentity();
@@ -180,8 +181,9 @@ export const createEvent = mutation({
     },
     handler: async (ctx, args) => {
         await assertOrgAccess(ctx, args.org_id);
+        const user = await getCurrentUser(ctx);
         const slug = args.title.toLowerCase().replace(/[^a-z0-9]+/g, "-") + "-" + Date.now();
-        return await ctx.db.insert("events", {
+        const eventId = await ctx.db.insert("events", {
             org_id: args.org_id,
             title: args.title,
             slug,
@@ -200,6 +202,28 @@ export const createEvent = mutation({
             },
             created_at: new Date().toISOString(),
         });
+
+        await ctx.runMutation(internal.messages.enqueue, {
+            type: "event_created",
+            channel: "email",
+            recipient_email: user.email,
+            recipient_phone: user.phone,
+            recipient_name: user.first_name,
+            user_id: user._id,
+            org_id: args.org_id,
+            event_id: eventId,
+            subject: `Event draft created: ${args.title}`,
+            body: `${args.title} has been created as a draft. Add ticket tiers and review the details before publishing.`,
+            template_key: "event_created",
+            data: {
+                event_title: args.title,
+                event_date: args.start_date,
+                event_venue: args.venue_name,
+                dashboard_link: "/organizer-dashboard.html",
+            },
+        });
+
+        return eventId;
     },
 });
 

@@ -229,6 +229,8 @@ export default defineSchema({
             v.literal("welcome_buyer"),
             v.literal("welcome_organizer"),
             v.literal("ticket_confirmation"),
+            v.literal("event_created"),
+            v.literal("ticket_scanned"),
             v.literal("event_reminder"),
             v.literal("attendee_update"),
             v.literal("newsletter"),
