@@ -58,7 +58,7 @@ function fmtDate(iso) {
 }
 
 function statusChip(status, map) {
-    const cfg = map[status] || { label: status, color: 'rgba(255,255,255,0.3)', bg: 'rgba(255,255,255,0.05)' };
+    const cfg = map[status] || { label: status, color: 'var(--color-text-secondary)', bg: 'var(--color-bg-elevated)' };
     return `<span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;background:${cfg.bg};color:${cfg.color};">${cfg.label}</span>`;
 }
 
@@ -216,15 +216,15 @@ async function loadAnalytics() {
             const maxRev = Math.max(...data.revenueByEvent.map(e => e.revenue), 1);
             list.innerHTML = data.revenueByEvent.map(ev => {
                 const pct = Math.round((ev.revenue / maxRev) * 100);
-                return `<div style="padding:12px 20px;border-bottom:1px solid rgba(255,255,255,0.06);">
+                return `<div style="padding:12px 20px;border-bottom:1px solid var(--color-border);">
                     <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
-                        <span style="font-size:13px;font-weight:600;">${ev.title}</span>
+                        <span style="font-size:13px;font-weight:600;color:var(--color-text-primary);">${ev.title}</span>
                         <span style="font-size:13px;font-weight:700;color:#8b5cf6;">${fmtCurrency(ev.revenue)}</span>
                     </div>
-                    <div style="height:4px;background:rgba(255,255,255,0.06);border-radius:2px;">
+                    <div style="height:4px;background:var(--color-bg-elevated);border-radius:2px;">
                         <div style="height:4px;border-radius:2px;background:linear-gradient(90deg,#8b5cf6,#ec4899);width:${pct}%;"></div>
                     </div>
-                    <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:4px;">${ev.orders} orders</div>
+                    <div style="font-size:11px;color:var(--color-text-muted);margin-top:4px;">${ev.orders} orders</div>
                 </div>`;
             }).join('');
         } else {
@@ -249,13 +249,14 @@ function drawRevenueChart(dailyData) {
     ctx.clearRect(0, 0, W, H);
 
     // Grid lines
-    ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+    const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+    ctx.strokeStyle = isLight ? 'rgba(25,25,25,0.1)' : 'rgba(255,255,255,0.06)';
     ctx.lineWidth = 1;
     for (let i = 0; i <= 4; i++) {
         const y = pad.top + chartH - (i / 4) * chartH;
         ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(W - pad.right, y); ctx.stroke();
         const val = (maxRev * i / 4 / 100).toFixed(0);
-        ctx.fillStyle = 'rgba(255,255,255,0.3)';
+        ctx.fillStyle = isLight ? 'rgba(25,25,25,0.5)' : 'rgba(255,255,255,0.3)';
         ctx.font = '10px Inter, sans-serif';
         ctx.textAlign = 'right';
         ctx.fillText('GHS' + val, pad.left - 6, y + 4);
@@ -277,7 +278,7 @@ function drawRevenueChart(dailyData) {
 
         // Label
         const label = d.date.slice(5); // MM-DD
-        ctx.fillStyle = 'rgba(255,255,255,0.4)';
+        ctx.fillStyle = isLight ? 'rgba(25,25,25,0.55)' : 'rgba(255,255,255,0.4)';
         ctx.font = '10px Inter, sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText(label, x + barW / 2, H - 8);
@@ -657,7 +658,7 @@ function addPollOptionRow() {
 }
 
 const POLL_STATUS = {
-    draft: { label: 'Draft', color: 'rgba(255,255,255,0.5)', bg: 'rgba(255,255,255,0.05)' },
+    draft: { label: 'Draft', color: 'var(--color-text-secondary)', bg: 'var(--color-bg-elevated)' },
     active: { label: 'Active', color: '#22c55e', bg: 'rgba(34,197,94,0.12)' },
     completed: { label: 'Completed', color: '#8b5cf6', bg: 'rgba(139,92,246,0.12)' },
 };

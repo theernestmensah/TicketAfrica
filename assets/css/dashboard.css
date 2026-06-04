@@ -480,6 +480,85 @@ body {
     font-size: 11px;
 }
 
+/* Light theme contrast fixes for dashboard-only dark accents and inline legacy styles. */
+[data-theme="light"] .dash-sidebar {
+    background: #191919;
+    border-right-color: rgba(25, 25, 25, 0.14);
+    color: #ffffff;
+}
+
+[data-theme="light"] .dash-sidebar__logo {
+    border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="light"] .dash-sidebar__logo-text,
+[data-theme="light"] .dash-user__name {
+    color: #ffffff;
+}
+
+[data-theme="light"] .dash-sidebar__context,
+[data-theme="light"] .dash-nav-section,
+[data-theme="light"] .dash-user__org {
+    color: rgba(255, 255, 255, 0.55);
+}
+
+[data-theme="light"] .dash-nav-link {
+    color: rgba(255, 255, 255, 0.72);
+}
+
+[data-theme="light"] .dash-nav-link:hover {
+    background: rgba(212, 175, 55, 0.12);
+    color: #ffffff;
+}
+
+[data-theme="light"] .dash-nav-link.active {
+    color: #191919;
+}
+
+[data-theme="light"] .dash-nav-link .badge-count {
+    color: #191919;
+}
+
+[data-theme="light"] .dash-sidebar__bottom {
+    border-top-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="light"] .payout-card {
+    background: #191919;
+    color: #ffffff;
+}
+
+[data-theme="light"] .payout-label {
+    color: rgba(255, 255, 255, 0.65);
+}
+
+[data-theme="light"] .payout-amount {
+    color: #ffffff;
+}
+
+[data-theme="light"] .dash-main [style*="color:#f0f0f5"],
+[data-theme="light"] .dash-main [style*="color: #f0f0f5"],
+[data-theme="light"] .dash-main [style*="color:rgba(255,255,255"],
+[data-theme="light"] .dash-main [style*="color: rgba(255,255,255"] {
+    color: var(--color-text-secondary) !important;
+}
+
+[data-theme="light"] .dash-main [style*="background:rgba(255,255,255"],
+[data-theme="light"] .dash-main [style*="background: rgba(255,255,255"] {
+    background: var(--color-bg-elevated) !important;
+}
+
+[data-theme="light"] .dash-main [style*="border:1px solid rgba(255,255,255"],
+[data-theme="light"] .dash-main [style*="border: 1px solid rgba(255,255,255"] {
+    border-color: var(--color-border) !important;
+}
+
+[data-theme="light"] .dash-main input,
+[data-theme="light"] .dash-main select,
+[data-theme="light"] .dash-main textarea {
+    color: var(--color-text-primary) !important;
+}
+
 /* ── Stat Cards ── */
 .stats-grid {
     display: grid;
