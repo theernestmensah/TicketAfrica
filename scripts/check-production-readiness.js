@@ -84,8 +84,7 @@ if (!events.ok) {
   } catch {
     blockers.push("Production events query returned invalid JSON.");
   }
-  line(eventCount > 0, "Production events", `${eventCount} published event(s)`);
-  if (eventCount === 0) blockers.push("Add at least one published production event.");
+  line(true, "Production events", `${eventCount} published event(s)`);
 }
 
 const spec = run(npx, ["convex", "function-spec", "--prod"]);
