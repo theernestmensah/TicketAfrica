@@ -6,6 +6,12 @@
 (function () {
   'use strict';
 
+  function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>"']/g, function (char) {
+      return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char];
+    });
+  }
+
   const NAV_HTML = `
   <nav class="site-nav nav--transparent" data-transparent="true" id="site-nav">
     <div class="container">
@@ -365,8 +371,8 @@
                 return `
                   <div class="poll-card" style="background:var(--color-bg-card);border:1px solid var(--color-border);border-radius:var(--radius-xl);padding:var(--space-6);display:flex;flex-direction:column;gap:var(--space-4);" data-reveal>
                     <div style="font-size:var(--text-xs);font-weight:700;color:var(--color-secondary);text-transform:uppercase;letter-spacing:0.06em;">Active Poll</div>
-                    <h3 style="font-family:var(--font-display);font-size:var(--text-lg);font-weight:700;">${poll.title}</h3>
-                    <p style="font-size:var(--text-sm);color:var(--color-text-muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;flex:1;">${poll.description}</p>
+                    <h3 style="font-family:var(--font-display);font-size:var(--text-lg);font-weight:700;">${escapeHtml(poll.title)}</h3>
+                    <p style="font-size:var(--text-sm);color:var(--color-text-muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;flex:1;">${escapeHtml(poll.description)}</p>
                     <div style="display:flex;align-items:center;justify-content:space-between;padding-top:var(--space-4);border-top:1px solid var(--color-border);">
                       <div style="font-size:var(--text-sm);color:var(--color-text-muted);font-weight:600;">
                         <iconify-icon icon="hugeicons:star" style="vertical-align:middle;margin-right:4px;"></iconify-icon> ${totalVotes} votes cast

@@ -1,6 +1,6 @@
-﻿import { action, internalMutation, mutation, query } from "./_generated/server";
+﻿import { action, internalMutation, internalQuery, mutation, query } from "./_generated/server";
 import { v } from "convex/values";
-import { api } from "./_generated/api";
+import { api, internal } from "./_generated/api";
 
 const messageType = v.union(
     v.literal("welcome_buyer"),
@@ -15,6 +15,37 @@ const messageType = v.union(
 );
 
 const channel = v.union(v.literal("email"), v.literal("sms"), v.literal("in_app"));
+
+async function assertAdmin(ctx: any) {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Authentication required.");
+    const user = await ctx.db
+        .query("users")
+        .withIndex("by_clerk_id", (q: any) => q.eq("clerk_id", identity.subject))
+        .first();
+    if (!user || user.role !== "admin") throw new Error("Admin access required.");
+    return user;
+}
+
+export const getUserRoleByClerkId = internalQuery({
+    args: { clerk_id: v.string() },
+    handler: async (ctx, args) => {
+        const user = await ctx.db
+            .query("users")
+            .withIndex("by_clerk_id", (q) => q.eq("clerk_id", args.clerk_id))
+            .first();
+        return user?.role || null;
+    },
+});
+
+async function assertAdminAction(ctx: any) {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Authentication required.");
+    const role = await ctx.runQuery(internal.messages.getUserRoleByClerkId, {
+        clerk_id: identity.subject,
+    });
+    if (role !== "admin") throw new Error("Admin access required.");
+}
 
 export const enqueue = internalMutation({
     args: {
@@ -41,16 +72,18 @@ export const enqueue = internalMutation({
             return null;
         }
 
-        return await ctx.db.insert("message_outbox", {
+        const messageId = await ctx.db.insert("message_outbox", {
             ...args,
             status: "queued",
             attempts: 0,
             created_at: new Date().toISOString(),
         });
+        await ctx.scheduler.runAfter(0, api.messages.deliverQueued, { limit: 25 });
+        return messageId;
     },
 });
 
-export const markSent = mutation({
+export const markSent = internalMutation({
     args: { message_id: v.id("message_outbox") },
     handler: async (ctx, args) => {
         await ctx.db.patch(args.message_id, {
@@ -61,7 +94,7 @@ export const markSent = mutation({
     },
 });
 
-export const markFailed = mutation({
+export const markFailed = internalMutation({
     args: { message_id: v.id("message_outbox"), error: v.string() },
     handler: async (ctx, args) => {
         const message = await ctx.db.get(args.message_id);
@@ -84,7 +117,7 @@ export const deliverQueued = action({
         const moolreSmsSenderId = process.env.MOOLRE_SMS_SENDER_ID || "TicketAfrica";
         const moolreBaseUrl = process.env.MOOLRE_BASE_URL || "https://api.moolre.com";
 
-        const messages = await ctx.runQuery(api.messages.listQueued, { limit: args.limit || 25 });
+        const messages = await ctx.runQuery(internal.messages.listQueued, { limit: args.limit || 25 });
         let sent = 0;
         let failed = 0;
 
@@ -115,13 +148,13 @@ export const deliverQueued = action({
                         throw new Error(body?.message || `Moolre SMS returned ${res.status}`);
                     }
 
-                    await ctx.runMutation(api.messages.markSent, { message_id: message._id });
+                    await ctx.runMutation(internal.messages.markSent, { message_id: message._id });
                     sent += 1;
                     continue;
                 }
 
                 if (message.channel !== "email") {
-                    await ctx.runMutation(api.messages.markFailed, {
+                    await ctx.runMutation(internal.messages.markFailed, {
                         message_id: message._id,
                         error: `No delivery provider configured for ${message.channel}`,
                     });
@@ -161,10 +194,10 @@ export const deliverQueued = action({
                     throw new Error(text || `Brevo returned ${res.status}`);
                 }
 
-                await ctx.runMutation(api.messages.markSent, { message_id: message._id });
+                await ctx.runMutation(internal.messages.markSent, { message_id: message._id });
                 sent += 1;
             } catch (error: any) {
-                await ctx.runMutation(api.messages.markFailed, {
+                await ctx.runMutation(internal.messages.markFailed, {
                     message_id: message._id,
                     error: error.message || String(error),
                 });
@@ -178,7 +211,8 @@ export const deliverQueued = action({
 
 export const checkBrevoConfig = action({
     args: {},
-    handler: async (): Promise<{ configured: boolean; accepted: boolean; status?: number; detail: string }> => {
+    handler: async (ctx): Promise<{ configured: boolean; accepted: boolean; status?: number; detail: string }> => {
+        await assertAdminAction(ctx);
         const brevoApiKey = process.env.BREVO_API_KEY;
         const senderEmail = process.env.BREVO_SENDER_EMAIL;
         if (!brevoApiKey || !senderEmail) {
@@ -364,12 +398,12 @@ function renderHtmlMessage(message: any): string {
 </html>`;
 }
 
-export const listQueued = query({
+export const listQueued = internalQuery({
     args: { limit: v.optional(v.number()) },
     handler: async (ctx, args) => {
         return await ctx.db
             .query("message_outbox")
-            .withIndex("by_status", q => q.eq("status", "queued"))
+            .withIndex("by_status_created", q => q.eq("status", "queued"))
             .take(args.limit || 50);
     },
 });
@@ -377,9 +411,21 @@ export const listQueued = query({
 export const listByRecipient = query({
     args: { email: v.string() },
     handler: async (ctx, args) => {
+        const identity = await ctx.auth.getUserIdentity();
+        if (!identity) throw new Error("Authentication required.");
+        const requestedEmail = args.email.trim().toLowerCase();
+        const user = await ctx.db
+            .query("users")
+            .withIndex("by_clerk_id", (q: any) => q.eq("clerk_id", identity.subject))
+            .first();
+        const identityEmail = String((identity as any).email || "").trim().toLowerCase();
+        const userEmail = String(user?.email || "").trim().toLowerCase();
+        if (requestedEmail !== identityEmail && requestedEmail !== userEmail && user?.role !== "admin") {
+            throw new Error("You can only read your own messages.");
+        }
         return await ctx.db
             .query("message_outbox")
-            .withIndex("by_recipient_email", q => q.eq("recipient_email", args.email.trim().toLowerCase()))
+            .withIndex("by_recipient_email", q => q.eq("recipient_email", requestedEmail))
             .order("desc")
             .collect();
     },
@@ -428,6 +474,7 @@ export const enqueueNewsletter = mutation({
         body: v.string(),
     },
     handler: async (ctx, args) => {
+        await assertAdmin(ctx);
         const subscribers = await ctx.db
             .query("newsletter_subscribers")
             .withIndex("by_status", q => q.eq("status", "subscribed"))
@@ -450,6 +497,9 @@ export const enqueueNewsletter = mutation({
                 attempts: 0,
                 created_at: now,
             }));
+        }
+        if (ids.length > 0) {
+            await ctx.scheduler.runAfter(0, api.messages.deliverQueued, { limit: 25 });
         }
         return { queued: ids.length };
     },

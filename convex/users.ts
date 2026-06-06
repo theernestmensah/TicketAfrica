@@ -2,10 +2,42 @@
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
 
+async function requireIdentity(ctx: any) {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Authentication required.");
+    return identity;
+}
+
+async function getCurrentUser(ctx: any) {
+    const identity = await requireIdentity(ctx);
+    const user = await ctx.db
+        .query("users")
+        .withIndex("by_clerk_id", (q: any) => q.eq("clerk_id", identity.subject))
+        .first();
+    if (!user) throw new Error("User profile not found.");
+    return { identity, user };
+}
+
+function identityEmail(identity: any, fallback?: string) {
+    return String(identity.email || identity.emailAddress || fallback || "").trim().toLowerCase();
+}
+
 // Get a user by their Clerk ID
 export const getByClerkId = query({
     args: { clerk_id: v.string() },
     handler: async (ctx, args) => {
+        const identity = await requireIdentity(ctx);
+        let callerRole = null;
+        if (identity.subject !== args.clerk_id) {
+            const caller = await ctx.db
+                .query("users")
+                .withIndex("by_clerk_id", (q) => q.eq("clerk_id", identity.subject))
+                .first();
+            callerRole = caller?.role || null;
+        }
+        if (identity.subject !== args.clerk_id && callerRole !== "admin") {
+            throw new Error("You can only read your own user profile.");
+        }
         return await ctx.db
             .query("users")
             .withIndex("by_clerk_id", (q) => q.eq("clerk_id", args.clerk_id))
@@ -24,35 +56,32 @@ export const upsertUser = mutation({
         role: v.optional(v.union(v.literal("buyer"), v.literal("organizer"))),
     },
     handler: async (ctx, args) => {
-        const role: "buyer" | "organizer" = args.role ?? "buyer";
+        const identity = await requireIdentity(ctx);
+        const clerkId = identity.subject;
+        const email = identityEmail(identity, args.email);
+        if (!email) throw new Error("Authenticated email is required.");
+
+        const role: "buyer" = "buyer";
         const existing = await ctx.db
             .query("users")
-            .withIndex("by_clerk_id", (q) => q.eq("clerk_id", args.clerk_id))
+            .withIndex("by_clerk_id", (q) => q.eq("clerk_id", clerkId))
             .first();
 
         if (existing) {
-            const updates: {
-                email: string;
-                first_name: string;
-                last_name: string;
-                phone: string;
-                role: "buyer" | "organizer" | "admin";
-            } = {
-                email: args.email,
+            const updates: Record<string, any> = {
+                email,
                 first_name: args.first_name,
                 last_name: args.last_name,
             };
 
             if (args.phone !== undefined) updates.phone = args.phone;
-            if (args.role && existing.role !== "admin") updates.role = args.role;
-
             await ctx.db.patch(existing._id, updates);
             return existing._id;
         }
 
         const userId = await ctx.db.insert("users", {
-            clerk_id: args.clerk_id,
-            email: args.email,
+            clerk_id: clerkId,
+            email,
             first_name: args.first_name,
             last_name: args.last_name,
             phone: args.phone,
@@ -64,7 +93,7 @@ export const upsertUser = mutation({
         await ctx.runMutation(internal.messages.enqueue, {
             type: isOrganizer ? "welcome_organizer" : "welcome_buyer",
             channel: "email",
-            recipient_email: args.email.trim().toLowerCase(),
+            recipient_email: email,
             recipient_phone: args.phone,
             recipient_name: args.first_name,
             user_id: userId,
@@ -89,6 +118,10 @@ export const upsertUser = mutation({
 export const getOrgByOwner = query({
     args: { owner_id: v.id("users") },
     handler: async (ctx, args) => {
+        const { user } = await getCurrentUser(ctx);
+        if (user._id !== args.owner_id && user.role !== "admin") {
+            throw new Error("You can only read your own organization.");
+        }
         return await ctx.db
             .query("organizations")
             .withIndex("by_owner", (q) => q.eq("owner_id", args.owner_id))
@@ -104,6 +137,14 @@ export const getOrCreateOrg = mutation({
         email: v.string(),
     },
     handler: async (ctx, args) => {
+        const { user } = await getCurrentUser(ctx);
+        if (user._id !== args.owner_id && user.role !== "admin") {
+            throw new Error("You can only create an organization for your own account.");
+        }
+        if (user.role !== "organizer" && user.role !== "admin") {
+            throw new Error("Organizer account required.");
+        }
+
         const existing = await ctx.db
             .query("organizations")
             .withIndex("by_owner", (q) => q.eq("owner_id", args.owner_id))
@@ -140,6 +181,7 @@ export const validatePromoCode = query({
             .first();
 
         if (!promo) return { valid: false, message: "Invalid promo code." };
+        if (args.org_id && promo.org_id !== args.org_id) return { valid: false, message: "Invalid promo code." };
         if (!promo.active) return { valid: false, message: "This promo code has been deactivated." };
         if (promo.expires_at && new Date(promo.expires_at) < new Date()) {
             return { valid: false, message: "This promo code has expired." };
@@ -157,16 +199,3 @@ export const validatePromoCode = query({
     },
 });
 
-// Increment promo code uses after successful order
-export const redeemPromoCode = mutation({
-    args: { code: v.string() },
-    handler: async (ctx, args) => {
-        const promo = await ctx.db
-            .query("promo_codes")
-            .withIndex("by_code", (q) => q.eq("code", args.code.toUpperCase()))
-            .first();
-        if (promo) {
-            await ctx.db.patch(promo._id, { uses: promo.uses + 1 });
-        }
-    },
-});

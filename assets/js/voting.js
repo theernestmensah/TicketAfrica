@@ -7,24 +7,38 @@
 let _selectedOption = null;
 let _currentPollId = null;
 
+function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>"']/g, (char) => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;',
+    }[char]));
+}
+
+function escapeAttr(value) {
+    return escapeHtml(value).replace(/`/g, '&#96;');
+}
+
 /* ─── Load Polls ─── */
 async function loadAllPolls() {
     const list = document.getElementById('polls-list');
     try {
-        const polls = await window.ConvexDB.query("events:listPublicPolls");
+        const polls = await window.ConvexDB.listPublicPolls();
         if (!polls || !polls.length) {
             list.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:100px 0;"><p style="color:rgba(255,255,255,0.4);">No active polls at the moment.</p></div>`;
             return;
         }
         list.innerHTML = polls.map(p => `
             <div class="poll-card">
-                <span class="poll-card__status status--${p.status}">${p.status}</span>
-                <div class="poll-card__title">${p.title}</div>
-                <div class="poll-card__desc">${p.description}</div>
+                <span class="poll-card__status status--${escapeAttr(p.status)}">${escapeHtml(p.status)}</span>
+                <div class="poll-card__title">${escapeHtml(p.title)}</div>
+                <div class="poll-card__desc">${escapeHtml(p.description)}</div>
                 <div class="poll-card__meta">
                     <span><iconify-icon icon="hugeicons:calendar-01"></iconify-icon> Ends ${new Date(p.end_date).toLocaleDateString()}</span>
                 </div>
-                <button class="btn btn--primary" onclick="openVoteModal('${p._id}')">
+                <button class="btn btn--primary" onclick="openVoteModal('${escapeAttr(p._id)}')">
                     ${p.status === 'active' ? 'Cast Your Vote' : 'View Results'}
                 </button>
             </div>
@@ -60,8 +74,8 @@ function renderPollDetails(poll) {
     let optionsHtml = '';
     if (isActive) {
         optionsHtml = poll.options.map(opt => `
-            <div class="v-option" onclick="selectOption('${opt._id}', this)">
-                <span class="v-option__label">${opt.label}</span>
+            <div class="v-option" onclick="selectOption('${escapeAttr(opt._id)}', this)">
+                <span class="v-option__label">${escapeHtml(opt.label)}</span>
                 <div class="v-option__radio"></div>
             </div>
         `).join('');
@@ -73,7 +87,7 @@ function renderPollDetails(poll) {
             return `
                 <div style="margin-bottom:24px;">
                     <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-size:14px;">
-                        <span style="font-weight:600;">${opt.label}</span>
+                        <span style="font-weight:600;">${escapeHtml(opt.label)}</span>
                         <span style="font-weight:700;color:var(--color-secondary);">${pct}% (${opt.votes_count})</span>
                     </div>
                     <div class="results-bar-wrap">
@@ -85,8 +99,8 @@ function renderPollDetails(poll) {
     }
 
     content.innerHTML = `
-        <h2 style="font-size:24px;margin-bottom:12px;">${poll.title}</h2>
-        <p style="color:var(--color-text-secondary);font-size:14px;margin-bottom:30px;">${poll.description}</p>
+        <h2 style="font-size:24px;margin-bottom:12px;">${escapeHtml(poll.title)}</h2>
+        <p style="color:var(--color-text-secondary);font-size:14px;margin-bottom:30px;">${escapeHtml(poll.description)}</p>
         
         <div id="v-options-container" style="margin-bottom:30px;">
             ${optionsHtml}

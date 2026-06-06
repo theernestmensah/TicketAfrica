@@ -26,6 +26,20 @@ function waitForOrgId() {
     });
 }
 
+function esc(value) {
+    return String(value ?? '').replace(/[&<>"']/g, char => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;',
+    }[char]));
+}
+
+function escAttr(value) {
+    return esc(value).replace(/`/g, '&#96;');
+}
+
 function populateEventSelectors() {
     const selectors = [
         'orders-event-filter', 'attendees-event-filter',
@@ -59,7 +73,7 @@ function fmtDate(iso) {
 
 function statusChip(status, map) {
     const cfg = map[status] || { label: status, color: 'var(--color-text-secondary)', bg: 'var(--color-bg-elevated)' };
-    return `<span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;background:${cfg.bg};color:${cfg.color};">${cfg.label}</span>`;
+    return `<span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;background:${cfg.bg};color:${cfg.color};">${esc(cfg.label)}</span>`;
 }
 
 const ORDER_STATUS = {
@@ -82,15 +96,15 @@ const STAFF_STATUS = {
 
 function emptyState(icon, title, desc) {
     return `<div class="empty-state">
-        <div class="empty-state__icon"><iconify-icon icon="${icon}"></iconify-icon></div>
-        <div class="empty-state__title">${title}</div>
-        ${desc ? `<div class="empty-state__desc">${desc}</div>` : ''}
+        <div class="empty-state__icon"><iconify-icon icon="${escAttr(icon)}"></iconify-icon></div>
+        <div class="empty-state__title">${esc(title)}</div>
+        ${desc ? `<div class="empty-state__desc">${esc(desc)}</div>` : ''}
     </div>`;
 }
 
 function renderTable(cols, rows) {
     if (!rows.length) return '';
-    const head = cols.map(c => `<th>${c}</th>`).join('');
+    const head = cols.map(c => `<th>${esc(c)}</th>`).join('');
     return `<div class="table-shell">
         <table class="events-table">
             <thead><tr>${head}</tr></thead>
@@ -120,9 +134,9 @@ function renderOrders(orders) {
         return;
     }
     const rows = orders.map(o => `<tr>
-        <td><div class="td-title">${o.buyer_name}</div><div class="td-meta">${o.buyer_email}</div></td>
-        <td class="td-meta">${o.event_title || '-'}</td>
-        <td>${o.items ? o.items.map(i => `${i.quantity}x ${i.tier_name}`).join('<br>') : '-'}</td>
+        <td><div class="td-title">${esc(o.buyer_name)}</div><div class="td-meta">${esc(o.buyer_email)}</div></td>
+        <td class="td-meta">${esc(o.event_title || '-')}</td>
+        <td>${o.items ? o.items.map(i => `${esc(i.quantity)}x ${esc(i.tier_name)}`).join('<br>') : '-'}</td>
         <td class="td-value">${fmtCurrency(o.total_amount, o.currency)}</td>
         <td>${statusChip(o.status, ORDER_STATUS)}</td>
         <td class="td-meta">${fmtDate(o.created_at)}</td>
@@ -171,12 +185,12 @@ function renderAttendees(orders) {
     }
     const rows = orders.map(o => `<tr>
         <td>
-            <div class="td-title">${o.buyer_name}</div>
-            <div class="td-meta">${o.buyer_email}</div>
+            <div class="td-title">${esc(o.buyer_name)}</div>
+            <div class="td-meta">${esc(o.buyer_email)}</div>
         </td>
-        <td class="td-meta">${o.event_title || '-'}</td>
-        <td>${o.items ? o.items.map(i => `<div class="td-meta">${i.quantity}x <strong>${i.tier_name}</strong></div>`).join('') : '-'}</td>
-        <td class="td-meta">${o.buyer_phone || '-'}</td>
+        <td class="td-meta">${esc(o.event_title || '-')}</td>
+        <td>${o.items ? o.items.map(i => `<div class="td-meta">${esc(i.quantity)}x <strong>${esc(i.tier_name)}</strong></div>`).join('') : '-'}</td>
+        <td class="td-meta">${esc(o.buyer_phone || '-')}</td>
         <td>${statusChip(o.status, ORDER_STATUS)}</td>
         <td class="td-meta">${fmtDate(o.created_at)}</td>
     </tr>`);
@@ -218,7 +232,7 @@ async function loadAnalytics() {
                 const pct = Math.round((ev.revenue / maxRev) * 100);
                 return `<div style="padding:12px 20px;border-bottom:1px solid var(--color-border);">
                     <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
-                        <span style="font-size:13px;font-weight:600;color:var(--color-text-primary);">${ev.title}</span>
+                        <span style="font-size:13px;font-weight:600;color:var(--color-text-primary);">${esc(ev.title)}</span>
                         <span style="font-size:13px;font-weight:700;color:#8b5cf6;">${fmtCurrency(ev.revenue)}</span>
                     </div>
                     <div style="height:4px;background:var(--color-bg-elevated);border-radius:2px;">
@@ -308,9 +322,9 @@ async function loadPayouts() {
             amountInput.placeholder = `Available: ${balance.available} minor units`;
         }
         const ledgerRows = (ledger || []).map(entry => `<tr>
-            <td class="td-meta">${entry.type.replace(/_/g, ' ')}</td>
+            <td class="td-meta">${esc(entry.type.replace(/_/g, ' '))}</td>
             <td>${entry.direction === 'credit' ? '+' : '-'}${fmtCurrency(entry.amount, entry.currency)}</td>
-            <td class="td-meta">${entry.account}</td>
+            <td class="td-meta">${esc(entry.account)}</td>
             <td class="td-meta">${fmtDate(entry.created_at)}</td>
         </tr>`);
         const ledgerHtml = ledgerRows.length
@@ -323,12 +337,12 @@ async function loadPayouts() {
         const rows = payouts.map(p => `<tr>
             <td class="td-value">${fmtCurrency(p.amount, p.currency)}</td>
             <td class="td-meta">${p.payout_fee ? fmtCurrency(p.payout_fee, p.currency) : 'No fee'}</td>
-            <td class="td-meta">${p.method === 'momo' ? 'Mobile Money' : p.method === 'bank' ? 'Bank Transfer' : 'USSD'}</td>
-            <td class="td-meta">${p.account_details.provider || ''} - ${p.account_details.number}<br>${p.account_details.name}</td>
+            <td class="td-meta">${esc(p.method === 'momo' ? 'Mobile Money' : p.method === 'bank' ? 'Bank Transfer' : 'USSD')}</td>
+            <td class="td-meta">${esc(p.account_details.provider || '')} - ${esc(p.account_details.number)}<br>${esc(p.account_details.name)}</td>
             <td>${statusChip(p.status, PAYOUT_STATUS)}</td>
-            <td class="td-meta">${p.reference || '-'}</td>
+            <td class="td-meta">${esc(p.reference || '-')}</td>
             <td class="td-meta">${fmtDate(p.requested_at)}</td>
-            <td>${p.status === 'pending' ? `<button class="dash-mini-button" onclick="processPayout('${p._id}')">Send</button>` : ''}</td>
+            <td>${p.status === 'pending' ? `<button class="dash-mini-button" onclick="processPayout('${escAttr(p._id)}')">Send</button>` : ''}</td>
         </tr>`);
         container.innerHTML = ledgerHtml + renderTable(['Net Amount', 'Fee', 'Method', 'Account', 'Status', 'Reference', 'Requested', 'Action'], rows);
     } catch (e) {
@@ -402,16 +416,16 @@ async function loadPromos() {
             return;
         }
         const rows = promos.map(p => `<tr>
-            <td><span class="code-chip">${p.code}</span></td>
+            <td><span class="code-chip">${esc(p.code)}</span></td>
             <td>${p.discount_type === 'percent' ? p.discount_value + '%' : fmtCurrency(p.discount_value)} off</td>
-            <td class="td-meta">${p.event_title || 'All Events'}</td>
+            <td class="td-meta">${esc(p.event_title || 'All Events')}</td>
             <td>${p.uses}${p.max_uses ? ' / ' + p.max_uses : ' / unlimited'}</td>
             <td>${p.expires_at ? fmtDate(p.expires_at) : 'Never'}</td>
             <td>${statusChip(p.active ? 'active' : 'off', { active: { label: 'Active', color: '#22c55e', bg: 'rgba(34,197,94,0.12)' }, off: { label: 'Off', color: '#ef4444', bg: 'rgba(239,68,68,0.12)' } })}</td>
             <td>
                 <div class="inline-actions">
-                    ${p.active ? `<button onclick="deactivatePromo('${p._id}')" class="dash-mini-button dash-mini-button--warn">Deactivate</button>` : ''}
-                    <button onclick="deletePromo('${p._id}')" class="dash-mini-button dash-mini-button--danger">Delete</button>
+                    ${p.active ? `<button onclick="deactivatePromo('${escAttr(p._id)}')" class="dash-mini-button dash-mini-button--warn">Deactivate</button>` : ''}
+                    <button onclick="deletePromo('${escAttr(p._id)}')" class="dash-mini-button dash-mini-button--danger">Delete</button>
                 </div>
             </td>
         </tr>`);
@@ -481,11 +495,11 @@ async function loadMessages() {
         }
         container.innerHTML = msgs.map(m => `<div class="message-card">
             <div class="message-card__head">
-                <div class="message-card__subject">${m.subject}</div>
+                <div class="message-card__subject">${esc(m.subject)}</div>
                 ${statusChip(m.channel, { email: { label: 'Email', color: '#38bdf8', bg: 'rgba(56,189,248,0.12)' }, sms: { label: 'SMS', color: '#f59e0b', bg: 'rgba(245,158,11,0.12)' }, both: { label: 'Email + SMS', color: '#22c55e', bg: 'rgba(34,197,94,0.12)' } })}
             </div>
-            <div class="message-card__body">${m.body.substring(0, 140)}${m.body.length > 140 ? '...' : ''}</div>
-            <div class="message-card__meta">Sent to <strong>${m.sent_to}</strong> attendees - ${fmtDate(m.sent_at)} - ${m.event_title || 'All Events'}</div>
+            <div class="message-card__body">${esc(m.body.substring(0, 140))}${m.body.length > 140 ? '...' : ''}</div>
+            <div class="message-card__meta">Sent to <strong>${esc(m.sent_to)}</strong> attendees - ${fmtDate(m.sent_at)} - ${esc(m.event_title || 'All Events')}</div>
         </div>`).join('');
     } catch (e) {
         container.innerHTML = emptyState('hugeicons:notification-03', 'Could not load messages', '');
@@ -571,15 +585,15 @@ async function loadStaff() {
             return;
         }
         const rows = staff.map(s => `<tr>
-            <td><div class="td-title">${s.name}</div><div class="td-meta">${s.invited_email}</div></td>
-            <td>${ROLE_LABELS[s.role] || s.role}</td>
-            <td class="td-meta">${s.event_title || 'All Events'}</td>
+            <td><div class="td-title">${esc(s.name)}</div><div class="td-meta">${esc(s.invited_email)}</div></td>
+            <td>${esc(ROLE_LABELS[s.role] || s.role)}</td>
+            <td class="td-meta">${esc(s.event_title || 'All Events')}</td>
             <td>${statusChip(s.status, STAFF_STATUS)}</td>
             <td class="td-meta">${fmtDate(s.invited_at)}</td>
             <td>
                 <div class="inline-actions">
-                    ${s.status !== 'revoked' ? `<button onclick="revokeStaffMember('${s._id}')" class="dash-mini-button dash-mini-button--warn">Revoke</button>` : ''}
-                    <button onclick="removeStaffMember('${s._id}')" class="dash-mini-button dash-mini-button--danger">Remove</button>
+                    ${s.status !== 'revoked' ? `<button onclick="revokeStaffMember('${escAttr(s._id)}')" class="dash-mini-button dash-mini-button--warn">Revoke</button>` : ''}
+                    <button onclick="removeStaffMember('${escAttr(s._id)}')" class="dash-mini-button dash-mini-button--danger">Remove</button>
                 </div>
             </td>
         </tr>`);
@@ -674,14 +688,14 @@ async function loadPolls() {
             return;
         }
         const rows = polls.map(p => `<tr>
-            <td><div class="td-title">${p.title}</div><div class="td-meta">${p.description.substring(0, 64)}${p.description.length > 64 ? '...' : ''}</div></td>
+            <td><div class="td-title">${esc(p.title)}</div><div class="td-meta">${esc(p.description.substring(0, 64))}${p.description.length > 64 ? '...' : ''}</div></td>
             <td>${statusChip(p.status, POLL_STATUS)}</td>
             <td class="td-meta">${fmtDate(p.start_date)} - ${fmtDate(p.end_date)}</td>
             <td>
                 <div class="inline-actions">
-                    ${p.status === 'draft' ? `<button onclick="setPollStatus('${p._id}', 'active')" class="dash-mini-button dash-mini-button--success">Activate</button>` : ''}
-                    ${p.status === 'active' ? `<button onclick="setPollStatus('${p._id}', 'completed')" class="dash-mini-button">Complete</button>` : ''}
-                    <button onclick="handleDeletePoll('${p._id}')" class="dash-mini-button dash-mini-button--danger">Delete</button>
+                    ${p.status === 'draft' ? `<button onclick="setPollStatus('${escAttr(p._id)}', 'active')" class="dash-mini-button dash-mini-button--success">Activate</button>` : ''}
+                    ${p.status === 'active' ? `<button onclick="setPollStatus('${escAttr(p._id)}', 'completed')" class="dash-mini-button">Complete</button>` : ''}
+                    <button onclick="handleDeletePoll('${escAttr(p._id)}')" class="dash-mini-button dash-mini-button--danger">Delete</button>
                 </div>
             </td>
         </tr>`);

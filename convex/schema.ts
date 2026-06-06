@@ -45,7 +45,9 @@ export default defineSchema({
     .index("by_org", ["org_id"])
     .index("by_slug", ["slug"])
     .index("by_status", ["status"])
+    .index("by_status_start_date", ["status", "start_date"])
     .index("by_country", ["location.country"])
+    .index("by_country_status", ["location.country", "status"])
     .searchIndex("search_text", {
         searchField: "title",
         filterFields: ["status"],
@@ -128,7 +130,9 @@ export default defineSchema({
         paid_at: v.optional(v.string()),
     })
     .index("by_event", ["event_id"])
+    .index("by_event_status", ["event_id", "status"])
     .index("by_org", ["org_id"])
+    .index("by_org_status", ["org_id", "status"])
     .index("by_email", ["buyer_email"])
     .index("by_payment_reference", ["payment_reference"]),
 
@@ -256,6 +260,7 @@ export default defineSchema({
         created_at: v.string(),
     })
     .index("by_status", ["status"])
+    .index("by_status_created", ["status", "created_at"])
     .index("by_type", ["type"])
     .index("by_recipient_email", ["recipient_email"])
     .index("by_org", ["org_id"])
@@ -280,7 +285,7 @@ export default defineSchema({
         end_date: v.string(),
         status: v.union(v.literal("draft"), v.literal("active"), v.literal("completed")),
         created_at: v.string(),
-    }).index("by_org", ["org_id"]),
+    }).index("by_org", ["org_id"]).index("by_status", ["status"]),
 
     poll_options: defineTable({
         poll_id: v.id("polls"),

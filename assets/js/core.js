@@ -8,6 +8,12 @@
     /* ── Toast System ───────────────────────────────────── */
     window.TA = window.TA || {};
 
+    function escapeHtml(value) {
+        return String(value ?? '').replace(/[&<>"']/g, function (char) {
+            return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char];
+        });
+    }
+
     TA.toast = function (message, type = 'info', duration = 4000) {
         let container = document.querySelector('.toast-container');
         if (!container) {
@@ -30,11 +36,12 @@
             info: 'var(--color-info)'
         };
 
+        type = colorMap[type] ? type : 'info';
         const toast = document.createElement('div');
         toast.className = 'toast';
         toast.innerHTML = `
       <span style="color:${colorMap[type]};width:20px;height:20px;flex-shrink:0;display:flex;align-items:center;">${iconMap[type]}</span>
-      <span style="font-size:var(--text-sm);color:var(--color-text-primary);flex:1;">${message}</span>
+      <span style="font-size:var(--text-sm);color:var(--color-text-primary);flex:1;">${escapeHtml(message)}</span>
       <button style="color:var(--color-text-muted);width:16px;height:16px;flex-shrink:0;display:flex;align-items:center;cursor:pointer;background:none;border:none;" onclick="this.closest('.toast').remove()">
         <iconify-icon icon="hugeicons:cancel-01"></iconify-icon>
       </button>`;

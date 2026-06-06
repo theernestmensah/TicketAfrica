@@ -39,28 +39,37 @@ if (!env.ok) {
   const hasMoolreApiKey = /^MOOLRE_API_KEY=/m.test(env.stdout);
   const hasMoolrePublicKey = /^MOOLRE_PUBLIC_KEY=/m.test(env.stdout);
   const hasMoolreAccountNumber = /^MOOLRE_ACCOUNT_NUMBER=/m.test(env.stdout);
+  const hasMoolreWebhookSecret = /^MOOLRE_WEBHOOK_SECRET=/m.test(env.stdout);
   const hasMoolreSmsVasKey = /^MOOLRE_SMS_VAS_KEY=/m.test(env.stdout);
   const hasMoolreSmsSenderId = /^MOOLRE_SMS_SENDER_ID=/m.test(env.stdout);
   const hasClerkWebhookSecret = /^CLERK_WEBHOOK_SECRET=/m.test(env.stdout);
   const hasBrevoApiKey = /^BREVO_API_KEY=/m.test(env.stdout);
   const hasBrevoSenderEmail = /^BREVO_SENDER_EMAIL=/m.test(env.stdout);
+  const hasUpstashRedisUrl = /^UPSTASH_REDIS_REST_URL=/m.test(env.stdout);
+  const hasUpstashRedisToken = /^UPSTASH_REDIS_REST_TOKEN=/m.test(env.stdout);
   line(hasClerkWebhookSecret, "CLERK_WEBHOOK_SECRET", hasClerkWebhookSecret ? "configured" : "missing");
   line(hasMoolreApiUser, "MOOLRE_API_USER", hasMoolreApiUser ? "configured" : "missing");
   line(hasMoolreApiKey, "MOOLRE_API_KEY", hasMoolreApiKey ? "configured" : "missing");
   line(hasMoolrePublicKey, "MOOLRE_PUBLIC_KEY", hasMoolrePublicKey ? "configured" : "missing");
   line(hasMoolreAccountNumber, "MOOLRE_ACCOUNT_NUMBER", hasMoolreAccountNumber ? "configured" : "missing");
+  line(hasMoolreWebhookSecret, "MOOLRE_WEBHOOK_SECRET", hasMoolreWebhookSecret ? "configured" : "missing");
   line(hasMoolreSmsVasKey, "MOOLRE_SMS_VAS_KEY", hasMoolreSmsVasKey ? "configured" : "missing");
   line(hasMoolreSmsSenderId, "MOOLRE_SMS_SENDER_ID", hasMoolreSmsSenderId ? "configured" : "missing");
   line(hasBrevoApiKey, "BREVO_API_KEY", hasBrevoApiKey ? "configured" : "missing");
   line(hasBrevoSenderEmail, "BREVO_SENDER_EMAIL", hasBrevoSenderEmail ? "configured" : "missing");
+  line(hasUpstashRedisUrl, "UPSTASH_REDIS_REST_URL", hasUpstashRedisUrl ? "configured" : "missing");
+  line(hasUpstashRedisToken, "UPSTASH_REDIS_REST_TOKEN", hasUpstashRedisToken ? "configured" : "missing");
   if (!hasMoolreApiUser) blockers.push("Set MOOLRE_API_USER in Convex production.");
   if (!hasMoolreApiKey) blockers.push("Set MOOLRE_API_KEY in Convex production.");
   if (!hasMoolrePublicKey) blockers.push("Set MOOLRE_PUBLIC_KEY in Convex production.");
   if (!hasMoolreAccountNumber) blockers.push("Set MOOLRE_ACCOUNT_NUMBER in Convex production.");
+  if (!hasMoolreWebhookSecret) blockers.push("Set MOOLRE_WEBHOOK_SECRET in Convex production.");
   if (!hasMoolreSmsVasKey) blockers.push("Set MOOLRE_SMS_VAS_KEY in Convex production.");
   if (!hasMoolreSmsSenderId) blockers.push("Set MOOLRE_SMS_SENDER_ID in Convex production.");
   if (!hasBrevoApiKey) blockers.push("Set BREVO_API_KEY in Convex production.");
   if (!hasBrevoSenderEmail) blockers.push("Set BREVO_SENDER_EMAIL in Convex production.");
+  if (!hasUpstashRedisUrl) blockers.push("Set UPSTASH_REDIS_REST_URL in Convex production.");
+  if (!hasUpstashRedisToken) blockers.push("Set UPSTASH_REDIS_REST_TOKEN in Convex production.");
 }
 
 const events = run(npx, [
@@ -104,6 +113,11 @@ if (!spec.ok) {
     "organizer.js:checkInTicket",
     "organizer.js:listScanEventsByEvent",
     "messages.js:deliverQueued",
+    "cache.js:getPublicEvents",
+    "cache.js:getUpcomingEvents",
+    "cache.js:getEventBySlug",
+    "cache.js:getPublicPolls",
+    "cache.js:warmPublicCache",
   ];
   for (const fn of required) {
     const present = spec.stdout.includes(`"identifier": "${fn}"`);

@@ -67,50 +67,50 @@ async function enrichEvents(ctx: any, events: any[]) {
 
 // Get all published events (public browse)
 export const listEvents = query({
-    args: { country: v.optional(v.string()) },
+    args: { country: v.optional(v.string()), limit: v.optional(v.number()) },
     handler: async (ctx, args) => {
+        const limit = Math.min(Math.max(args.limit || 200, 1), 500);
         let events;
         if (args.country) {
             events = await ctx.db
                 .query("events")
-                .withIndex("by_country", (q) => q.eq("location.country", args.country!))
-                .filter((q) => q.eq(q.field("status"), "published"))
+                .withIndex("by_country_status", (q) => q.eq("location.country", args.country!).eq("status", "published"))
                 .order("desc")
-                .collect();
+                .take(limit);
         } else {
             events = await ctx.db
                 .query("events")
                 .withIndex("by_status", (q) => q.eq("status", "published"))
                 .order("desc")
-                .collect();
+                .take(limit);
         }
         return await enrichEvents(ctx, events);
     },
 });
 
 export const searchEvents = query({
-    args: { query: v.string() },
+    args: { query: v.string(), limit: v.optional(v.number()) },
     handler: async (ctx, args) => {
         const events = await ctx.db
             .query("events")
             .withSearchIndex("search_text", (q) =>
                 q.search("title", args.query).eq("status", "published")
             )
-            .collect();
+            .take(Math.min(Math.max(args.limit || 100, 1), 200));
         return await enrichEvents(ctx, events);
     },
 });
 
 // Get ALL events for an org (draft + published + cancelled)  -  for organizer dashboard
 export const listEventsByOrg = query({
-    args: { org_id: v.id("organizations") },
+    args: { org_id: v.id("organizations"), limit: v.optional(v.number()) },
     handler: async (ctx, args) => {
         await assertOrgAccess(ctx, args.org_id);
         const events = await ctx.db
             .query("events")
             .withIndex("by_org", (q) => q.eq("org_id", args.org_id))
             .order("desc")
-            .collect();
+            .take(Math.min(Math.max(args.limit || 200, 1), 500));
         return await enrichEvents(ctx, events);
     },
 });
@@ -120,13 +120,12 @@ export const getUpcomingEvents = query({
     args: { limit: v.optional(v.number()) },
     handler: async (ctx, args) => {
         const today = new Date().toISOString();
+        const limit = Math.min(Math.max(args.limit || 10, 1), 100);
         const events = await ctx.db
             .query("events")
-            .withIndex("by_status", (q) => q.eq("status", "published"))
-            .filter((q) => q.gte(q.field("start_date"), today))
-            .collect();
-        const shown = args.limit ? events.slice(0, args.limit) : events;
-        return await enrichEvents(ctx, shown);
+            .withIndex("by_status_start_date", (q) => q.eq("status", "published").gte("start_date", today))
+            .take(limit);
+        return await enrichEvents(ctx, events);
     },
 });
 
@@ -448,12 +447,19 @@ export const getPollDetails = query({
 export const listPublicPolls = query({
     args: {},
     handler: async (ctx) => {
-        const polls = await ctx.db
+        const active = await ctx.db
             .query("polls")
-            .filter((q) => q.neq(q.field("status"), "draft"))
+            .withIndex("by_status", (q) => q.eq("status", "active"))
             .order("desc")
-            .collect();
-        return polls;
+            .take(100);
+        const completed = await ctx.db
+            .query("polls")
+            .withIndex("by_status", (q) => q.eq("status", "completed"))
+            .order("desc")
+            .take(100);
+        return [...active, ...completed]
+            .sort((a, b) => b.created_at.localeCompare(a.created_at))
+            .slice(0, 100);
     },
 });
 
@@ -505,96 +511,3 @@ export const addRealDemoEvents = mutation({
     },
 });
 
-export const bootstrapLaunchData = mutation({
-    args: {
-        confirmation: v.string(),
-    },
-    handler: async (_ctx, args) => {
-        if (args.confirmation !== "BOOTSTRAP_TICKET_AFRICA_LAUNCH") {
-            throw new Error("Invalid launch bootstrap confirmation.");
-        }
-        return { inserted_events: 0, inserted_tiers: 0, disabled: true };
-    },
-});
-
-// â”€â”€ Admin Utilities â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
-export const deleteAllEvents = mutation({
-    args: {},
-    handler: async (ctx) => {
-        const events = await ctx.db.query("events").collect();
-        for (const event of events) {
-            await ctx.db.delete(event._id);
-        }
-        
-        const tiers = await ctx.db.query("ticket_tiers").collect();
-        for (const tier of tiers) {
-            await ctx.db.delete(tier._id);
-        }
-        
-        return { deleted_events: events.length, deleted_tiers: tiers.length };
-    },
-});
-
-export const deleteDemoContent = mutation({
-    args: {},
-    handler: async (ctx) => {
-        const demoSlugs = new Set([
-            "afrobeats-night-grand-finale",
-            "caf-champions-league-qf",
-            "accra-creators-summit-2026",
-            "lagos-food-culture-weekend",
-            "kumasi-highlife-live",
-            "cape-town-sevens-fan-zone",
-        ]);
-
-        const events = await ctx.db.query("events").collect();
-        const demoEvents = events.filter((event) => demoSlugs.has(event.slug));
-        const demoEventIds = new Set(demoEvents.map((event) => event._id));
-
-        const tiers = await ctx.db.query("ticket_tiers").collect();
-        let deletedTiers = 0;
-        for (const tier of tiers) {
-            if (demoEventIds.has(tier.event_id)) {
-                await ctx.db.delete(tier._id);
-                deletedTiers++;
-            }
-        }
-
-        let deletedEvents = 0;
-        for (const event of demoEvents) {
-            await ctx.db.delete(event._id);
-            deletedEvents++;
-        }
-
-        const demoPollTitles = new Set([
-            "Artist of the Year 2026",
-            "Lagos Carnival: Best Float",
-        ]);
-        const polls = await ctx.db.query("polls").collect();
-        const demoPolls = polls.filter((poll) => demoPollTitles.has(poll.title));
-        const demoPollIds = new Set(demoPolls.map((poll) => poll._id));
-
-        const pollOptions = await ctx.db.query("poll_options").collect();
-        let deletedPollOptions = 0;
-        for (const option of pollOptions) {
-            if (demoPollIds.has(option.poll_id)) {
-                await ctx.db.delete(option._id);
-                deletedPollOptions++;
-            }
-        }
-
-        let deletedPolls = 0;
-        for (const poll of demoPolls) {
-            await ctx.db.delete(poll._id);
-            deletedPolls++;
-        }
-
-        return {
-            deleted_events: deletedEvents,
-            deleted_tiers: deletedTiers,
-            deleted_polls: deletedPolls,
-            deleted_poll_options: deletedPollOptions,
-        };
-    },
-});

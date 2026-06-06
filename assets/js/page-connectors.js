@@ -33,6 +33,10 @@ function escapeHtml(value) {
     }[char]));
 }
 
+function escapeAttr(value) {
+    return escapeHtml(value).replace(/`/g, '&#96;');
+}
+
 function moneyFromMinor(amount, currency) {
     const label = currency || 'GHS';
     return `${label} ${((Number(amount) || 0) / 100).toFixed(2)}`;
@@ -108,8 +112,8 @@ async function initHomePage() {
                         <div style="font-size:var(--text-xs);font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--color-secondary);margin-bottom:var(--space-2);">
                             ${p.status === 'active' ? '🟢 Active' : '✅ Ended'}
                         </div>
-                        <div style="font-size:var(--text-lg);font-weight:700;color:var(--color-text-primary);margin-bottom:var(--space-3);line-height:1.3;">${p.title}</div>
-                        <p style="font-size:var(--text-sm);color:var(--color-text-secondary);line-height:1.6;margin-bottom:var(--space-5);">${p.description}</p>
+                        <div style="font-size:var(--text-lg);font-weight:700;color:var(--color-text-primary);margin-bottom:var(--space-3);line-height:1.3;">${escapeHtml(p.title)}</div>
+                        <p style="font-size:var(--text-sm);color:var(--color-text-secondary);line-height:1.6;margin-bottom:var(--space-5);">${escapeHtml(p.description)}</p>
                         <a href="voting.html" class="btn btn--primary btn--sm" style="text-decoration:none;">
                             ${p.status === 'active' ? 'Cast Your Vote →' : 'View Results →'}
                         </a>
@@ -331,13 +335,13 @@ async function initVotingPage() {
             }
             list.innerHTML = polls.map(p => `
                 <div class="poll-card">
-                    <span class="poll-card__status status--${p.status}">${p.status}</span>
-                    <div class="poll-card__title">${p.title}</div>
-                    <div class="poll-card__desc">${p.description || ''}</div>
+                    <span class="poll-card__status status--${escapeAttr(p.status)}">${escapeHtml(p.status)}</span>
+                    <div class="poll-card__title">${escapeHtml(p.title)}</div>
+                    <div class="poll-card__desc">${escapeHtml(p.description || '')}</div>
                     <div class="poll-card__meta">
                         <span><iconify-icon icon="hugeicons:calendar-01"></iconify-icon> ${p.end_date ? 'Ends ' + new Date(p.end_date).toLocaleDateString() : ''}</span>
                     </div>
-                    <button class="btn btn--primary" onclick="openVoteModal('${p._id}')">
+                    <button class="btn btn--primary" onclick="openVoteModal('${escapeAttr(p._id)}')">
                         ${p.status === 'active' ? 'Cast Your Vote' : 'View Results'}
                     </button>
                 </div>
@@ -464,7 +468,7 @@ async function loadWallet(email) {
                 ? `<span class="badge" style="background:rgba(107,114,128,0.2);color:#9CA3AF;">Used</span>`
                 : isUpcoming
                     ? `<span class="badge badge--success">Valid</span>`
-                    : `<span class="badge badge--primary">${ticket.status || order.status || 'Active'}</span>`;
+                    : `<span class="badge badge--primary">${escapeHtml(ticket.status || order.status || 'Active')}</span>`;
             const ticketNumber = ticket.ticket_number || `TKA-${String(order._id).slice(-8).toUpperCase()}`;
             const scanCode = ticket.scan_token || ticket.qr_code || ticketNumber;
             const eventDate = order.event_date ? new Date(order.event_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : dateStr;
@@ -472,10 +476,10 @@ async function loadWallet(email) {
             const eventVenue = escapeHtml([order.event_venue, order.event_city].filter(Boolean).join(', ') || 'Venue TBA');
             const ticketType = escapeHtml(ticket.tier_name || 'Ticket');
             const safeNumber = escapeHtml(ticketNumber);
-            const safeScanCode = escapeHtml(scanCode);
+            const safeScanCode = escapeAttr(scanCode);
             const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(scanCode)}`;
-            const downloadTitle = escapeHtml(order.event_title || 'Event');
-            const downloadVenue = escapeHtml([order.event_venue, order.event_city].filter(Boolean).join(', ') || 'Venue TBA');
+            const downloadTitle = escapeAttr(order.event_title || 'Event');
+            const downloadVenue = escapeAttr([order.event_venue, order.event_city].filter(Boolean).join(', ') || 'Venue TBA');
 
             return `
             <div class="ticket-card ${isUsed ? 'ticket-card--used' : 'ticket-card--upcoming'}" data-ticket-code="${safeScanCode}">
@@ -505,7 +509,7 @@ async function loadWallet(email) {
                 </div>
                 <div class="ticket-card__actions">
                     <button class="btn btn--secondary btn--sm ticket-copy-btn" style="flex:1;" data-code="${safeNumber}">Copy No.</button>
-                    <button class="btn btn--secondary btn--sm ticket-download-btn" style="flex:1;" data-code="${safeNumber}" data-title="${downloadTitle}" data-type="${ticketType}" data-date="${eventDate}" data-venue="${downloadVenue}">Download</button>
+                    <button class="btn btn--secondary btn--sm ticket-download-btn" style="flex:1;" data-code="${escapeAttr(ticketNumber)}" data-title="${downloadTitle}" data-type="${escapeAttr(ticket.tier_name || 'Ticket')}" data-date="${escapeAttr(eventDate)}" data-venue="${downloadVenue}">Download</button>
                     <button class="btn btn--ghost btn--sm" style="flex:1;" onclick="window.print()">Print</button>
                 </div>
             </div>`;
@@ -528,7 +532,7 @@ async function loadWallet(email) {
         const transferSelect = document.getElementById('transfer-ticket-select');
         if (transferSelect) {
             transferSelect.innerHTML = ticketCards.map(({ order, ticket }) =>
-                `<option value="${ticket._id}">${ticket.tier_name || 'Ticket'} - ${order.event_title || 'Event'} (${ticket.ticket_number || ticket.qr_code || 'pending code'})</option>`
+                `<option value="${escapeAttr(ticket._id)}">${escapeHtml(ticket.tier_name || 'Ticket')} - ${escapeHtml(order.event_title || 'Event')} (${escapeHtml(ticket.ticket_number || ticket.qr_code || 'pending code')})</option>`
             ).join('') || '<option value="">No tickets available</option>';
         }
 
@@ -536,7 +540,7 @@ async function loadWallet(email) {
         if (supportSelect) {
             const base = '<option value="">None - General enquiry</option>';
             supportSelect.innerHTML = base + (orders || []).map(o =>
-                `<option value="${o._id}">${o.event_title || 'Event'} (TKA-${String(o._id).slice(-8).toUpperCase()})</option>`
+                `<option value="${escapeAttr(o._id)}">${escapeHtml(o.event_title || 'Event')} (TKA-${escapeHtml(String(o._id).slice(-8).toUpperCase())})</option>`
             ).join('');
         }
 
@@ -567,12 +571,12 @@ async function loadPurchaseHistory(email) {
                 <div class="order-row">
                     <div class="order-row__img"><iconify-icon icon="hugeicons:ticket-01"></iconify-icon></div>
                     <div style="flex:1;min-width:0;">
-                        <div class="order-row__name">${order.event_title || 'Event Ticket'}</div>
-                        <div class="order-row__meta">${dateStr} - ${(order.items || []).map(i => `${i.tier_name || 'Ticket'} x${i.quantity || 1}`).join(', ') || '1 ticket'}</div>
+                        <div class="order-row__name">${escapeHtml(order.event_title || 'Event Ticket')}</div>
+                        <div class="order-row__meta">${escapeHtml(dateStr)} - ${escapeHtml((order.items || []).map(i => `${i.tier_name || 'Ticket'} x${i.quantity || 1}`).join(', ') || '1 ticket')}</div>
                     </div>
                     <div>
                         <div class="order-row__amount">GHS ${amount}</div>
-                        <div class="order-row__ref" style="color:${statusColor};">${(order.status || 'confirmed').charAt(0).toUpperCase() + (order.status||'confirmed').slice(1)}</div>
+                        <div class="order-row__ref" style="color:${statusColor};">${escapeHtml((order.status || 'confirmed').charAt(0).toUpperCase() + (order.status||'confirmed').slice(1))}</div>
                     </div>
                 </div>`;
         }).join('');
@@ -801,13 +805,13 @@ async function initVerifyPage() {
                     ? `<div style="text-align:center;padding:var(--space-6);background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);border-radius:var(--radius-xl);">
                         <iconify-icon icon="ph:check-circle-fill" style="font-size:48px;color:var(--color-success);"></iconify-icon>
                         <h3 style="color:var(--color-success);margin-top:var(--space-3);">Authentic Ticket ✓</h3>
-                        <p style="color:var(--color-text-secondary);margin-top:var(--space-2);">Holder: <strong>${result.attendee_name || 'Valid Holder'}</strong></p>
-                        <p style="color:var(--color-text-secondary);">Type: <strong>${result.ticket_type || 'General'}</strong></p>
+                        <p style="color:var(--color-text-secondary);margin-top:var(--space-2);">Holder: <strong>${escapeHtml(result.attendee_name || 'Valid Holder')}</strong></p>
+                        <p style="color:var(--color-text-secondary);">Type: <strong>${escapeHtml(result.ticket_type || 'General')}</strong></p>
                     </div>`
                     : `<div style="text-align:center;padding:var(--space-6);background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:var(--radius-xl);">
                         <iconify-icon icon="ph:x-circle-fill" style="font-size:48px;color:var(--color-error);"></iconify-icon>
                         <h3 style="color:var(--color-error);margin-top:var(--space-3);">Invalid Ticket ✗</h3>
-                        <p style="color:var(--color-text-secondary);margin-top:var(--space-2);">${result.message || 'This ticket code could not be verified.'}</p>
+                        <p style="color:var(--color-text-secondary);margin-top:var(--space-2);">${escapeHtml(result.message || 'This ticket code could not be verified.')}</p>
                     </div>`;
             } else {
                 if (window.TA) {
@@ -859,7 +863,10 @@ async function initEventDetailPage() {
         // Cover image / icon
         const coverEl = document.getElementById('event-cover');
         if (coverEl && event.cover_image) {
-            coverEl.style.backgroundImage = `url('${event.cover_image}')`;
+            const coverUrl = String(event.cover_image || '').trim();
+            if (/^(https?:\/\/|data:image\/)/i.test(coverUrl)) {
+                coverEl.style.backgroundImage = `url("${coverUrl.replace(/["\\]/g, '')}")`;
+            }
             coverEl.style.backgroundSize = 'cover';
             coverEl.style.backgroundPosition = 'center';
         }
@@ -913,7 +920,7 @@ async function initEventDetailPage() {
         const aboutTitle = Array.from(document.querySelectorAll('.detail-section__title')).find(el => el.textContent.trim() === 'About This Event');
         const aboutBody = aboutTitle?.nextElementSibling;
         if (aboutBody) {
-            aboutBody.innerHTML = `<p style="margin-bottom:var(--space-4);">${event.description || 'Event details will be announced soon.'}</p>`;
+            aboutBody.innerHTML = `<p style="margin-bottom:var(--space-4);">${escapeHtml(event.description || 'Event details will be announced soon.')}</p>`;
         }
 
         const venueMap = document.getElementById('venue-map');
@@ -936,12 +943,12 @@ async function initEventDetailPage() {
                     const currency = event.currency || 'GHS';
                     return `
                     <div class="ticket-tier ${isSoldOut ? 'sold-out' : ''} ${index === firstAvailableIndex ? 'selected' : ''}" id="tier-${tier._id}"
-                         data-price="${tier.price / 100}" data-name="${tier.name}" data-tier-id="${tier._id}">
+                         data-price="${tier.price / 100}" data-name="${escapeAttr(tier.name)}" data-tier-id="${escapeAttr(tier._id)}">
                         <div class="ticket-tier__info">
-                            <div class="ticket-tier__name">${tier.name}</div>
-                            <div class="ticket-tier__desc">${tier.description || ''}</div>
+                            <div class="ticket-tier__name">${escapeHtml(tier.name)}</div>
+                            <div class="ticket-tier__desc">${escapeHtml(tier.description || '')}</div>
                         </div>
-                        <div class="ticket-tier__price">${currency} ${priceGhc}</div>
+                        <div class="ticket-tier__price">${escapeHtml(currency)} ${priceGhc}</div>
                         ${isSoldOut ? '<div class="sold-out-badge">Sold Out</div>' : `<div class="ticket-tier__avail" style="font-size:11px;color:var(--color-text-muted);">${cap - sold} remaining</div>`}
                     </div>`;
                 }).join('');
@@ -1008,4 +1015,3 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     // checkout.html is self-contained with inline Convex calls
 });
-

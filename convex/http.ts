@@ -147,6 +147,18 @@ http.route({
     path: "/moolre/webhook",
     method: "POST",
     handler: httpAction(async (ctx, request) => {
+        const webhookSecret = process.env.MOOLRE_WEBHOOK_SECRET;
+        if (!webhookSecret) {
+            console.error("[Moolre] Missing MOOLRE_WEBHOOK_SECRET");
+            return new Response("Webhook not configured", { status: 500 });
+        }
+
+        const suppliedSecret = request.headers.get("x-ticket-africa-webhook-secret") || "";
+        if (!timingSafeEqual(suppliedSecret, webhookSecret)) {
+            console.warn("[Moolre] Invalid webhook secret");
+            return new Response("Invalid signature", { status: 401 });
+        }
+
         let event;
         try {
             event = await request.json();

@@ -1,6 +1,6 @@
 ﻿import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
-import { internal } from "./_generated/api";
+import { api, internal } from "./_generated/api";
 import { action, internalMutation, internalQuery } from "./_generated/server";
 
 async function getCurrentUser(ctx: any) {
@@ -143,14 +143,15 @@ async function findTicketByCode(ctx: any, code: string) {
 // â”€â”€ Orders â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export const listOrdersByOrg = query({
-    args: { org_id: v.id("organizations") },
+    args: { org_id: v.id("organizations"), limit: v.optional(v.number()) },
     handler: async (ctx, args) => {
         await assertOrgAccess(ctx, args.org_id);
+        const limit = Math.min(Math.max(args.limit || 200, 1), 500);
         const orders = await ctx.db
             .query("orders")
             .withIndex("by_org", (q) => q.eq("org_id", args.org_id))
             .order("desc")
-            .collect();
+            .take(limit);
 
         // Enrich with event title
         const enriched = await Promise.all(orders.map(async (o) => {
@@ -162,14 +163,14 @@ export const listOrdersByOrg = query({
 });
 
 export const listOrdersByEvent = query({
-    args: { event_id: v.id("events") },
+    args: { event_id: v.id("events"), limit: v.optional(v.number()) },
     handler: async (ctx, args) => {
         await assertEventOrgAccess(ctx, args.event_id);
         return await ctx.db
             .query("orders")
             .withIndex("by_event", (q) => q.eq("event_id", args.event_id))
             .order("desc")
-            .collect();
+            .take(Math.min(Math.max(args.limit || 200, 1), 500));
     },
 });
 
@@ -434,6 +435,12 @@ export const requestPayout = mutation({
             });
         }
 
+        if (process.env.MOOLRE_AUTO_PROCESS_PAYOUTS === "true") {
+            await ctx.scheduler.runAfter(0, api.organizer.processMoolrePayout, {
+                payout_id: payoutId,
+            });
+        }
+
         return payoutId;
     },
 });
@@ -445,7 +452,6 @@ export const getPayoutForProcessing = internalQuery({
     handler: async (ctx, args) => {
         const payout = await ctx.db.get(args.payout_id);
         if (!payout) throw new Error("Payout not found.");
-        await assertOrgAccess(ctx, payout.org_id);
         return payout;
     },
 });
@@ -593,14 +599,14 @@ export const processMoolrePayout = action({
 });
 
 export const listMessagesByOrg = query({
-    args: { org_id: v.id("organizations") },
+    args: { org_id: v.id("organizations"), limit: v.optional(v.number()) },
     handler: async (ctx, args) => {
         await assertOrgAccess(ctx, args.org_id);
         const messages = await ctx.db
             .query("attendee_messages")
             .withIndex("by_org", (q) => q.eq("org_id", args.org_id))
             .order("desc")
-            .collect();
+            .take(Math.min(Math.max(args.limit || 100, 1), 300));
 
         const enriched = await Promise.all(messages.map(async (m) => {
             const event = m.event_id ? await ctx.db.get(m.event_id) : null;
@@ -666,6 +672,10 @@ export const sendAttendeeMessage = mutation({
             });
         }
 
+        if (paidRecipients.size > 0) {
+            await ctx.scheduler.runAfter(0, api.messages.deliverQueued, { limit: 25 });
+        }
+
         return {
             message_id: messageId,
             sent_to: paidRecipients.size,
@@ -688,16 +698,14 @@ export const getOrgAnalytics = query({
 
         const orders = await ctx.db
             .query("orders")
-            .withIndex("by_org", (q) => q.eq("org_id", args.org_id))
+            .withIndex("by_org_status", (q) => q.eq("org_id", args.org_id).eq("status", "paid"))
             .collect();
 
         const totalRevenue = orders
-            .filter(o => o.status === "paid")
             .reduce((s, o) => s + o.total_amount, 0);
 
-        const totalOrders = orders.filter(o => o.status === "paid").length;
+        const totalOrders = orders.length;
         const totalTickets = orders
-            .filter(o => o.status === "paid")
             .reduce((s, o) => s + o.items.reduce((is, i) => is + i.quantity, 0), 0);
 
         // Revenue per event
@@ -705,7 +713,7 @@ export const getOrgAnalytics = query({
         for (const ev of events) {
             revenueByEvent[ev._id] = { title: ev.title, revenue: 0, orders: 0 };
         }
-        for (const o of orders.filter(ord => ord.status === "paid")) {
+        for (const o of orders) {
             if (revenueByEvent[o.event_id]) {
                 revenueByEvent[o.event_id].revenue += o.total_amount;
                 revenueByEvent[o.event_id].orders += 1;
@@ -721,7 +729,7 @@ export const getOrgAnalytics = query({
             const key = d.toISOString().split("T")[0];
             dailyMap[key] = { date: key, revenue: 0, orders: 0 };
         }
-        for (const o of orders.filter(ord => ord.status === "paid")) {
+        for (const o of orders) {
             const key = o.created_at.split("T")[0];
             if (dailyMap[key]) {
                 dailyMap[key].revenue += o.total_amount;

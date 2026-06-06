@@ -10,4 +10,11 @@ crons.interval(
     { limit: 25 }
 );
 
+crons.interval(
+    "warm public redis cache",
+    { minutes: 10 },
+    api.cache.warmPublicCache,
+    {}
+);
+
 export default crons;
