@@ -75,7 +75,31 @@
               </a>
             </div>
           </div>
-          <div id="clerk-user-button" style="margin-left: 8px;"></div>
+          <div class="nav-user" id="nav-user" hidden>
+            <button class="nav-user__button" id="nav-user-toggle" type="button" aria-haspopup="menu" aria-expanded="false">
+              <span class="nav-user__avatar" id="nav-user-avatar" aria-hidden="true">TA</span>
+              <span class="nav-user__meta">
+                <span class="nav-user__status">Signed in</span>
+                <span class="nav-user__name" id="nav-user-name">Account</span>
+              </span>
+              <iconify-icon icon="hugeicons:arrow-down-01" class="nav-user__chevron"></iconify-icon>
+            </button>
+            <div class="nav-user__menu" id="nav-user-menu" role="menu">
+              <a href="/account.html" class="nav-user__menu-item" role="menuitem">
+                <iconify-icon icon="hugeicons:ticket-01"></iconify-icon>
+                My tickets
+              </a>
+              <a href="/organizer-dashboard.html" class="nav-user__menu-item" role="menuitem">
+                <iconify-icon icon="hugeicons:dashboard-square-01"></iconify-icon>
+                Organizer dashboard
+              </a>
+              <button class="nav-user__menu-item nav-user__menu-item--button" id="nav-signout" type="button" role="menuitem">
+                <iconify-icon icon="hugeicons:logout-03"></iconify-icon>
+                Sign out
+              </button>
+            </div>
+          </div>
+          <div id="clerk-user-button" hidden></div>
           <button class="nav-mobile-toggle" id="nav-mobile-toggle" aria-label="Open menu">
             <span></span><span></span><span></span>
           </button>
@@ -124,6 +148,24 @@
       </a>
     </div>
     <div class="nav-mobile-actions">
+      <div class="nav-mobile-account" id="mob-user-card" hidden>
+        <span class="nav-user__avatar" id="mob-user-avatar" aria-hidden="true">TA</span>
+        <span class="nav-mobile-account__meta">
+          <span class="nav-mobile-account__status">Signed in</span>
+          <span class="nav-mobile-account__name" id="mob-user-name">Account</span>
+        </span>
+      </div>
+      <div class="nav-mobile-account-links" id="mob-user-links" hidden>
+        <a href="/account.html" class="btn btn--secondary btn--full">
+          <iconify-icon icon="hugeicons:ticket-01"></iconify-icon> My tickets
+        </a>
+        <a href="/organizer-dashboard.html" class="btn btn--secondary btn--full">
+          <iconify-icon icon="hugeicons:dashboard-square-01"></iconify-icon> Dashboard
+        </a>
+        <button class="btn btn--ghost btn--full" id="mob-signout" type="button">
+          <iconify-icon icon="hugeicons:logout-03"></iconify-icon> Sign out
+        </button>
+      </div>
       <a href="/login.html" class="btn btn--secondary btn--full" id="mob-login">Sign in</a>
       <div style="display:flex;flex-direction:column;gap:8px;">
         <a href="/signup.html" class="btn btn--primary btn--full" id="mob-signup-attendee" style="display:flex;align-items:center;justify-content:center;gap:8px;">
@@ -479,5 +521,146 @@
   window.addEventListener('DOMContentLoaded', () => {
     setTimeout(initAuthUI, 500); // Give inject a moment
   });
+
+  const initTicketAfricaAuthUI = () => {
+    const loginBtn = document.getElementById('nav-login');
+    const mobileLoginBtn = document.getElementById('mob-login');
+    const signupBtn = document.getElementById('nav-signup');
+    const signupDropdown = document.getElementById('nav-signup-dd');
+    const mobileSignupAttendee = document.getElementById('mob-signup-attendee');
+    const mobileSignupOrganizer = document.getElementById('mob-signup-organizer');
+    const navUser = document.getElementById('nav-user');
+    const navUserToggle = document.getElementById('nav-user-toggle');
+    const navUserName = document.getElementById('nav-user-name');
+    const navUserAvatar = document.getElementById('nav-user-avatar');
+    const navSignout = document.getElementById('nav-signout');
+    const mobileUserCard = document.getElementById('mob-user-card');
+    const mobileUserLinks = document.getElementById('mob-user-links');
+    const mobileUserName = document.getElementById('mob-user-name');
+    const mobileUserAvatar = document.getElementById('mob-user-avatar');
+    const mobileSignout = document.getElementById('mob-signout');
+
+    if (!loginBtn && !mobileLoginBtn && !navUser) return;
+
+    const closeDrawer = () => {
+      const drawer = document.getElementById('nav-mobile-drawer');
+      const overlay = document.getElementById('nav-mobile-overlay');
+      if (drawer) drawer.classList.remove('open');
+      if (overlay) overlay.classList.remove('active');
+      document.body.style.overflow = '';
+    };
+
+    const openSignIn = (e) => {
+      e.preventDefault();
+      closeDrawer();
+      if (window.Clerk?.openSignIn) {
+        window.Clerk.openSignIn();
+      } else {
+        window.location.href = '/login.html';
+      }
+    };
+
+    const setVisible = (el, visible, displayValue) => {
+      if (!el) return;
+      el.hidden = !visible;
+      el.style.display = visible ? (displayValue || '') : 'none';
+    };
+
+    const getDisplayName = (user) => {
+      return user?.fullName || [user?.firstName, user?.lastName].filter(Boolean).join(' ') || user?.primaryEmailAddress?.emailAddress || 'Account';
+    };
+
+    const getInitials = (name) => {
+      const parts = String(name || 'TA').trim().split(/\s+/).filter(Boolean);
+      return (parts.length > 1 ? parts[0][0] + parts[parts.length - 1][0] : parts[0]?.slice(0, 2) || 'TA').toUpperCase();
+    };
+
+    const setAvatar = (el, user, name) => {
+      if (!el) return;
+      if (user?.imageUrl) {
+        el.innerHTML = '<img src="' + escapeHtml(user.imageUrl) + '" alt="">';
+      } else {
+        el.textContent = getInitials(name);
+      }
+    };
+
+    const update = () => {
+      const user = window.Clerk?.user || null;
+      const signedIn = Boolean(user);
+      const name = getDisplayName(user);
+
+      setVisible(loginBtn, !signedIn, 'inline-flex');
+      setVisible(mobileLoginBtn, !signedIn, 'flex');
+      setVisible(signupBtn, !signedIn, 'inline-flex');
+      setVisible(signupDropdown, !signedIn);
+      setVisible(mobileSignupAttendee, !signedIn, 'flex');
+      setVisible(mobileSignupOrganizer, !signedIn, 'flex');
+      setVisible(navUser, signedIn, 'flex');
+      setVisible(mobileUserCard, signedIn, 'flex');
+      setVisible(mobileUserLinks, signedIn, 'flex');
+
+      if (signedIn) {
+        if (navUserName) navUserName.textContent = name;
+        if (mobileUserName) mobileUserName.textContent = name;
+        setAvatar(navUserAvatar, user, name);
+        setAvatar(mobileUserAvatar, user, name);
+      }
+
+      if (loginBtn) loginBtn.onclick = openSignIn;
+      if (mobileLoginBtn) mobileLoginBtn.onclick = openSignIn;
+    };
+
+    if (navUserToggle && !navUserToggle.dataset.taBound) {
+      navUserToggle.dataset.taBound = 'true';
+      navUserToggle.addEventListener('click', () => {
+        const isOpen = navUser?.classList.toggle('is-open');
+        navUserToggle.setAttribute('aria-expanded', String(Boolean(isOpen)));
+      });
+      document.addEventListener('click', (event) => {
+        if (navUser && !navUser.contains(event.target)) {
+          navUser.classList.remove('is-open');
+          navUserToggle.setAttribute('aria-expanded', 'false');
+        }
+      });
+    }
+
+    const signOut = async () => {
+      try {
+        await window.Clerk?.signOut?.();
+      } finally {
+        window.location.href = '/index.html';
+      }
+    };
+
+    if (navSignout && !navSignout.dataset.taBound) {
+      navSignout.dataset.taBound = 'true';
+      navSignout.addEventListener('click', signOut);
+    }
+
+    if (mobileSignout && !mobileSignout.dataset.taBound) {
+      mobileSignout.dataset.taBound = 'true';
+      mobileSignout.addEventListener('click', signOut);
+    }
+
+    update();
+
+    if (window.Clerk?.addListener && !window.Clerk.__taVisibleAuthBound) {
+      window.Clerk.__taVisibleAuthBound = true;
+      window.Clerk.addListener(update);
+    }
+  };
+
+  const waitForTicketAfricaAuthUI = (attemptsLeft = 30) => {
+    initTicketAfricaAuthUI();
+    if (window.Clerk) {
+      Promise.resolve(window.Clerk.load?.()).catch(() => {}).finally(initTicketAfricaAuthUI);
+      return;
+    }
+    if (attemptsLeft > 0) setTimeout(() => waitForTicketAfricaAuthUI(attemptsLeft - 1), 200);
+  };
+
+  window.addEventListener('clerk-ready', initTicketAfricaAuthUI);
+  window.addEventListener('load', () => waitForTicketAfricaAuthUI());
+  window.addEventListener('DOMContentLoaded', () => setTimeout(waitForTicketAfricaAuthUI, 250));
 
 })();
