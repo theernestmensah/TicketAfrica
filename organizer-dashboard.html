@@ -178,11 +178,128 @@
                     </div>
                 </div>
             </section>
-            <section id="section-my-events" style="display:none;"><div class="page-header section-toolbar"><div><h1>My Events</h1><p class="dash-section-note">Create and manage real events that are ready for Ticket Africa buyers.</p></div><div class="page-header__actions"><button class="btn btn--primary btn--sm" onclick="openCreateModal()">+ New Event</button></div></div><div class="panel"><div id="my-events-container"></div></div></section>
-            <section id="section-orders" style="display:none;"><div class="page-header section-toolbar"><div><h1>Orders</h1><p class="dash-section-note">Paid and pending transactions will appear here after checkout.</p></div><div class="section-controls"><select id="orders-event-filter" class="dash-select" onchange="loadOrders()"><option value="">All Events</option></select><input id="orders-search" class="dash-input" type="search" placeholder="Search buyer or email" oninput="filterOrders()"></div></div><div class="panel"><div class="panel__header"><div class="panel__title">Transaction History</div></div><div id="orders-container"><div class="empty-state"><div class="empty-state__icon"><iconify-icon icon="hugeicons:loading-03"></iconify-icon></div><div class="empty-state__title">Loading orders...</div></div></div></div></section>
-            <section id="section-attendees" style="display:none;"><div class="page-header section-toolbar"><div><h1>Attendees</h1><p class="dash-section-note">Guest records are created from real ticket purchases.</p></div><div class="section-controls"><select id="attendees-event-filter" class="dash-select" onchange="loadAttendees()"><option value="">All Events</option></select><input id="attendees-search" class="dash-input" type="search" placeholder="Search attendee" oninput="filterAttendees()"></div></div><div class="panel"><div class="panel__header"><div class="panel__title">Guest List</div></div><div id="attendees-container"><div class="empty-state"><div class="empty-state__icon"><iconify-icon icon="hugeicons:loading-03"></iconify-icon></div><div class="empty-state__title">Loading attendees...</div></div></div></div></section>
+            <section id="section-my-events" class="dash-section" style="display:none;">
+                <div class="page-header section-toolbar">
+                    <div>
+                        <div class="page-header__greeting">Event Operations</div>
+                        <h1>My Events</h1>
+                        <p class="dash-section-note">Create, publish, scan, and manage every event from one clean workspace.</p>
+                    </div>
+                    <div class="page-header__actions">
+                        <button class="btn btn--primary btn--sm" onclick="openCreateModal()"><iconify-icon icon="hugeicons:add-01"></iconify-icon> New Event</button>
+                    </div>
+                </div>
+                <div class="dash-kpi-row" id="events-kpis">
+                    <div class="dash-kpi"><span>Events</span><strong id="events-kpi-total">-</strong></div>
+                    <div class="dash-kpi"><span>Live</span><strong id="events-kpi-live">-</strong></div>
+                    <div class="dash-kpi"><span>Tickets Sold</span><strong id="events-kpi-tickets">-</strong></div>
+                    <div class="dash-kpi"><span>Capacity Used</span><strong id="events-kpi-capacity">-</strong></div>
+                </div>
+                <div class="panel dash-data-panel">
+                    <div class="panel__header">
+                        <div>
+                            <div class="panel__title">Event Inventory</div>
+                            <div class="panel__subtitle">Status, sales progress, revenue, and event-day tools.</div>
+                        </div>
+                    </div>
+                    <div id="my-events-container"></div>
+                </div>
+            </section>
+            <section id="section-orders" class="dash-section" style="display:none;">
+                <div class="page-header section-toolbar">
+                    <div>
+                        <div class="page-header__greeting">Sales Desk</div>
+                        <h1>Orders</h1>
+                        <p class="dash-section-note">Track paid and pending transactions with quick buyer search and event filtering.</p>
+                    </div>
+                </div>
+                <div class="dash-filter-panel">
+                    <div class="dash-field">
+                        <label class="dash-label">Event</label>
+                        <select id="orders-event-filter" class="dash-select" onchange="loadOrders()"><option value="">All Events</option></select>
+                    </div>
+                    <div class="dash-field dash-field--grow">
+                        <label class="dash-label">Search</label>
+                        <input id="orders-search" class="dash-input" type="search" placeholder="Buyer name or email" oninput="filterOrders()">
+                    </div>
+                </div>
+                <div class="panel dash-data-panel">
+                    <div class="panel__header">
+                        <div>
+                            <div class="panel__title">Transaction History</div>
+                            <div class="panel__subtitle" id="orders-panel-subtitle">Loading order activity...</div>
+                        </div>
+                    </div>
+                    <div id="orders-container"><div class="empty-state"><div class="empty-state__icon"><iconify-icon icon="hugeicons:loading-03"></iconify-icon></div><div class="empty-state__title">Loading orders...</div></div></div>
+                </div>
+            </section>
+            <section id="section-attendees" class="dash-section" style="display:none;">
+                <div class="page-header section-toolbar">
+                    <div>
+                        <div class="page-header__greeting">Guest Management</div>
+                        <h1>Attendees</h1>
+                        <p class="dash-section-note">Search ticket holders, check purchase status, and prepare guest lists for event day.</p>
+                    </div>
+                </div>
+                <div class="dash-filter-panel">
+                    <div class="dash-field">
+                        <label class="dash-label">Event</label>
+                        <select id="attendees-event-filter" class="dash-select" onchange="loadAttendees()"><option value="">All Events</option></select>
+                    </div>
+                    <div class="dash-field dash-field--grow">
+                        <label class="dash-label">Search</label>
+                        <input id="attendees-search" class="dash-input" type="search" placeholder="Attendee name, email, or phone" oninput="filterAttendees()">
+                    </div>
+                </div>
+                <div class="panel dash-data-panel">
+                    <div class="panel__header">
+                        <div>
+                            <div class="panel__title">Guest List</div>
+                            <div class="panel__subtitle" id="attendees-panel-subtitle">Loading attendee records...</div>
+                        </div>
+                    </div>
+                    <div id="attendees-container"><div class="empty-state"><div class="empty-state__icon"><iconify-icon icon="hugeicons:loading-03"></iconify-icon></div><div class="empty-state__title">Loading attendees...</div></div></div>
+                </div>
+            </section>
             <section id="section-analytics" style="display:none;"><div class="page-header"><div><h1>Analytics</h1></div></div><div class="stats-grid" id="analytics-stats" style="margin-bottom:24px;"><div class="stat-card"><div class="stat-card__label"><iconify-icon icon="hugeicons:money-bag-02"></iconify-icon> Total Revenue</div><div class="stat-card__value" id="a-revenue">-</div><div class="stat-card__sub">All paid orders</div></div><div class="stat-card"><div class="stat-card__label"><iconify-icon icon="hugeicons:ticket-02"></iconify-icon> Tickets Sold</div><div class="stat-card__value" id="a-tickets">-</div><div class="stat-card__sub">Across all events</div></div><div class="stat-card"><div class="stat-card__label"><iconify-icon icon="hugeicons:package-delivered"></iconify-icon> Total Orders</div><div class="stat-card__value" id="a-orders">-</div><div class="stat-card__sub">Completed transactions</div></div><div class="stat-card"><div class="stat-card__label"><iconify-icon icon="hugeicons:calendar-01"></iconify-icon> Active Events</div><div class="stat-card__value" id="a-events">-</div><div class="stat-card__sub">Currently live</div></div></div><div class="content-grid"><div class="panel"><div class="panel__header"><div class="panel__title">Daily Revenue (Last 7 Days)</div></div><div class="panel__body" style="padding:20px;"><canvas id="revenue-chart" height="180" style="width:100%;"></canvas></div></div><div class="panel"><div class="panel__header"><div class="panel__title">Revenue by Event</div></div><div id="event-revenue-list" style="padding:8px 0;"></div></div></div></section>
-            <section id="section-payouts" style="display:none;"><div class="page-header section-toolbar"><div><h1>Payouts</h1><p class="dash-section-note">Request settlement only after real paid orders create an available balance.</p></div><div class="page-header__actions"><button class="btn btn--primary btn--sm" onclick="document.getElementById('payout-form-wrap').style.display=document.getElementById('payout-form-wrap').style.display==='none'?'block':'none'">+ Request Payout</button></div></div><div class="panel-stack"><div id="payout-form-wrap" style="display:none;" class="panel"><div class="panel__header"><div class="panel__title">New Payout Request</div></div><div class="panel__body"><div class="dash-form-grid"><div class="dash-field"><label class="dash-label">Amount (minor units)</label><input id="po-amount" class="dash-input" type="number" min="1" placeholder="e.g. 50000"></div><div class="dash-field"><label class="dash-label">Method</label><select id="po-method" class="dash-select"><option value="momo">Mobile Money</option><option value="bank">Bank Transfer</option><option value="ussd">USSD</option></select></div><div class="dash-field"><label class="dash-label">Provider</label><select id="po-provider" class="dash-select"><option value="MTN">MTN MoMo</option><option value="Vodafone">Vodafone Cash</option><option value="AirtelTigo">AirtelTigo Money</option><option value="GCB">GCB Bank</option><option value="Ecobank">Ecobank</option><option value="Stanbic">Stanbic Bank</option></select></div></div><div class="dash-form-grid dash-form-grid--two"><div class="dash-field"><label class="dash-label">Account / Phone</label><input id="po-number" class="dash-input" type="text" placeholder="e.g. 0241234567"></div><div class="dash-field"><label class="dash-label">Account Name</label><input id="po-name" class="dash-input" type="text" placeholder="Full name on account"></div></div><div class="dash-form-actions"><button onclick="submitPayoutRequest()" class="btn btn--primary">Submit Request</button></div></div></div><div class="panel"><div class="panel__header"><div class="panel__title">Payout History</div></div><div id="payouts-container"><div class="empty-state"><div class="empty-state__icon"><iconify-icon icon="hugeicons:loading-03"></iconify-icon></div><div class="empty-state__title">Loading payouts...</div></div></div></div></div></section>
+            <section id="section-payouts" class="dash-section" style="display:none;">
+                <div class="page-header section-toolbar">
+                    <div>
+                        <div class="page-header__greeting">Revenue</div>
+                        <h1>Payouts</h1>
+                        <p class="dash-section-note">Review settlement activity and request withdrawals from your available balance.</p>
+                    </div>
+                    <div class="page-header__actions">
+                        <button class="btn btn--primary btn--sm" onclick="document.getElementById('payout-form-wrap').style.display=document.getElementById('payout-form-wrap').style.display==='none'?'block':'none'"><iconify-icon icon="hugeicons:money-send-02"></iconify-icon> Request Payout</button>
+                    </div>
+                </div>
+                <div class="payout-workspace">
+                    <div class="payout-card payout-card--wide">
+                        <div class="payout-label">Available Balance</div>
+                        <div class="payout-amount" id="payout-balance-large">GHS 0.00</div>
+                        <div class="payout-helper">New paid orders increase this balance after settlement checks.</div>
+                    </div>
+                    <div id="payout-form-wrap" style="display:none;" class="panel">
+                        <div class="panel__header"><div><div class="panel__title">New Payout Request</div><div class="panel__subtitle">Enter account details exactly as registered with the provider.</div></div></div>
+                        <div class="panel__body">
+                            <div class="dash-form-grid">
+                                <div class="dash-field"><label class="dash-label">Amount (minor units)</label><input id="po-amount" class="dash-input" type="number" min="1" placeholder="e.g. 50000"></div>
+                                <div class="dash-field"><label class="dash-label">Method</label><select id="po-method" class="dash-select"><option value="momo">Mobile Money</option><option value="bank">Bank Transfer</option><option value="ussd">USSD</option></select></div>
+                                <div class="dash-field"><label class="dash-label">Provider</label><select id="po-provider" class="dash-select"><option value="MTN">MTN MoMo</option><option value="Vodafone">Vodafone Cash</option><option value="AirtelTigo">AirtelTigo Money</option><option value="GCB">GCB Bank</option><option value="Ecobank">Ecobank</option><option value="Stanbic">Stanbic Bank</option></select></div>
+                            </div>
+                            <div class="dash-form-grid dash-form-grid--two">
+                                <div class="dash-field"><label class="dash-label">Account / Phone</label><input id="po-number" class="dash-input" type="text" placeholder="e.g. 0241234567"></div>
+                                <div class="dash-field"><label class="dash-label">Account Name</label><input id="po-name" class="dash-input" type="text" placeholder="Full name on account"></div>
+                            </div>
+                            <div class="dash-form-actions"><button onclick="submitPayoutRequest()" class="btn btn--primary">Submit Request</button></div>
+                        </div>
+                    </div>
+                    <div class="panel dash-data-panel">
+                        <div class="panel__header"><div><div class="panel__title">Payout History</div><div class="panel__subtitle" id="payouts-panel-subtitle">Loading settlement activity...</div></div></div>
+                        <div id="payouts-container"><div class="empty-state"><div class="empty-state__icon"><iconify-icon icon="hugeicons:loading-03"></iconify-icon></div><div class="empty-state__title">Loading payouts...</div></div></div>
+                    </div>
+                </div>
+            </section>
             <section id="section-promos" style="display:none;"><div class="page-header section-toolbar"><div><h1>Promo Codes</h1><p class="dash-section-note">Create discounts for your own live events when you are ready to sell.</p></div><div class="page-header__actions"><button class="btn btn--primary btn--sm" onclick="togglePromoForm()">+ Create Code</button></div></div><div class="panel-stack"><div id="promo-form-wrap" style="display:none;" class="panel"><div class="panel__header"><div class="panel__title">New Promo Code</div></div><div class="panel__body"><div class="dash-form-grid"><div class="dash-field"><label class="dash-label">Code *</label><input id="pc-code" class="dash-input" type="text" placeholder="e.g. EARLYBIRD"></div><div class="dash-field"><label class="dash-label">Discount Type</label><select id="pc-type" class="dash-select"><option value="percent">Percentage (%)</option><option value="fixed">Fixed Amount</option></select></div><div class="dash-field"><label class="dash-label">Value *</label><input id="pc-value" class="dash-input" type="number" min="1" placeholder="e.g. 20 for 20%"></div><div class="dash-field"><label class="dash-label">Max Uses</label><input id="pc-max" class="dash-input" type="number" min="1" placeholder="Unlimited if blank"></div></div><div class="dash-form-grid dash-form-grid--two"><div class="dash-field"><label class="dash-label">Description</label><input id="pc-desc" class="dash-input" type="text" placeholder="Optional note"></div><div class="dash-field"><label class="dash-label">Expires At</label><input id="pc-expires" class="dash-input" type="datetime-local"></div></div><div class="dash-form-actions"><button onclick="submitPromoCode()" class="btn btn--primary">Create Promo Code</button></div></div></div><div class="panel"><div class="panel__header"><div class="panel__title">Your Promo Codes</div></div><div id="promos-container"><div class="empty-state"><div class="empty-state__icon"><iconify-icon icon="hugeicons:loading-03"></iconify-icon></div><div class="empty-state__title">Loading promo codes...</div></div></div></div></div></section>
             <section id="section-updates" style="display:none;"><div class="page-header section-toolbar"><div><h1>Attendee Updates</h1><p class="dash-section-note">Send event updates only to real attendees with paid tickets.</p></div></div><div class="content-grid"><div class="panel"><div class="panel__header"><div class="panel__title">Compose Message</div></div><div class="panel__body"><div class="dash-form-grid dash-form-grid--two"><div class="dash-field"><label class="dash-label">Send to</label><select id="msg-event" class="dash-select"><option value="">All Events (all attendees)</option></select></div><div class="dash-field"><label class="dash-label">Channel</label><select id="msg-channel" class="dash-select"><option value="email">Email only</option><option value="sms">SMS only</option><option value="both">Email + SMS</option></select></div></div><div class="dash-field" style="margin-bottom:14px;"><label class="dash-label">Subject</label><input id="msg-subject" class="dash-input" type="text" placeholder="e.g. Important update"></div><div class="dash-field"><label class="dash-label">Message</label><textarea id="msg-body" class="dash-textarea" rows="5" placeholder="Write your message to attendees here..."></textarea></div><div class="dash-form-actions"><button onclick="sendMessage()" class="btn btn--primary btn--full">Send Message</button></div></div></div><div class="panel"><div class="panel__header"><div class="panel__title">Sent Messages</div></div><div id="messages-container"><div class="empty-state"><div class="empty-state__icon"><iconify-icon icon="hugeicons:loading-03"></iconify-icon></div><div class="empty-state__title">Loading messages...</div></div></div></div></div></section>
             <section id="section-voting" style="display:none;"><div class="page-header section-toolbar"><div><h1>Voting &amp; Polls</h1><p class="dash-section-note">Create audience polls for events you control.</p></div><div class="page-header__actions"><button class="btn btn--primary btn--sm" onclick="togglePollForm()">+ Create New Poll</button></div></div><div class="panel-stack"><div id="poll-form-wrap" style="display:none;" class="panel"><div class="panel__header"><div class="panel__title">New Poll Configuration</div></div><div class="panel__body"><div class="dash-form-grid dash-form-grid--two"><div class="dash-field"><label class="dash-label">Poll Title *</label><input id="poll-title" class="dash-input" type="text" placeholder="e.g. Best Artist of the Year"></div><div class="dash-form-grid dash-form-grid--two" style="margin-bottom:0;"><div class="dash-field"><label class="dash-label">Start Date</label><input id="poll-start" class="dash-input" type="datetime-local"></div><div class="dash-field"><label class="dash-label">End Date</label><input id="poll-end" class="dash-input" type="datetime-local"></div></div></div><div class="dash-field" style="margin-bottom:16px;"><label class="dash-label">Description</label><textarea id="poll-desc" class="dash-textarea" placeholder="Explain what people are voting for..."></textarea></div><div class="dash-field"><label class="dash-label">Options (At least 2)</label><div id="poll-options-list" class="dash-form-grid dash-form-grid--two" style="margin-bottom:10px;"><input type="text" class="poll-option-input dash-input" placeholder="Option 1"><input type="text" class="poll-option-input dash-input" placeholder="Option 2"></div><button class="btn btn--secondary btn--sm" onclick="addPollOptionRow()">+ Add Option</button></div><div class="dash-form-actions"><button onclick="submitPoll()" class="btn btn--primary">Create Poll</button><button onclick="togglePollForm()" class="btn btn--secondary btn--sm">Cancel</button></div></div></div><div class="panel"><div class="panel__header"><div class="panel__title">Active &amp; Past Polls</div></div><div id="polls-container"><div class="empty-state"><div class="empty-state__icon"><iconify-icon icon="hugeicons:loading-03"></iconify-icon></div><div class="empty-state__title">Loading polls...</div></div></div></div></div></section>
@@ -271,6 +388,12 @@
             if (!container) return;
 
             if (!events || events.length === 0) {
+                if (containerId === 'my-events-container') {
+                    document.getElementById('events-kpi-total').textContent = '0';
+                    document.getElementById('events-kpi-live').textContent = '0';
+                    document.getElementById('events-kpi-tickets').textContent = '0';
+                    document.getElementById('events-kpi-capacity').textContent = '0%';
+                }
                 container.innerHTML = `
                 <div class="empty-state">
                     <div class="empty-state__icon"><iconify-icon icon="hugeicons:calendar-add-02"></iconify-icon></div>
@@ -284,6 +407,16 @@
             }
 
             const shown = limit ? events.slice(0, limit) : events;
+            if (containerId === 'my-events-container') {
+                const total = events.length;
+                const live = events.filter(ev => ev.status === 'published').length;
+                const soldTotal = events.reduce((sum, ev) => sum + (ev.tickets_sold ?? 0), 0);
+                const capacityTotal = events.reduce((sum, ev) => sum + (ev.ticket_capacity ?? ev.capacity ?? 0), 0);
+                document.getElementById('events-kpi-total').textContent = total.toLocaleString();
+                document.getElementById('events-kpi-live').textContent = live.toLocaleString();
+                document.getElementById('events-kpi-tickets').textContent = soldTotal.toLocaleString();
+                document.getElementById('events-kpi-capacity').textContent = capacityTotal > 0 ? Math.round((soldTotal / capacityTotal) * 100) + '%' : '0%';
+            }
             const rows = shown.map(ev => {
                 const sold = ev.tickets_sold ?? 0;
                 const capacity = ev.ticket_capacity ?? ev.capacity ?? 0;
@@ -312,30 +445,24 @@
                     </td>
                     <td data-label="Revenue" class="td-value">${ev.currency || 'GHS'} ${((sold * (ev.base_price ?? 0)) / 100).toFixed(2)}</td>
                     <td data-label="Actions">
+                        <div class="inline-actions">
                         <a href="scanner.html?event_id=${ev._id}" title="Open scanner for this event"
-                            style="display:inline-flex;align-items:center;background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.22);border-radius:7px;padding:5px 10px;color:#60a5fa;font-size:12px;text-decoration:none;margin-right:4px;transition:all 150ms;">Scan</a>
+                            class="dash-mini-button dash-mini-button--info">Scan</a>
                         <button onclick="openManagePanel('${ev._id}', '${(ev.title || '').replace(/'/g, "\\'")}')"
-                            style="background:none;border:1px solid rgba(255,255,255,0.08);border-radius:7px;padding:5px 12px;color:rgba(255,255,255,0.5);font-size:12px;cursor:pointer;transition:all 150ms;"
-                            onmouseover="this.style.borderColor='rgba(139,92,246,0.4)';this.style.color='#f0f0f5'"
-                            onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';this.style.color='rgba(255,255,255,0.5)'">Manage
+                            class="dash-mini-button">Manage
                         </button>
                         ${ev.status === 'draft' ? `<button onclick="handlePublish('${ev._id}')"
-                            style="background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);border-radius:7px;padding:5px 10px;color:#22c55e;font-size:12px;cursor:pointer;margin-left:4px;transition:all 150ms;"
-                            onmouseover="this.style.background='rgba(34,197,94,0.2)'"
-                            onmouseout="this.style.background='rgba(34,197,94,0.1)'">Publish</button>` : `<button onclick="handleCancel('${ev._id}')"
-                            style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:7px;padding:5px 10px;color:#f59e0b;font-size:12px;cursor:pointer;margin-left:4px;transition:all 150ms;"
-                            onmouseover="this.style.background='rgba(245,158,11,0.2)'"
-                            onmouseout="this.style.background='rgba(245,158,11,0.1)'">Unpublish</button>`}
+                            class="dash-mini-button dash-mini-button--success">Publish</button>` : `<button onclick="handleCancel('${ev._id}')"
+                            class="dash-mini-button dash-mini-button--warn">Unpublish</button>`}
                         <button onclick="handleDelete('${ev._id}', '${(ev.title || '').replace(/'/g, "\\'")}')"
-                            style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:7px;padding:5px 10px;color:#ef4444;font-size:12px;cursor:pointer;margin-left:4px;transition:all 150ms;"
-                            onmouseover="this.style.background='rgba(239,68,68,0.18)'"
-                            onmouseout="this.style.background='rgba(239,68,68,0.08)'">Delete</button>
+                            class="dash-mini-button dash-mini-button--danger">Delete</button>
+                        </div>
                     </td>
                 </tr>`;
             }).join('');
 
             container.innerHTML = `
-            <div style="overflow-x:auto;">
+            <div class="table-shell">
                 <table class="events-table">
                     <thead>
                         <tr>

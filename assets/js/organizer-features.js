@@ -76,6 +76,11 @@ function statusChip(status, map) {
     return `<span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;background:${cfg.bg};color:${cfg.color};">${esc(cfg.label)}</span>`;
 }
 
+function setText(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value;
+}
+
 const ORDER_STATUS = {
     paid: { label: 'Paid', color: '#22c55e', bg: 'rgba(34,197,94,0.12)' },
     pending: { label: 'Pending', color: '#f59e0b', bg: 'rgba(245,158,11,0.12)' },
@@ -125,12 +130,16 @@ async function loadOrders() {
     try { await waitForOrgId(); } catch { return; }
     if (!window.ConvexDB) return;
     const container = document.getElementById('orders-container');
+    const eventId = document.getElementById('orders-event-filter')?.value || null;
     try {
-        const orders = await window.ConvexDB.listOrdersByOrg(_orgId);
+        const orders = eventId && window.ConvexDB.listOrdersByEvent
+            ? await window.ConvexDB.listOrdersByEvent(eventId)
+            : await window.ConvexDB.listOrdersByOrg(_orgId);
         _allOrders = orders || [];
         renderOrders(_allOrders);
     } catch (e) {
         container.innerHTML = emptyState('hugeicons:package-delivered', 'No orders yet', 'Orders will appear here once attendees purchase tickets.');
+        setText('orders-panel-subtitle', 'No transaction activity yet.');
     }
 }
 
@@ -138,8 +147,12 @@ function renderOrders(orders) {
     const container = document.getElementById('orders-container');
     if (!orders.length) {
         container.innerHTML = emptyState('hugeicons:package-delivered', 'No orders yet', 'Orders will appear here once attendees purchase tickets.');
+        setText('orders-panel-subtitle', 'No orders match the current view.');
         return;
     }
+    const paidCount = orders.filter(o => o.status === 'paid').length;
+    const revenue = orders.filter(o => o.status === 'paid').reduce((sum, o) => sum + (o.total_amount || 0), 0);
+    setText('orders-panel-subtitle', `${orders.length.toLocaleString()} orders, ${paidCount.toLocaleString()} paid, ${fmtCurrency(revenue)} collected`);
     const rows = orders.map(o => `<tr>
         <td><div class="td-title">${esc(o.buyer_name)}</div><div class="td-meta">${esc(o.buyer_email)}</div></td>
         <td class="td-meta">${esc(o.event_title || '-')}</td>
@@ -154,7 +167,7 @@ function renderOrders(orders) {
 function filterOrders() {
     const q = (document.getElementById('orders-search')?.value || '').toLowerCase();
     const filtered = _allOrders.filter(o =>
-        o.buyer_name.toLowerCase().includes(q) || o.buyer_email.toLowerCase().includes(q)
+        (o.buyer_name || '').toLowerCase().includes(q) || (o.buyer_email || '').toLowerCase().includes(q)
     );
     renderOrders(filtered);
 }
@@ -188,8 +201,12 @@ function renderAttendees(orders) {
     const container = document.getElementById('attendees-container');
     if (!orders.length) {
         container.innerHTML = emptyState('hugeicons:user-multiple-02', 'No attendees yet', 'Ticket buyers will appear here.');
+        setText('attendees-panel-subtitle', 'No guest records match the current view.');
         return;
     }
+    const paidCount = orders.filter(o => o.status === 'paid').length;
+    const ticketCount = orders.reduce((sum, o) => sum + ((o.items || []).reduce((itemSum, item) => itemSum + (item.quantity || 0), 0)), 0);
+    setText('attendees-panel-subtitle', `${orders.length.toLocaleString()} buyers, ${ticketCount.toLocaleString()} tickets, ${paidCount.toLocaleString()} paid orders`);
     const rows = orders.map(o => `<tr>
         <td>
             <div class="td-title">${esc(o.buyer_name)}</div>
@@ -207,8 +224,8 @@ function renderAttendees(orders) {
 function filterAttendees() {
     const q = (document.getElementById('attendees-search')?.value || '').toLowerCase();
     const filtered = _attendeeData.filter(o =>
-        o.buyer_name.toLowerCase().includes(q) ||
-        o.buyer_email.toLowerCase().includes(q) ||
+        (o.buyer_name || '').toLowerCase().includes(q) ||
+        (o.buyer_email || '').toLowerCase().includes(q) ||
         (o.buyer_phone || '').includes(q)
     );
     renderAttendees(filtered);
@@ -323,6 +340,10 @@ async function loadPayouts() {
         if (payoutBalanceEl && balance) {
             payoutBalanceEl.textContent = fmtCurrency(balance.available, balance.currency || 'GHS');
         }
+        const payoutBalanceLargeEl = document.getElementById('payout-balance-large');
+        if (payoutBalanceLargeEl && balance) {
+            payoutBalanceLargeEl.textContent = fmtCurrency(balance.available, balance.currency || 'GHS');
+        }
         const amountInput = document.getElementById('po-amount');
         if (amountInput && balance) {
             amountInput.max = String(balance.available);
@@ -339,8 +360,12 @@ async function loadPayouts() {
             : '';
         if (!payouts || !payouts.length) {
             container.innerHTML = ledgerHtml + emptyState('hugeicons:money-send-02', 'No payouts yet', 'Submit a payout request to receive your earnings.');
+            setText('payouts-panel-subtitle', 'No payout requests have been submitted yet.');
             return;
         }
+        const pendingCount = payouts.filter(p => p.status === 'pending' || p.status === 'processing').length;
+        const payoutTotal = payouts.reduce((sum, p) => sum + (p.amount || 0), 0);
+        setText('payouts-panel-subtitle', `${payouts.length.toLocaleString()} requests, ${pendingCount.toLocaleString()} pending, ${fmtCurrency(payoutTotal)} requested`);
         const rows = payouts.map(p => `<tr>
             <td class="td-value">${fmtCurrency(p.amount, p.currency)}</td>
             <td class="td-meta">${p.payout_fee ? fmtCurrency(p.payout_fee, p.currency) : 'No fee'}</td>
@@ -354,6 +379,7 @@ async function loadPayouts() {
         container.innerHTML = ledgerHtml + renderTable(['Net Amount', 'Fee', 'Method', 'Account', 'Status', 'Reference', 'Requested', 'Action'], rows);
     } catch (e) {
         container.innerHTML = emptyState('hugeicons:money-send-02', 'Could not load payouts', '');
+        setText('payouts-panel-subtitle', 'Payout activity could not be loaded.');
     }
 }
 
