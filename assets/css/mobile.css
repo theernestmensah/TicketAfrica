@@ -56,60 +56,9 @@ input, select, textarea, button {
 }
 
 /* ─── 5. Organizer Dashboard ─────────────────────────────── */
-@media (max-width: 1024px) {
-    .dash-layout {
-        grid-template-columns: 1fr !important;
-    }
-    .dash-sidebar {
-        display: none !important;
-    }
-    .dash-main {
-        padding: var(--space-4) !important;
-    }
-}
-
 @media (max-width: 768px) {
-    /* Mobile nav bar replaces sidebar */
     .dash-mobile-nav {
         display: flex !important;
-    }
-
-    /* Stats grid → 2 cols */
-    .overview-stats {
-        grid-template-columns: repeat(2, 1fr) !important;
-        gap: var(--space-3) !important;
-    }
-
-    /* Tables → scrollable */
-    .events-table,
-    .orders-table,
-    .staff-table {
-        min-width: 600px;
-    }
-
-    /* Section header wrap */
-    .section-header {
-        flex-direction: column !important;
-        align-items: flex-start !important;
-        gap: var(--space-3) !important;
-    }
-    .section-header .btn {
-        width: 100%;
-        justify-content: center;
-    }
-
-    /* Dashboard stat card font */
-    .stat-value {
-        font-size: 1.5rem !important;
-    }
-}
-
-@media (max-width: 480px) {
-    .overview-stats {
-        grid-template-columns: 1fr !important;
-    }
-    .dash-main {
-        padding: var(--space-3) !important;
     }
 }
 
@@ -121,9 +70,11 @@ input, select, textarea, button {
     left: 0;
     right: 0;
     z-index: 200;
-    background: var(--color-bg-elevated);
+    background: rgba(25, 25, 25, 0.94);
     border-top: 1px solid var(--color-border);
-    padding: var(--space-2) 0 env(safe-area-inset-bottom, 8px);
+    box-shadow: 0 -12px 30px rgba(0, 0, 0, 0.18);
+    backdrop-filter: blur(18px);
+    padding: 8px max(8px, env(safe-area-inset-left)) calc(8px + env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-right));
     justify-content: space-around;
     align-items: center;
 }
@@ -133,18 +84,19 @@ input, select, textarea, button {
     flex-direction: column;
     align-items: center;
     gap: 2px;
-    padding: var(--space-2);
-    color: var(--color-text-muted);
-    font-size: 9px;
-    font-weight: 600;
-    text-transform: uppercase;
+    padding: 8px 6px;
+    color: rgba(255, 255, 255, 0.62);
+    font-size: 10px;
+    font-weight: 700;
     letter-spacing: 0;
     cursor: pointer;
     background: none;
     border: none;
     font-family: var(--font-body);
-    transition: color var(--transition-fast);
-    min-width: 52px;
+    transition: color var(--transition-fast), background var(--transition-fast);
+    min-width: 56px;
+    min-height: 48px;
+    border-radius: 12px;
     text-align: center;
 }
 
@@ -155,13 +107,14 @@ input, select, textarea, button {
 
 .dash-mobile-nav__item.active,
 .dash-mobile-nav__item:hover {
-    color: var(--color-secondary);
+    background: rgba(var(--color-secondary-rgb), 0.16);
+    color: #ffffff;
 }
 
 /* Pad dash-main so content isn't behind mobile nav */
 @media (max-width: 768px) {
-    .dash-main {
-        padding-bottom: 70px !important;
+    .dash-content {
+        padding-bottom: 92px !important;
     }
 }
 

@@ -295,7 +295,7 @@
                         : '<span class="badge badge-scheduled">Scheduled</span>';
 
                 return `<tr>
-                    <td>
+                    <td data-label="Event">
                         <div class="event-name-cell">
                             <div class="event-thumb"><iconify-icon icon="hugeicons:calendar-03"></iconify-icon></div>
                             <div>
@@ -304,14 +304,14 @@
                             </div>
                         </div>
                     </td>
-                    <td>${statusBadge}</td>
-                    <td>
+                    <td data-label="Status">${statusBadge}</td>
+                    <td data-label="Tickets">
                         <div class="td-value">${sold}</div>
                         <div class="mini-bar" style="margin-top:4px;"><div class="mini-bar__fill" style="width:${pct}%"></div></div>
                          <div class="td-muted" style="margin-top:2px;">${capacity ? `${pct}% of ${capacity}` : 'No tiers yet'}</div>
                     </td>
-                    <td class="td-value">${ev.currency || 'GHS'} ${((sold * (ev.base_price ?? 0)) / 100).toFixed(2)}</td>
-                    <td>
+                    <td data-label="Revenue" class="td-value">${ev.currency || 'GHS'} ${((sold * (ev.base_price ?? 0)) / 100).toFixed(2)}</td>
+                    <td data-label="Actions">
                         <a href="scanner.html?event_id=${ev._id}" title="Open scanner for this event"
                             style="display:inline-flex;align-items:center;background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.22);border-radius:7px;padding:5px 10px;color:#60a5fa;font-size:12px;text-decoration:none;margin-right:4px;transition:all 150ms;">Scan</a>
                         <button onclick="openManagePanel('${ev._id}', '${(ev.title || '').replace(/'/g, "\\'")}')"

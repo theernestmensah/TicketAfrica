@@ -104,11 +104,18 @@ function emptyState(icon, title, desc) {
 
 function renderTable(cols, rows) {
     if (!rows.length) return '';
+    const labelledRows = rows.map(row => {
+        let cellIndex = 0;
+        return row.replace(/<td(\s|>)/g, (match, suffix) => {
+            const label = escAttr(cols[cellIndex++] || '');
+            return `<td data-label="${label}"${suffix}`;
+        });
+    });
     const head = cols.map(c => `<th>${esc(c)}</th>`).join('');
     return `<div class="table-shell">
         <table class="events-table">
             <thead><tr>${head}</tr></thead>
-            <tbody>${rows.join('')}</tbody>
+            <tbody>${labelledRows.join('')}</tbody>
         </table>
     </div>`;
 }
