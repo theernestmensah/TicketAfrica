@@ -1,6 +1,7 @@
-﻿import { query, mutation } from "./_generated/server";
+import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
+import { sanitizeText, sanitizeHtml } from "./sanitize";
 
 async function getCurrentUser(ctx: any) {
     const identity = await ctx.auth.getUserIdentity();
@@ -181,23 +182,24 @@ export const createEvent = mutation({
     handler: async (ctx, args) => {
         await assertOrgAccess(ctx, args.org_id);
         const user = await getCurrentUser(ctx);
-        const slug = args.title.toLowerCase().replace(/[^a-z0-9]+/g, "-") + "-" + Date.now();
+        const sanitizedTitle = sanitizeText(args.title);
+        const slug = sanitizedTitle.toLowerCase().replace(/[^a-z0-9]+/g, "-") + "-" + Date.now();
         const eventId = await ctx.db.insert("events", {
             org_id: args.org_id,
-            title: args.title,
+            title: sanitizedTitle,
             slug,
-            description: args.description,
-            category: args.category,
+            description: sanitizeHtml(args.description),
+            category: sanitizeText(args.category),
             start_date: args.start_date,
             end_date: args.end_date,
             cover_image: args.cover_image ?? "",
             currency: args.currency,
             status: "draft",
             location: {
-                venue_name: args.venue_name,
-                city: args.city,
-                country: args.country,
-                address: args.address,
+                venue_name: sanitizeText(args.venue_name),
+                city: sanitizeText(args.city),
+                country: sanitizeText(args.country),
+                address: sanitizeText(args.address),
             },
             created_at: new Date().toISOString(),
         });
@@ -211,13 +213,13 @@ export const createEvent = mutation({
             user_id: user._id,
             org_id: args.org_id,
             event_id: eventId,
-            subject: `Event draft created: ${args.title}`,
-            body: `${args.title} has been created as a draft. Add ticket tiers and review the details before publishing.`,
+            subject: `Event draft created: ${sanitizedTitle}`,
+            body: `${sanitizedTitle} has been created as a draft. Add ticket tiers and review the details before publishing.`,
             template_key: "event_created",
             data: {
-                event_title: args.title,
+                event_title: sanitizedTitle,
                 event_date: args.start_date,
-                event_venue: args.venue_name,
+                event_venue: sanitizeText(args.venue_name),
                 dashboard_link: "/organizer-dashboard.html",
             },
         });
@@ -247,9 +249,9 @@ export const updateEvent = mutation({
         const existing = await assertEventAccess(ctx, event_id);
 
         const patch: Record<string, any> = {};
-        if (fields.title !== undefined) patch.title = fields.title;
-        if (fields.description !== undefined) patch.description = fields.description;
-        if (fields.category !== undefined) patch.category = fields.category;
+        if (fields.title !== undefined) patch.title = sanitizeText(fields.title);
+        if (fields.description !== undefined) patch.description = sanitizeHtml(fields.description);
+        if (fields.category !== undefined) patch.category = sanitizeText(fields.category);
         if (fields.start_date !== undefined) patch.start_date = fields.start_date;
         if (fields.end_date !== undefined) patch.end_date = fields.end_date;
         if (fields.cover_image !== undefined) patch.cover_image = fields.cover_image;
@@ -257,10 +259,10 @@ export const updateEvent = mutation({
 
         if (venue_name !== undefined || city !== undefined || country !== undefined || address !== undefined) {
             patch.location = {
-                venue_name: venue_name ?? existing.location.venue_name,
-                city: city ?? existing.location.city,
-                country: country ?? existing.location.country,
-                address: address ?? existing.location.address,
+                venue_name: venue_name !== undefined ? sanitizeText(venue_name) : existing.location.venue_name,
+                city: city !== undefined ? sanitizeText(city) : existing.location.city,
+                country: country !== undefined ? sanitizeText(country) : existing.location.country,
+                address: address !== undefined ? sanitizeText(address) : existing.location.address,
                 coordinates: existing.location.coordinates,
             };
         }
@@ -322,8 +324,8 @@ export const addTicketTier = mutation({
         await assertEventAccess(ctx, args.event_id);
         return await ctx.db.insert("ticket_tiers", {
             event_id: args.event_id,
-            name: args.name,
-            description: args.description,
+            name: sanitizeText(args.name),
+            description: args.description !== undefined ? sanitizeText(args.description) : undefined,
             price: args.price,
             capacity: args.capacity,
             sold: 0,
@@ -360,8 +362,8 @@ export const createPoll = mutation({
         await assertOrgAccess(ctx, args.org_id);
         const pollId = await ctx.db.insert("polls", {
             org_id: args.org_id,
-            title: args.title,
-            description: args.description,
+            title: sanitizeText(args.title),
+            description: sanitizeText(args.description),
             start_date: args.start_date,
             end_date: args.end_date,
             status: "draft",
@@ -371,7 +373,7 @@ export const createPoll = mutation({
         for (const option of args.options) {
             await ctx.db.insert("poll_options", {
                 poll_id: pollId,
-                label: option,
+                label: sanitizeText(option),
                 votes_count: 0,
             });
         }

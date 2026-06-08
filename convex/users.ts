@@ -1,6 +1,7 @@
 ﻿import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
-import { internal } from "./_generated/api";
+import { internal } from "./_generated/api";
+import { sanitizeText, sanitizeEmail, sanitizePhone } from "./sanitize";
 
 async function requireIdentity(ctx: any) {
     const identity = await ctx.auth.getUserIdentity();
@@ -71,11 +72,11 @@ export const upsertUser = mutation({
         if (existing) {
             const updates: Record<string, any> = {
                 email,
-                first_name: args.first_name,
-                last_name: args.last_name,
+                first_name: sanitizeText(args.first_name),
+                last_name: sanitizeText(args.last_name),
             };
 
-            if (args.phone !== undefined) updates.phone = args.phone;
+            if (args.phone !== undefined) updates.phone = sanitizePhone(args.phone);
             if (args.preferred_language !== undefined) updates.preferred_language = args.preferred_language;
             await ctx.db.patch(existing._id, updates);
             return existing._id;
@@ -84,9 +85,9 @@ export const upsertUser = mutation({
         const userId = await ctx.db.insert("users", {
             clerk_id: clerkId,
             email,
-            first_name: args.first_name,
-            last_name: args.last_name,
-            phone: args.phone,
+            first_name: sanitizeText(args.first_name),
+            last_name: sanitizeText(args.last_name),
+            phone: args.phone !== undefined ? sanitizePhone(args.phone) : undefined,
             role,
             preferred_language: args.preferred_language,
             joined_at: new Date().toISOString(),
@@ -97,7 +98,7 @@ export const upsertUser = mutation({
             type: isOrganizer ? "welcome_organizer" : "welcome_buyer",
             channel: "email",
             recipient_email: email,
-            recipient_phone: args.phone,
+            recipient_phone: args.phone !== undefined ? sanitizePhone(args.phone) : undefined,
             recipient_name: args.first_name,
             user_id: userId,
             subject: isOrganizer ? "Welcome to Ticket Africa for Organizers" : "Welcome to Ticket Africa",
@@ -106,8 +107,8 @@ export const upsertUser = mutation({
                 : `Hi ${args.first_name}, welcome to Ticket Africa. Your account is ready. When organizers publish events, you can discover them, pay locally, and receive secure QR-code tickets.`,
             template_key: isOrganizer ? "welcome_organizer" : "welcome_buyer",
             data: {
-                first_name: args.first_name,
-                last_name: args.last_name,
+                first_name: sanitizeText(args.first_name),
+                last_name: sanitizeText(args.last_name),
                 account_link: isOrganizer ? "/organizer-dashboard.html" : "/account.html",
                 events_link: "/events.html",
             },

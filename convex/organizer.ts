@@ -2,6 +2,7 @@
 import { v } from "convex/values";
 import { api, internal } from "./_generated/api";
 import { action, internalMutation, internalQuery } from "./_generated/server";
+import { sanitizeText, sanitizeEmail, sanitizePhone, sanitizeAlphanumeric, sanitizeHtml } from "./sanitize";
 
 async function getCurrentUser(ctx: any) {
     const identity = await ctx.auth.getUserIdentity();
@@ -202,8 +203,15 @@ export const createOrder = mutation({
         }
         await assertOrgAccess(ctx, orgId);
         const { org_id: _, ...rest } = args;
-        return await ctx.db.insert("orders", {
+        const sanitizedRest = {
             ...rest,
+            buyer_name: sanitizeText(args.buyer_name),
+            buyer_email: sanitizeEmail(args.buyer_email),
+            buyer_phone: args.buyer_phone !== undefined ? sanitizePhone(args.buyer_phone) : undefined,
+            promo_code: args.promo_code !== undefined ? sanitizeAlphanumeric(args.promo_code) : undefined,
+        };
+        return await ctx.db.insert("orders", {
+            ...sanitizedRest,
             org_id: orgId,
             status: "paid",
             created_at: new Date().toISOString(),
@@ -245,16 +253,18 @@ export const createPromoCode = mutation({
     },
     handler: async (ctx, args) => {
         await assertOrgAccess(ctx, args.org_id);
+        const sanitizedCode = sanitizeAlphanumeric(args.code);
         // Check code isn't already taken
         const existing = await ctx.db
             .query("promo_codes")
-            .withIndex("by_code", (q) => q.eq("code", args.code.toUpperCase()))
+            .withIndex("by_code", (q) => q.eq("code", sanitizedCode))
             .first();
         if (existing) throw new Error("Code already exists. Choose a different code.");
 
         return await ctx.db.insert("promo_codes", {
             ...args,
-            code: args.code.toUpperCase(),
+            code: sanitizedCode,
+            description: args.description !== undefined ? sanitizeText(args.description) : undefined,
             uses: 0,
             active: true,
             created_at: new Date().toISOString(),
@@ -315,6 +325,8 @@ export const inviteStaff = mutation({
         await assertOrgAccess(ctx, args.org_id);
         return await ctx.db.insert("staff_members", {
             ...args,
+            invited_email: sanitizeEmail(args.invited_email),
+            name: sanitizeText(args.name),
             status: "pending",
             invited_at: new Date().toISOString(),
         });
@@ -400,8 +412,14 @@ export const requestPayout = mutation({
         }
 
         const ref = "TA-PAY-" + Date.now().toString(36).toUpperCase();
+        const sanitizedAccountDetails = {
+            provider: args.account_details.provider !== undefined ? sanitizeText(args.account_details.provider) : undefined,
+            number: sanitizeText(args.account_details.number),
+            name: sanitizeText(args.account_details.name),
+        };
         const payoutId = await ctx.db.insert("payouts", {
             ...args,
+            account_details: sanitizedAccountDetails,
             gross_amount: grossAmount,
             payout_fee: payoutFee,
             status: "pending",
@@ -642,8 +660,12 @@ export const sendAttendeeMessage = mutation({
             paidRecipients.set(order.buyer_email.trim().toLowerCase(), order);
         }
 
+        const sanitizedSubject = sanitizeText(args.subject);
+        const sanitizedBody = sanitizeHtml(args.body);
         const messageId = await ctx.db.insert("attendee_messages", {
             ...args,
+            subject: sanitizedSubject,
+            body: sanitizedBody,
             sent_to: paidRecipients.size,
             status: "sent",
             sent_at: new Date().toISOString(),
@@ -661,8 +683,8 @@ export const sendAttendeeMessage = mutation({
                 org_id: args.org_id,
                 event_id: args.event_id,
                 order_id: order._id.toString(),
-                subject: args.subject,
-                body: args.body,
+                subject: sanitizedSubject,
+                body: sanitizedBody,
                 template_key: "attendee_update",
                 data: {
                     attendee_message_id: messageId.toString(),

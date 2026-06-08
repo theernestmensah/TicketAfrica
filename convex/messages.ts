@@ -1,6 +1,7 @@
 ﻿import { action, internalMutation, internalQuery, mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { api, internal } from "./_generated/api";
+import { sanitizeText, sanitizeEmail, sanitizePhone, sanitizeHtml } from "./sanitize";
 
 const messageType = v.union(
     v.literal("welcome_buyer"),
@@ -447,9 +448,9 @@ export const subscribeNewsletter = mutation({
 
         if (existing) {
             await ctx.db.patch(existing._id, {
-                name: args.name,
-                phone: args.phone,
-                source: args.source,
+                name: args.name !== undefined ? sanitizeText(args.name) : undefined,
+                phone: args.phone !== undefined ? sanitizePhone(args.phone) : undefined,
+                source: args.source !== undefined ? sanitizeText(args.source) : undefined,
                 status: "subscribed",
                 consented_at: new Date().toISOString(),
                 unsubscribed_at: undefined,
@@ -459,9 +460,9 @@ export const subscribeNewsletter = mutation({
 
         return await ctx.db.insert("newsletter_subscribers", {
             email,
-            name: args.name,
-            phone: args.phone,
-            source: args.source,
+            name: args.name !== undefined ? sanitizeText(args.name) : undefined,
+            phone: args.phone !== undefined ? sanitizePhone(args.phone) : undefined,
+            source: args.source !== undefined ? sanitizeText(args.source) : undefined,
             status: "subscribed",
             consented_at: new Date().toISOString(),
         });
@@ -490,8 +491,8 @@ export const enqueueNewsletter = mutation({
                 recipient_email: subscriber.email,
                 recipient_phone: subscriber.phone,
                 recipient_name: subscriber.name,
-                subject: args.subject,
-                body: args.body,
+                subject: sanitizeText(args.subject),
+                body: sanitizeHtml(args.body),
                 template_key: "newsletter",
                 data: { source: subscriber.source },
                 attempts: 0,

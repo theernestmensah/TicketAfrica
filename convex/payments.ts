@@ -2,6 +2,7 @@
 import { internal } from "./_generated/api";
 import { v } from "convex/values";
 import { internalAction, internalQuery, query } from "./_generated/server";
+import { sanitizeText, sanitizeEmail, sanitizePhone } from "./sanitize";
 
 function normalizeEmail(email: string) {
     return email.trim().toLowerCase();
@@ -103,9 +104,13 @@ export const createCheckout = mutation({
         currency: v.string(),
     },
     handler: async (ctx, args) => {
+        const sanitizedBuyerName = sanitizeText(args.buyer_name);
+        const sanitizedBuyerEmail = sanitizeEmail(args.buyer_email);
+        const sanitizedBuyerPhone = args.buyer_phone !== undefined ? sanitizePhone(args.buyer_phone) : undefined;
+
         if (!args.items.length) throw new Error("Your cart is empty.");
-        if (!args.buyer_name.trim()) throw new Error("Buyer name is required.");
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(args.buyer_email.trim())) {
+        if (!sanitizedBuyerName) throw new Error("Buyer name is required.");
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(sanitizedBuyerEmail)) {
             throw new Error("A valid buyer email is required.");
         }
 
@@ -164,9 +169,9 @@ export const createCheckout = mutation({
         const orderId = await ctx.db.insert("orders", {
             event_id: args.event_id,
             org_id: event.org_id,
-            buyer_name: args.buyer_name.trim(),
-            buyer_email: normalizeEmail(args.buyer_email),
-            buyer_phone: args.buyer_phone.trim() || undefined,
+            buyer_name: sanitizedBuyerName,
+            buyer_email: sanitizedBuyerEmail,
+            buyer_phone: sanitizedBuyerPhone || undefined,
             items: validatedItems,
             total_amount: expectedTotal,
             currency: args.currency,
@@ -185,21 +190,23 @@ export const setPaystackReference = mutation({
         reference: v.string(),
     },
     handler: async (ctx, args) => {
+        const sanitizedBuyerEmail = sanitizeEmail(args.buyer_email);
+        const sanitizedReference = sanitizeText(args.reference);
+
         const order = await ctx.db.get(args.order_id);
         if (!order) throw new Error("Order not found.");
         if (order.status !== "pending") throw new Error("This order is no longer pending.");
-        if (normalizeEmail(order.buyer_email) !== normalizeEmail(args.buyer_email)) {
+        if (normalizeEmail(order.buyer_email) !== normalizeEmail(sanitizedBuyerEmail)) {
             throw new Error("Buyer email does not match this order.");
         }
 
-        const reference = args.reference.trim();
-        if (!/^TKA_[A-Za-z0-9_]{8,80}$/.test(reference)) {
+        if (!/^TKA_[A-Za-z0-9_]{8,80}$/.test(sanitizedReference)) {
             throw new Error("Invalid Paystack reference format.");
         }
 
         const existingRef = await ctx.db
             .query("orders")
-            .withIndex("by_payment_reference", q => q.eq("payment_reference", reference))
+            .withIndex("by_payment_reference", q => q.eq("payment_reference", sanitizedReference))
             .first();
         if (existingRef && existingRef._id !== args.order_id) {
             throw new Error("This payment reference is already attached to another order.");
@@ -207,7 +214,7 @@ export const setPaystackReference = mutation({
 
         await ctx.db.patch(args.order_id, {
             payment_gateway: "paystack",
-            payment_reference: reference,
+            payment_reference: sanitizedReference,
         });
 
         return { success: true };
