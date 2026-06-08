@@ -658,161 +658,323 @@
     </div>
 
     <!-- -- Create Event Modal -- -->
-    <div id="create-event-modal"
-        style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(12px);z-index:9999;align-items:center;justify-content:center;padding:20px;">
-        <div
-            style="background:var(--color-bg-card);border:1px solid var(--color-border);border-radius:24px;width:100%;max-width:720px;max-height:92vh;overflow-y:auto;box-shadow:var(--shadow-2xl);color:var(--color-text-primary);">
-            <div
-                style="padding:24px 28px;border-bottom:1px solid var(--color-border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--color-bg-card);z-index:10;">
+    <div id="create-event-modal" class="modal-overlay" style="display:none;">
+        <div class="modal modal-wizard-width" style="max-height:92vh;overflow:hidden;display:flex;flex-direction:column;">
+            <div style="padding:20px 28px;border-bottom:1px solid var(--color-border);display:flex;align-items:center;justify-content:space-between;background:var(--color-bg-card);z-index:10;flex-shrink:0;">
                 <div>
-                    <div
-                        style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color: var(--color-text-primary);margin-bottom:4px;">
+                    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color: var(--color-text-muted);margin-bottom:4px;">
                         Organizer Portal</div>
-                    <h2
-                        style="font-family:var(--font-display);font-size:20px;font-weight:800;letter-spacing:-0.02em;color: var(--color-text-primary);">
+                    <h2 style="font-family:var(--font-display);font-size:20px;font-weight:800;letter-spacing:-0.02em;color: var(--color-text-primary);">
                         Create New Event</h2>
                 </div>
                 <button onclick="closeCreateModal()"
                     style="width:36px;height:36px;border-radius:9px;border:1px solid var(--color-border);background:none;color:var(--color-text-muted);cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;">&#x2715;</button>
             </div>
-            <form id="create-event-form" style="padding:28px;">
-                <!-- Basic Details -->
-                <div
-                    style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--color-text-muted);margin-bottom:16px;">
-                    Event Details</div>
-                <div style="display:grid;gap:16px;margin-bottom:24px;">
-                    <div>
-                        <label
-                            style="font-size:12px;font-weight:600;color:var(--color-text-secondary);display:block;margin-bottom:6px;">Event
-                            Title *</label>
-                        <input id="ce-title" type="text" required placeholder="e.g. Selected Event 2026"
-                            style="width:100%;background:var(--color-bg-elevated);border:1px solid var(--color-border);border-radius:10px;padding:12px 14px;color:var(--color-text-primary);font-size:14px;outline:none;transition:border-color 200ms;"
-                            onfocus="this.style.borderColor='var(--color-primary)'"
-                            onblur="this.style.borderColor='var(--color-border)'" />
+
+            <!-- Wizard Progress Stepper -->
+            <div class="wizard-stepper" style="flex-shrink:0;">
+                <div class="wizard-step active" id="step-node-1">
+                    <div class="wizard-step__indicator">1</div>
+                    <div class="wizard-step__label">
+                        <span class="wizard-step__title">Details</span>
+                        <span class="wizard-step__sub">Step 1</span>
                     </div>
-                    <div>
-                        <label
-                            style="font-size:12px;font-weight:600;color:var(--color-text-secondary);display:block;margin-bottom:6px;">Description
-                            *</label>
-                        <textarea id="ce-description" required rows="3"
-                            placeholder="Tell attendees what makes this event special..."
-                            style="width:100%;background:var(--color-bg-elevated);border:1px solid var(--color-border);border-radius:10px;padding:12px 14px;color:var(--color-text-primary);font-size:14px;outline:none;resize:vertical;transition:border-color 200ms;"
-                            onfocus="this.style.borderColor='var(--color-primary)'"
-                            onblur="this.style.borderColor='var(--color-border)'"></textarea>
+                </div>
+                <div class="wizard-step-divider" id="step-div-1"></div>
+                <div class="wizard-step" id="step-node-2">
+                    <div class="wizard-step__indicator">2</div>
+                    <div class="wizard-step__label">
+                        <span class="wizard-step__title">Format &amp; Venue</span>
+                        <span class="wizard-step__sub">Step 2</span>
                     </div>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-                        <div>
-                            <label
-                                style="font-size:12px;font-weight:600;color:var(--color-text-secondary);display:block;margin-bottom:6px;">Category
-                                *</label>
-                            <select id="ce-category" required
-                                style="width:100%;background:var(--color-bg-elevated);border:1px solid var(--color-border);border-radius:10px;padding:12px 14px;color:var(--color-text-primary);font-size:14px;outline:none;">
-                                <option value="concerts">Concerts &amp; Music</option>
-                                <option value="sports">Sports</option>
-                                <option value="festivals">Festivals</option>
-                                <option value="church">Church &amp; Faith</option>
-                                <option value="conferences">Conferences</option>
-                                <option value="nightlife">Nightlife &amp; Parties</option>
-                                <option value="culture">Cultural Events</option>
-                            </select>
+                </div>
+                <div class="wizard-step-divider" id="step-div-2"></div>
+                <div class="wizard-step" id="step-node-3">
+                    <div class="wizard-step__indicator">3</div>
+                    <div class="wizard-step__label">
+                        <span class="wizard-step__title">Tickets</span>
+                        <span class="wizard-step__sub">Step 3</span>
+                    </div>
+                </div>
+                <div class="wizard-step-divider" id="step-div-3"></div>
+                <div class="wizard-step" id="step-node-4">
+                    <div class="wizard-step__indicator">4</div>
+                    <div class="wizard-step__label">
+                        <span class="wizard-step__title">Review</span>
+                        <span class="wizard-step__sub">Step 4</span>
+                    </div>
+                </div>
+            </div>
+
+            <form id="create-event-form" class="wizard-modal-grid" style="overflow:hidden;">
+                <!-- Left side: Form steps -->
+                <div class="wizard-form-side" style="display:flex;flex-direction:column;justify-content:space-between;flex:1;">
+                    <div style="flex:1;">
+                        
+                        <!-- STEP 1: EVENT DETAILS -->
+                        <div class="wizard-step-card active" id="ce-step-1">
+                            <div class="dash-label" style="margin-bottom:16px;color:var(--color-secondary);">Step 1: Event Details</div>
+                            <div style="display:grid;gap:16px;margin-bottom:24px;">
+                                <div>
+                                    <label class="dash-label" style="display:block;margin-bottom:6px;">Event Title *</label>
+                                    <input id="ce-title" type="text" required placeholder="e.g. Selected Event 2026" class="dash-input" style="width:100%;" />
+                                </div>
+                                <div>
+                                    <label class="dash-label" style="display:block;margin-bottom:6px;">Category *</label>
+                                    <select id="ce-category" required class="dash-select" style="width:100%;">
+                                        <option value="concerts">Concerts &amp; Music</option>
+                                        <option value="sports">Sports</option>
+                                        <option value="festivals">Festivals</option>
+                                        <option value="church">Church &amp; Faith</option>
+                                        <option value="conferences">Conferences</option>
+                                        <option value="nightlife">Nightlife &amp; Parties</option>
+                                        <option value="culture">Cultural Events</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="dash-label" style="display:block;margin-bottom:6px;">Description *</label>
+                                    <div class="rich-textarea-wrapper">
+                                        <div class="rich-editor-toolbar">
+                                            <button type="button" class="rich-editor-btn" onclick="simFormat('bold')" title="Bold"><iconify-icon icon="ph:text-b-bold"></iconify-icon></button>
+                                            <button type="button" class="rich-editor-btn" onclick="simFormat('italic')" title="Italic"><iconify-icon icon="ph:text-italic-bold"></iconify-icon></button>
+                                            <button type="button" class="rich-editor-btn" onclick="simFormat('link')" title="Add Link"><iconify-icon icon="ph:link-bold"></iconify-icon></button>
+                                            <span style="width:1px;height:18px;background:var(--color-border);margin:0 4px;"></span>
+                                            <button type="button" class="rich-editor-btn" onclick="simFormat('list-bullet')" title="Bullet List"><iconify-icon icon="ph:list-bullets-bold"></iconify-icon></button>
+                                            <button type="button" class="rich-editor-btn" onclick="simFormat('list-number')" title="Numbered List"><iconify-icon icon="ph:list-numbers-bold"></iconify-icon></button>
+                                        </div>
+                                        <textarea id="ce-description" required rows="4" placeholder="Tell attendees what makes this event special..." class="dash-textarea" style="width:100%; border-top-left-radius:0; border-top-right-radius:0;"></textarea>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="dash-label" style="display:block;margin-bottom:6px;">Event Banner Cover</label>
+                                    <div class="banner-upload-dropzone" onclick="document.getElementById('ce-banner-file').click()">
+                                        <iconify-icon icon="ph:image-square-bold"></iconify-icon>
+                                        <span style="font-size:13px;font-weight:700;color:var(--color-text-primary);">Upload Custom Banner</span>
+                                        <span style="font-size:11px;color:var(--color-text-muted);">Recommended: 16:9 ratio, max 5MB</span>
+                                        <input type="file" id="ce-banner-file" accept="image/*" style="display:none;" onchange="handleBannerUpload(event)">
+                                    </div>
+                                    <div style="margin-top:14px;">
+                                        <span class="dash-label" style="font-size:10px;color:var(--color-text-muted);">Or Choose a Premium Cover Preset:</span>
+                                        <div class="cover-presets-grid">
+                                            <div class="cover-preset-option active" onclick="selectPresetCover('concert', this)">
+                                                <img src="https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?auto=format&fit=crop&w=300&q=80" alt="Concert Preset">
+                                                <span class="cover-preset-label">Concert</span>
+                                            </div>
+                                            <div class="cover-preset-option" onclick="selectPresetCover('party', this)">
+                                                <img src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=300&q=80" alt="Festival Preset">
+                                                <span class="cover-preset-label">Festival</span>
+                                            </div>
+                                            <div class="cover-preset-option" onclick="selectPresetCover('conference', this)">
+                                                <img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=300&q=80" alt="Tech Preset">
+                                                <span class="cover-preset-label">Tech</span>
+                                            </div>
+                                            <div class="cover-preset-option" onclick="selectPresetCover('sports', this)">
+                                                <img src="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=300&q=80" alt="Sports Preset">
+                                                <span class="cover-preset-label">Sports</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            <label
-                                class="dash-label" style="display:block;margin-bottom:6px;">Currency</label>
-                            <select id="ce-currency"
-                                class="dash-select">
-                                <option value="GHS">GHS</option>
-                                <option value="NGN">NGN</option>
-                                <option value="R">R (ZAR)</option>
-                                <option value="KSh">KSh (KES)</option>
-                                <option value="$">$ (USD)</option>
-                            </select>
+
+                        <!-- STEP 2: FORMAT & VENUE -->
+                        <div class="wizard-step-card" id="ce-step-2">
+                            <div class="dash-label" style="margin-bottom:16px;color:var(--color-secondary);">Step 2: Format &amp; Venue</div>
+                            <div class="form-group" style="margin-bottom:20px;">
+                                <label class="dash-label" style="display:block;margin-bottom:8px;">Event Format *</label>
+                                <div class="format-cards-container">
+                                    <div class="format-card active" onclick="setFormat('in-person', this)">
+                                        <iconify-icon icon="ph:buildings-bold"></iconify-icon>
+                                        <span class="format-card__title">In-Person</span>
+                                        <span class="format-card__desc">Physical location</span>
+                                    </div>
+                                    <div class="format-card" onclick="setFormat('virtual', this)">
+                                        <iconify-icon icon="ph:video-camera-bold"></iconify-icon>
+                                        <span class="format-card__title">Virtual</span>
+                                        <span class="format-card__desc">Online streaming</span>
+                                    </div>
+                                    <div class="format-card" onclick="setFormat('hybrid', this)">
+                                        <iconify-icon icon="ph:users-four-bold"></iconify-icon>
+                                        <span class="format-card__title">Hybrid</span>
+                                        <span class="format-card__desc">Both combined</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="location-fields-wrap" style="display:block;margin-bottom:20px;">
+                                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+                                    <div>
+                                        <label class="dash-label" style="display:block;margin-bottom:6px;">Venue Name *</label>
+                                        <input id="ce-venue" type="text" required placeholder="e.g. Accra Sports Stadium" class="dash-input" style="width:100%;" />
+                                    </div>
+                                    <div>
+                                        <label class="dash-label" style="display:block;margin-bottom:6px;">Street Address</label>
+                                        <input id="ce-address" type="text" placeholder="e.g. Castle Road" class="dash-input" style="width:100%;" />
+                                    </div>
+                                </div>
+                                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                                    <div>
+                                        <label class="dash-label" style="display:block;margin-bottom:6px;">City *</label>
+                                        <input id="ce-city" type="text" required placeholder="e.g. Accra" class="dash-input" style="width:100%;" />
+                                    </div>
+                                    <div>
+                                        <label class="dash-label" style="display:block;margin-bottom:6px;">Country *</label>
+                                        <select id="ce-country" required class="dash-select" style="width:100%;">
+                                            <option value="Ghana">Ghana</option>
+                                            <option value="Nigeria">Nigeria</option>
+                                            <option value="Kenya">Kenya</option>
+                                            <option value="South Africa">South Africa</option>
+                                            <option value="Rwanda">Rwanda</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="virtual-fields-wrap" style="display:none;margin-bottom:20px;">
+                                <div class="form-group">
+                                    <label class="dash-label" style="display:block;margin-bottom:6px;">Virtual Link / Stream Access Instructions</label>
+                                    <input id="ce-virtual-link" type="text" placeholder="e.g. Zoom or YouTube stream URL" class="dash-input" style="width:100%;" />
+                                    <span style="font-size:11px;color:var(--color-text-muted);margin-top:4px;">This link will only be visible to ticket holders.</span>
+                                </div>
+                            </div>
+
+                            <div style="display:grid;grid-template-columns:1fr;gap:16px;margin-bottom:20px;">
+                                <div>
+                                    <label class="dash-label" style="display:block;margin-bottom:6px;">Currency</label>
+                                    <select id="ce-currency" class="dash-select" style="width:100%;">
+                                        <option value="GHS">GHS (Ghanian Cedi)</option>
+                                        <option value="NGN">NGN (Nigerian Naira)</option>
+                                        <option value="R">ZAR (South African Rand)</option>
+                                        <option value="KSh">KES (Kenyan Shilling)</option>
+                                        <option value="USD">USD (US Dollar)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                                <div>
+                                    <label class="dash-label" style="display:block;margin-bottom:6px;">Start Date &amp; Time *</label>
+                                    <input id="ce-start" type="datetime-local" required class="dash-input" style="width:100%;" />
+                                </div>
+                                <div>
+                                    <label class="dash-label" style="display:block;margin-bottom:6px;">End Date &amp; Time *</label>
+                                    <input id="ce-end" type="datetime-local" required class="dash-input" style="width:100%;" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- STEP 3: TICKETS -->
+                        <div class="wizard-step-card" id="ce-step-3">
+                            <div class="dash-label" style="margin-bottom:16px;color:var(--color-secondary);">Step 3: Tickets &amp; Pricing</div>
+                            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+                                <span class="dash-label" style="font-size:11px;color:var(--color-text-muted);">Configure ticket classes</span>
+                                <button type="button" onclick="addTierRow()" class="btn btn--secondary btn--sm" style="display:flex;align-items:center;gap:4px;">
+                                    <iconify-icon icon="ph:plus-bold"></iconify-icon> Add Tier
+                                </button>
+                            </div>
+                            <div id="ce-tiers" style="display:flex;flex-direction:column;gap:12px;margin-bottom:28px;"></div>
+                        </div>
+
+                        <!-- STEP 4: REVIEW & PUBLISH -->
+                        <div class="wizard-step-card" id="ce-step-4">
+                            <div class="dash-label" style="margin-bottom:16px;color:var(--color-secondary);">Step 4: Review Details</div>
+                            
+                            <div class="review-section">
+                                <div class="review-section-title"><iconify-icon icon="ph:info-bold"></iconify-icon> Event Summary</div>
+                                <div class="review-grid">
+                                    <div class="review-item">
+                                        <span class="review-item__label">Title</span>
+                                        <span class="review-item__value" id="rev-title">-</span>
+                                    </div>
+                                    <div class="review-item">
+                                        <span class="review-item__label">Category</span>
+                                        <span class="review-item__value" id="rev-category">-</span>
+                                    </div>
+                                    <div class="review-item" style="grid-column: span 2;">
+                                        <span class="review-item__label">Date &amp; Time</span>
+                                        <span class="review-item__value" id="rev-dates">-</span>
+                                    </div>
+                                    <div class="review-item" style="grid-column: span 2;">
+                                        <span class="review-item__label">Venue &amp; Location</span>
+                                        <span class="review-item__value" id="rev-location">-</span>
+                                    </div>
+                                    <div class="review-item" style="grid-column: span 2;">
+                                        <span class="review-item__label">Description</span>
+                                        <span class="review-item__value--desc" id="rev-desc">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="review-section">
+                                <div class="review-section-title"><iconify-icon icon="ph:ticket-bold"></iconify-icon> Tickets Configured</div>
+                                <div id="rev-tickets-list" style="display:flex;flex-direction:column;gap:8px;">
+                                    <!-- Populated in syncPreviewPrice -->
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Submit errors -->
+                    <div id="ce-error"
+                        style="display:none;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:10px;padding:12px 14px;font-size:13px;color:#ef4444;margin-top:16px;width:100%;flex-shrink:0;">
+                    </div>
+
+                    <!-- Wizard Actions footer -->
+                    <div class="dash-form-actions" style="margin-top:28px;padding-top:20px;border-top:1px solid var(--color-border);display:flex;justify-content:space-between;flex-shrink:0;">
+                        <button type="button" id="wizard-back-btn" onclick="prevWizardStep()" class="btn btn--ghost" style="visibility:hidden;display:flex;align-items:center;gap:6px;min-height:42px;">
+                            <iconify-icon icon="ph:arrow-left-bold"></iconify-icon> Back
+                        </button>
+                        <div style="display:flex;gap:12px;">
+                            <button type="button" onclick="closeCreateModal()" class="btn btn--ghost" style="min-height:42px;">Cancel</button>
+                            <button type="button" id="wizard-next-btn" onclick="nextWizardStep()" class="btn btn--primary" style="display:flex;align-items:center;gap:6px;min-height:42px;">
+                                Next <iconify-icon icon="ph:arrow-right-bold"></iconify-icon>
+                            </button>
+                            <button type="submit" id="ce-submit" class="btn btn--primary" style="display:none;min-height:42px;background:linear-gradient(135deg, var(--color-secondary) 0%, var(--color-accent) 100%);color:var(--color-bg);font-weight:800;">
+                                Create Event (Save Draft)
+                            </button>
                         </div>
                     </div>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-                        <div>
-                            <label
-                                class="dash-label" style="display:block;margin-bottom:6px;">Start
-                                Date &amp; Time *</label>
-                            <input id="ce-start" type="datetime-local" required
-                                style="width:100%;background:var(--color-bg-elevated);border:1px solid var(--color-border);border-radius:10px;padding:12px 14px;color:var(--color-text-primary);font-size:14px;outline:none;" />
-                        </div>
-                        <div>
-                            <label
-                                class="dash-label" style="display:block;margin-bottom:6px;">End
-                                Date &amp; Time *</label>
-                            <input id="ce-end" type="datetime-local" required
-                                style="width:100%;background:var(--color-bg-elevated);border:1px solid var(--color-border);border-radius:10px;padding:12px 14px;color:var(--color-text-primary);font-size:14px;outline:none;" />
-                        </div>
-                    </div>
+
                 </div>
 
-                <!-- Location -->
-                <div
-                    style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.3);margin-bottom:16px;">
-                    Location</div>
-                <div style="display:grid;gap:12px;margin-bottom:24px;">
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-                        <div>
-                            <label
-                                class="dash-label" style="display:block;margin-bottom:6px;">Venue
-                                Name *</label>
-                            <input id="ce-venue" type="text" required placeholder="e.g. Accra Sports Stadium"
-                                style="width:100%;background:var(--color-bg-elevated);border:1px solid var(--color-border);border-radius:10px;padding:12px 14px;color:var(--color-text-primary);font-size:14px;outline:none;" />
-                        </div>
-                        <div>
-                            <label
-                                class="dash-label" style="display:block;margin-bottom:6px;">Address</label>
-                            <input id="ce-address" type="text" placeholder="Street address"
-                                style="width:100%;background:var(--color-bg-elevated);border:1px solid var(--color-border);border-radius:10px;padding:12px 14px;color:var(--color-text-primary);font-size:14px;outline:none;" />
-                        </div>
-                    </div>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-                        <div>
-                            <label
-                                style="font-size:12px;font-weight:600;color:var(--color-text-secondary);display:block;margin-bottom:6px;">City
-                                *</label>
-                            <input id="ce-city" type="text" required placeholder="e.g. Accra"
-                                style="width:100%;background:var(--color-bg-elevated);border:1px solid var(--color-border);border-radius:10px;padding:12px 14px;color:var(--color-text-primary);font-size:14px;outline:none;" />
-                        </div>
-                        <div>
-                            <label
-                                style="font-size:12px;font-weight:600;color:var(--color-text-secondary);display:block;margin-bottom:6px;">Country
-                                *</label>
-                            <select id="ce-country" required
-                                style="width:100%;background:var(--color-bg-elevated);border:1px solid var(--color-border);border-radius:10px;padding:12px 14px;color:var(--color-text-primary);font-size:14px;outline:none;">
-                                <option value="Ghana">Ghana</option>
-                                <option value="Nigeria">Nigeria</option>
-                                <option value="Kenya">Kenya</option>
-                                <option value="South Africa">South Africa</option>
-                                <option value="Rwanda">Rwanda</option>
-                                <option value="Other">Other</option>
-                            </select>
+                <!-- Right side: Live Preview -->
+                <div class="wizard-preview-side">
+                    <div class="preview-badge">Live Preview</div>
+                    <div class="live-preview-wrapper">
+                        <!-- Premium Ticket Preview Card -->
+                        <div class="ticket-preview-card">
+                            <div class="ticket-preview-banner">
+                                <span class="ticket-preview-category" id="preview-category">Concerts</span>
+                                <img id="preview-banner-img" src="https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?auto=format&fit=crop&w=600&q=80" alt="Event Cover">
+                            </div>
+                            <div class="ticket-preview-content">
+                                <h3 class="ticket-preview-title" id="preview-title">Your Event Title</h3>
+                                <div class="ticket-preview-details">
+                                    <div class="ticket-preview-detail">
+                                        <iconify-icon icon="ph:calendar-blank-bold"></iconify-icon>
+                                        <span id="preview-date">Date &amp; Time TBD</span>
+                                    </div>
+                                    <div class="ticket-preview-detail">
+                                        <iconify-icon icon="ph:map-pin-bold"></iconify-icon>
+                                        <span id="preview-location">Location TBD</span>
+                                    </div>
+                                </div>
+                                <div class="ticket-divider"></div>
+                            </div>
+                            <div class="ticket-preview-footer">
+                                <div class="ticket-preview-barcode">
+                                    <div class="barcode-svg"></div>
+                                    <span style="font-size:9px;color:var(--color-text-muted);font-family:monospace;letter-spacing:0.5px;">TICKETAFRICA-2026</span>
+                                </div>
+                                <div class="ticket-preview-price-range">
+                                    <div class="ticket-price-label">Tickets from</div>
+                                    <div class="ticket-price-value" id="preview-price">GHS 0.00</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-
-                <!-- Ticket Tiers -->
-                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-                    <div
-                        style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--color-text-muted);">
-                        Ticket Tiers</div>
-                    <button type="button" onclick="addTierRow()"
-                        style="font-size:12px;font-weight:700;color: var(--color-text-primary);background:var(--color-secondary);border:none;border-radius:8px;padding:6px 16px;cursor:pointer;">+
-                        Add Tier</button>
-                </div>
-                <div id="ce-tiers" style="display:flex;flex-direction:column;gap:12px;margin-bottom:28px;"></div>
-
-                <!-- Submit -->
-                <div id="ce-error"
-                    style="display:none;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:10px;padding:12px 14px;font-size:13px;color:#ef4444;margin-bottom:16px;">
-                </div>
-                <div style="display:flex;gap:12px;">
-                    <button type="button" onclick="closeCreateModal()"
-                        style="flex:1;padding:13px;border-radius:10px;border:1px solid var(--color-border);background:var(--color-bg-elevated);color:var(--color-text-secondary);font-size:14px;font-weight:600;cursor:pointer;">Cancel</button>
-                    <button type="submit" id="ce-submit"
-                        style="flex:2;padding:13px;border-radius:10px;border:none;background:var(--color-primary);color:white;font-size:14px;font-weight:700;cursor:pointer;">Create
-                        Event (Save as Draft)</button>
                 </div>
             </form>
         </div>
@@ -847,6 +1009,15 @@
 
         /* -- Create Event Modal -- */
         let tierCount = 0;
+        let currentWizardStep = 1;
+        let activeFormat = 'in-person';
+
+        const PRESET_COVERS = {
+            concert: 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?auto=format&fit=crop&w=600&q=80',
+            party: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=600&q=80',
+            conference: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=600&q=80',
+            sports: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=600&q=80'
+        };
 
         function openCreateModal() {
             const modal = document.getElementById('create-event-modal');
@@ -856,14 +1027,372 @@
             tierCount = 0;
             addTierRow(); // start with one tier
 
+            // Reset wizard step
+            setWizardStep(1);
+
+            // Set default active format
+            setFormat('in-person', document.querySelector('.format-card'));
+
+            // Select default cover preset
+            selectPresetCover('concert', document.querySelector('.cover-preset-option'));
+
             // Prevent past dates
             const nowMin = getNowMin();
             document.getElementById('ce-start').min = nowMin;
             document.getElementById('ce-end').min = nowMin;
+
+            // Wire listeners once
+            wireLivePreviewSync();
+            syncLivePreview();
         }
 
         function closeCreateModal() {
             document.getElementById('create-event-modal').style.display = 'none';
+        }
+
+        function setWizardStep(step) {
+            currentWizardStep = step;
+            
+            // Toggle active cards
+            for (let i = 1; i <= 4; i++) {
+                const card = document.getElementById('ce-step-' + i);
+                const node = document.getElementById('step-node-' + i);
+                const divider = document.getElementById('step-div-' + i);
+
+                if (card) {
+                    if (i === step) card.classList.add('active');
+                    else card.classList.remove('active');
+                }
+
+                if (node) {
+                    if (i === step) {
+                        node.classList.add('active');
+                        node.classList.remove('completed');
+                    } else if (i < step) {
+                        node.classList.add('completed');
+                        node.classList.remove('active');
+                    } else {
+                        node.classList.remove('active', 'completed');
+                    }
+                }
+
+                if (divider) {
+                    if (i < step) divider.classList.add('filled');
+                    else divider.classList.remove('filled');
+                }
+            }
+
+            // Button configurations
+            const backBtn = document.getElementById('wizard-back-btn');
+            const nextBtn = document.getElementById('wizard-next-btn');
+            const submitBtn = document.getElementById('ce-submit');
+
+            if (backBtn) {
+                backBtn.style.visibility = step === 1 ? 'hidden' : 'visible';
+            }
+
+            if (step === 4) {
+                nextBtn.style.display = 'none';
+                submitBtn.style.display = 'block';
+                syncLivePreview(); // final sync
+            } else {
+                nextBtn.style.display = 'block';
+                submitBtn.style.display = 'none';
+            }
+        }
+
+        function validateWizardStep(step) {
+            const card = document.getElementById('ce-step-' + step);
+            if (!card) return true;
+
+            const inputs = card.querySelectorAll('input[required], textarea[required], select[required]');
+            let allValid = true;
+
+            inputs.forEach(input => {
+                // If it is inside hidden location Fields, don't validate it
+                if (input.offsetParent === null) {
+                    return; // skipped if hidden (like locations in virtual format)
+                }
+
+                if (!input.checkValidity()) {
+                    input.reportValidity();
+                    allValid = false;
+                }
+            });
+
+            // Special checks for Step 3:
+            if (step === 3 && allValid) {
+                const tiers = document.getElementById('ce-tiers');
+                const rows = tiers.querySelectorAll('[id^="tier-row-"]');
+                if (rows.length === 0) {
+                    alert('Please configure at least one ticket tier.');
+                    allValid = false;
+                }
+            }
+
+            return allValid;
+        }
+
+        function nextWizardStep() {
+            if (validateWizardStep(currentWizardStep)) {
+                if (currentWizardStep < 4) {
+                    setWizardStep(currentWizardStep + 1);
+                }
+            }
+        }
+
+        function prevWizardStep() {
+            if (currentWizardStep > 1) {
+                setWizardStep(currentWizardStep - 1);
+            }
+        }
+
+        function setFormat(format, element) {
+            activeFormat = format;
+            document.querySelectorAll('.format-card').forEach(el => el.classList.remove('active'));
+            if (element) element.classList.add('active');
+
+            const locationFields = document.getElementById('location-fields-wrap');
+            const virtualFields = document.getElementById('virtual-fields-wrap');
+
+            const venueInput = document.getElementById('ce-venue');
+            const cityInput = document.getElementById('ce-city');
+            const countrySelect = document.getElementById('ce-country');
+
+            if (format === 'in-person') {
+                locationFields.style.display = 'block';
+                virtualFields.style.display = 'none';
+                
+                venueInput.required = true;
+                cityInput.required = true;
+                countrySelect.required = true;
+
+                if (venueInput.value === 'Virtual Event') venueInput.value = '';
+                if (cityInput.value === 'Online') cityInput.value = '';
+            } else if (format === 'virtual') {
+                locationFields.style.display = 'none';
+                virtualFields.style.display = 'block';
+                
+                venueInput.required = false;
+                cityInput.required = false;
+                countrySelect.required = false;
+                
+                venueInput.value = 'Virtual Event';
+                cityInput.value = 'Online';
+                countrySelect.value = 'Other';
+            } else if (format === 'hybrid') {
+                locationFields.style.display = 'block';
+                virtualFields.style.display = 'block';
+                
+                venueInput.required = true;
+                cityInput.required = true;
+                countrySelect.required = true;
+
+                if (venueInput.value === 'Virtual Event') venueInput.value = '';
+                if (cityInput.value === 'Online') cityInput.value = '';
+            }
+            
+            syncLivePreview();
+        }
+
+        function selectPresetCover(theme, element) {
+            // Remove active class from all options
+            document.querySelectorAll('.cover-preset-option').forEach(el => el.classList.remove('active'));
+            // Add active class to clicked option
+            if (element) element.classList.add('active');
+            // Update preview image
+            const imgUrl = PRESET_COVERS[theme];
+            if (imgUrl) {
+                document.getElementById('preview-banner-img').src = imgUrl;
+            }
+        }
+
+        function handleBannerUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            // Remove active class from presets since custom upload is selected
+            document.querySelectorAll('.cover-preset-option').forEach(el => el.classList.remove('active'));
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('preview-banner-img').src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function simFormat(type) {
+            const textarea = document.getElementById('ce-description');
+            if (!textarea) return;
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const text = textarea.value;
+            const selectedText = text.substring(start, end);
+            
+            let replacement = '';
+            if (type === 'bold') {
+                replacement = `**${selectedText || 'bold text'}**`;
+            } else if (type === 'italic') {
+                replacement = `*${selectedText || 'italic text'}*`;
+            } else if (type === 'link') {
+                const url = prompt('Enter URL:', 'https://');
+                if (url) replacement = `[${selectedText || 'link text'}](${url})`;
+                else return;
+            } else if (type === 'list-bullet') {
+                replacement = `\n- ${selectedText || 'list item'}`;
+            } else if (type === 'list-number') {
+                replacement = `\n1. ${selectedText || 'list item'}`;
+            }
+            
+            textarea.value = text.substring(0, start) + replacement + text.substring(end);
+            textarea.focus();
+            textarea.setSelectionRange(start + replacement.length, start + replacement.length);
+            
+            syncLivePreview();
+        }
+
+        function syncLivePreview() {
+            const title = document.getElementById('ce-title').value.trim() || 'Your Event Title';
+            document.getElementById('preview-title').textContent = title;
+            document.getElementById('rev-title').textContent = title;
+
+            const categoryText = document.getElementById('ce-category').options[document.getElementById('ce-category').selectedIndex]?.text || 'Concerts';
+            document.getElementById('preview-category').textContent = categoryText;
+            document.getElementById('rev-category').textContent = categoryText;
+
+            const descVal = document.getElementById('ce-description').value.trim() || 'No description provided.';
+            document.getElementById('rev-desc').textContent = descVal;
+
+            const startVal = document.getElementById('ce-start').value;
+            const endVal = document.getElementById('ce-end').value;
+            let dateText = 'Date & Time TBD';
+            let dateReviewText = 'Date & Time TBD';
+
+            if (startVal) {
+                const startDate = new Date(startVal);
+                const startFormatted = startDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) + ', ' + startDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                dateText = startFormatted;
+                dateReviewText = startFormatted;
+
+                if (endVal) {
+                    const endDate = new Date(endVal);
+                    const endFormatted = endDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) + ', ' + endDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                    dateReviewText += ' to ' + endFormatted;
+                }
+            }
+            document.getElementById('preview-date').textContent = dateText;
+            document.getElementById('rev-dates').textContent = dateReviewText;
+
+            // Location
+            let locationText = 'Location TBD';
+            if (activeFormat === 'virtual') {
+                const linkVal = document.getElementById('ce-virtual-link').value.trim() || 'Zoom Link';
+                locationText = 'Virtual Event (' + (linkVal.startsWith('http') ? 'Online Stream' : linkVal) + ')';
+                document.getElementById('ce-address').value = linkVal || 'Online Stream';
+            } else {
+                const venue = document.getElementById('ce-venue').value.trim();
+                const city = document.getElementById('ce-city').value.trim();
+                const country = document.getElementById('ce-country').value;
+                if (venue || city) {
+                    locationText = [venue, city, country].filter(v => v).join(', ');
+                }
+            }
+            document.getElementById('preview-location').textContent = locationText;
+            document.getElementById('rev-location').textContent = locationText;
+
+            // Update price
+            syncPreviewPrice();
+        }
+
+        function syncPreviewPrice() {
+            const currency = document.getElementById('ce-currency').value || 'GHS';
+            const tiersContainer = document.getElementById('ce-tiers');
+            const rows = tiersContainer.querySelectorAll('[id^="tier-row-"]');
+            
+            if (rows.length === 0) {
+                document.getElementById('preview-price').textContent = 'Free';
+                document.getElementById('rev-tickets-list').innerHTML = `<span style="font-size:12px;color:var(--color-text-muted);">No tickets configured.</span>`;
+                return;
+            }
+
+            let minPrice = Infinity;
+            let maxPrice = -Infinity;
+            let ticketsHtml = '';
+
+            rows.forEach(row => {
+                const idAttr = row.id;
+                const id = idAttr.replace('tier-row-', '');
+                const name = row.querySelector(`[name="tier-name-${id}"]`)?.value || 'General Admission';
+                const priceVal = parseInt(row.querySelector(`[name="tier-price-${id}"]`)?.value || '0');
+                const cap = parseInt(row.querySelector(`[name="tier-capacity-${id}"]`)?.value || '0');
+                const isFree = document.getElementById(`tier-free-toggle-${id}`)?.checked;
+
+                const actualPrice = isFree ? 0 : priceVal;
+                
+                if (actualPrice < minPrice) minPrice = actualPrice;
+                if (actualPrice > maxPrice) maxPrice = actualPrice;
+
+                // Build ticket list HTML for step 4 review
+                const formattedPrice = actualPrice === 0 ? 'Free' : (actualPrice / 100).toFixed(2);
+                ticketsHtml += `
+                    <div style="display:flex;justify-content:space-between;align-items:center;background:var(--color-bg-card);border:1px solid var(--color-border);padding:10px 14px;border-radius:8px;">
+                        <div>
+                            <div style="font-size:13px;font-weight:700;color:var(--color-text-primary);">${name}</div>
+                            <div style="font-size:11px;color:var(--color-text-muted);">Capacity: ${cap || 'Unlimited'}</div>
+                        </div>
+                        <div style="font-size:14px;font-weight:800;color:var(--color-secondary);">${actualPrice === 0 ? 'Free' : `${currency} ${formattedPrice}`}</div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('rev-tickets-list').innerHTML = ticketsHtml;
+
+            const priceEl = document.getElementById('preview-price');
+            if (minPrice === Infinity) {
+                priceEl.textContent = `${currency} 0.00`;
+            } else if (minPrice === maxPrice) {
+                priceEl.textContent = minPrice === 0 ? 'Free' : `${currency} ${(minPrice / 100).toFixed(2)}`;
+            } else {
+                const minStr = minPrice === 0 ? 'Free' : `${currency} ${(minPrice / 100).toFixed(2)}`;
+                const maxStr = `${currency} ${(maxPrice / 100).toFixed(2)}`;
+                priceEl.textContent = `${minStr} - ${maxStr}`;
+            }
+        }
+
+        function toggleTierFree(id) {
+            const priceInput = document.getElementById(`tier-price-input-${id}`);
+            const freeToggle = document.getElementById(`tier-free-toggle-${id}`);
+            if (freeToggle.checked) {
+                priceInput.value = '0';
+                priceInput.disabled = true;
+                priceInput.required = false;
+            } else {
+                priceInput.value = '';
+                priceInput.disabled = false;
+                priceInput.required = true;
+            }
+            syncLivePreview();
+        }
+
+        function removeTier(id) {
+            const row = document.getElementById('tier-row-' + id);
+            if (row) {
+                row.remove();
+                syncLivePreview();
+            }
+        }
+
+        function wireLivePreviewSync() {
+            const ids = ['ce-title', 'ce-category', 'ce-description', 'ce-start', 'ce-end', 'ce-venue', 'ce-address', 'ce-city', 'ce-country', 'ce-currency', 'ce-virtual-link'];
+            ids.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.removeEventListener('input', syncLivePreview);
+                    el.removeEventListener('change', syncLivePreview);
+                    el.addEventListener('input', syncLivePreview);
+                    el.addEventListener('change', syncLivePreview);
+                }
+            });
         }
 
         function addTierRow() {
@@ -872,27 +1401,39 @@
             const tiers = document.getElementById('ce-tiers');
             const div = document.createElement('div');
             div.id = 'tier-row-' + id;
-            div.style.cssText = 'background:var(--color-bg-elevated);border:1px solid var(--color-border);border-radius:12px;padding:16px;';
+            div.className = 'card';
+            div.style.cssText = 'background:var(--color-bg-elevated);border:1px solid var(--color-border);border-radius:12px;padding:16px;margin-bottom:10px;position:relative;animation:fadeInStep 200ms ease;';
             div.innerHTML = `
                 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-                    <span style="font-size:12px;font-weight:700;color:rgba(255,255,255,0.4);">TIER ${id}</span>
-                    <button type="button" onclick="document.getElementById('tier-row-${id}').remove()" style="font-size:11px;color:#ef4444;background:none;border:none;cursor:pointer;">Remove</button>
+                    <span class="dash-label" style="font-size:10px;color:var(--color-secondary);">TIER ${id}</span>
+                    <button type="button" onclick="removeTier(${id})" style="font-size:11px;color:var(--color-error);background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:4px;">
+                        <iconify-icon icon="ph:trash-bold"></iconify-icon> Remove
+                    </button>
                 </div>
-                <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px;">
+                <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px;margin-bottom:10px;">
                     <div>
                         <label class="dash-label" style="display:block;margin-bottom:5px;">Tier Name</label>
-                        <input name="tier-name-${id}" type="text" placeholder="e.g. General Admission" required style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 12px;color:#f0f0f5;font-size:13px;outline:none;" />
+                        <input name="tier-name-${id}" type="text" placeholder="e.g. General Admission" required class="dash-input" style="min-height:38px;padding:8px 10px;" oninput="syncLivePreview()" />
                     </div>
                     <div>
                         <label class="dash-label" style="display:block;margin-bottom:5px;">Price (pesewas)</label>
-                        <input name="tier-price-${id}" type="number" min="0" placeholder="5000 = GHS 50" required style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 12px;color:#f0f0f5;font-size:13px;outline:none;" />
+                        <input name="tier-price-${id}" id="tier-price-input-${id}" type="number" min="0" placeholder="5000 = GHS 50" required class="dash-input" style="min-height:38px;padding:8px 10px;" oninput="syncLivePreview()" />
                     </div>
                     <div>
                         <label class="dash-label" style="display:block;margin-bottom:5px;">Capacity</label>
-                        <input name="tier-capacity-${id}" type="number" min="1" placeholder="e.g. 500" required style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 12px;color:#f0f0f5;font-size:13px;outline:none;" />
+                        <input name="tier-capacity-${id}" type="number" min="1" placeholder="e.g. 500" required class="dash-input" style="min-height:38px;padding:8px 10px;" oninput="syncLivePreview()" />
                     </div>
-                </div>`;
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;padding-top:8px;border-top:1px solid var(--color-border);">
+                    <label class="toggle-switch-wrapper">
+                        <input type="checkbox" id="tier-free-toggle-${id}" onchange="toggleTierFree(${id})" class="toggle-switch-input">
+                        <span class="toggle-switch"></span>
+                        <span style="font-size:12px;font-weight:600;color:var(--color-text-secondary);">This is a Free Ticket</span>
+                    </label>
+                </div>
+            `;
             tiers.appendChild(div);
+            syncLivePreview();
         }
 
         document.getElementById('create-event-form').addEventListener('submit', async (e) => {
