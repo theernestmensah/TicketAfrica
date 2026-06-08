@@ -148,7 +148,7 @@ body {
 .dash-nav-link .badge-count {
     margin-left: auto;
     background: var(--color-secondary);
-    color: var(--color-bg);
+    color: var(--color-on-accent);
     font-size: 10px;
     font-weight: 800;
     padding: 2px 8px;
@@ -1640,7 +1640,7 @@ body {
 .wizard-step.active .wizard-step__indicator {
     border-color: var(--color-secondary);
     background: var(--color-secondary);
-    color: var(--color-bg);
+    color: var(--color-on-accent);
     box-shadow: 0 0 12px rgba(184, 135, 18, 0.4);
 }
 

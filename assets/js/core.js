@@ -8,6 +8,32 @@
     /* ── Toast System ───────────────────────────────────── */
     window.TA = window.TA || {};
 
+    /* ── Auth Attempts Throttler ────────────────────────── */
+    TA.checkAuthRateLimit = function (identifier) {
+        const key = 'ta_auth_attempts_' + identifier.replace(/[^a-zA-Z0-9]/g, '_');
+        const now = Date.now();
+        const windowMs = 15 * 60 * 1000; // 15 minutes
+        const maxAttempts = 5;
+
+        let attempts = [];
+        try {
+            attempts = JSON.parse(localStorage.getItem(key) || '[]');
+        } catch (e) {
+            attempts = [];
+        }
+
+        // Clean up attempts older than 15 minutes
+        attempts = attempts.filter(t => now - t < windowMs);
+
+        if (attempts.length >= maxAttempts) {
+            return false;
+        }
+
+        attempts.push(now);
+        localStorage.setItem(key, JSON.stringify(attempts));
+        return true;
+    };
+
     function escapeHtml(value) {
         return String(value ?? '').replace(/[&<>"']/g, function (char) {
             return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char];

@@ -1152,6 +1152,13 @@
             const alertEl = document.getElementById('auth-alert');
             alertEl.classList.remove('show');
 
+            if (window.TA && window.TA.checkAuthRateLimit && !window.TA.checkAuthRateLimit(email)) {
+                alertEl.classList.add('show');
+                document.getElementById('auth-alert-msg').textContent =
+                    'Too many sign-up attempts. Please wait 15 minutes and try again.';
+                return;
+            }
+
             let valid = true;
             if (!fname) { setError('grp-fname', true); valid = false; } else setError('grp-fname', false);
             if (!lname) { setError('grp-lname', true); valid = false; } else setError('grp-lname', false);

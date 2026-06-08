@@ -130,9 +130,9 @@
             position: absolute;
             top: 20px;
             right: 20px;
-            background: rgba(255,255,255,0.05);
-            border: none;
-            color: white;
+            background: var(--color-bg-elevated);
+            border: 1px solid var(--color-border);
+            color: var(--color-text-primary);
             width: 32px;
             height: 32px;
             border-radius: 50%;
@@ -140,6 +140,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: all var(--transition-fast);
+        }
+        .v-modal__close:hover {
+            background: var(--color-border);
         }
         .v-option {
             background: rgba(255,255,255,0.03);

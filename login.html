@@ -861,6 +861,13 @@
             const alertEl = document.getElementById('auth-alert');
             alertEl.classList.remove('show');
 
+            if (window.TA && window.TA.checkAuthRateLimit && !window.TA.checkAuthRateLimit(email)) {
+                alertEl.classList.add('show');
+                document.getElementById('auth-alert-msg').textContent =
+                    'Too many sign-in attempts. Please wait 15 minutes and try again.';
+                return;
+            }
+
             let valid = true;
             if (!validateEmail(email)) {
                 showError('grp-email', 'email-error', true);

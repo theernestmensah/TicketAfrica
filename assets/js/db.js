@@ -96,21 +96,54 @@ function renderEventCard(event) {
 }
 
 // -- window.ConvexDB -------------------------------------------------------
+const clientLimits = {};
+function checkClientRateLimit(name, limit = 60, windowMs = 60000) {
+    const now = Date.now();
+    
+    // Global threshold check (max 120 calls across all endpoints per minute)
+    if (name !== "__global__") {
+        if (!checkClientRateLimit("__global__", 120, 60000)) {
+            return false;
+        }
+    }
+    
+    if (!clientLimits[name]) {
+        clientLimits[name] = [];
+    }
+    // Remove timestamps older than the window
+    clientLimits[name] = clientLimits[name].filter(t => now - t < windowMs);
+    
+    if (clientLimits[name].length >= limit) {
+        return false;
+    }
+    clientLimits[name].push(now);
+    return true;
+}
+
 window.ConvexDB = {
     client: convex,
 
     // Generic wrappers (used by voting.js etc.)
     query: async function(name, args) {
+        if (!checkClientRateLimit(name, 60, 60000)) {
+            throw new Error("Rate limit exceeded for " + name + ". Please try again in a minute.");
+        }
         args = args || {};
         await syncConvexAuth();
         return convex.query(name, args);
     },
     mutation: async function(name, args) {
+        if (!checkClientRateLimit(name, 60, 60000)) {
+            throw new Error("Rate limit exceeded for " + name + ". Please try again in a minute.");
+        }
         args = args || {};
         await syncConvexAuth();
         return convex.mutation(name, args);
     },
     action: async function(name, args) {
+        if (!checkClientRateLimit(name, 60, 60000)) {
+            throw new Error("Rate limit exceeded for " + name + ". Please try again in a minute.");
+        }
         args = args || {};
         await syncConvexAuth();
         return convex.action(name, args);
