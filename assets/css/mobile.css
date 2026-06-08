@@ -66,55 +66,94 @@ input, select, textarea, button {
 .dash-mobile-nav {
     display: none;
     position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    left: 16px;
+    right: 16px;
     z-index: 200;
-    background: rgba(25, 25, 25, 0.94);
-    border-top: 1px solid var(--color-border);
-    box-shadow: 0 -12px 30px rgba(0, 0, 0, 0.18);
-    backdrop-filter: blur(18px);
-    padding: 8px max(8px, env(safe-area-inset-left)) calc(8px + env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-right));
+    background: rgba(11, 11, 13, 0.88); /* Deep luxury obsidian dark */
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 6px 12px;
+    border-radius: 20px;
     justify-content: space-around;
     align-items: center;
+    transition: all 0.3s ease;
 }
 
 .dash-mobile-nav__item {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 2px;
-    padding: 8px 6px;
-    color: rgba(255, 255, 255, 0.62);
+    justify-content: center;
+    gap: 3px;
+    padding: 6px 8px;
+    color: rgba(255, 255, 255, 0.5);
     font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0;
+    font-weight: 600;
+    letter-spacing: 0.02em;
     cursor: pointer;
     background: none;
     border: none;
     font-family: var(--font-body);
-    transition: color var(--transition-fast), background var(--transition-fast);
-    min-width: 56px;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    min-width: 58px;
     min-height: 48px;
-    border-radius: 12px;
+    border-radius: 14px;
+    position: relative;
     text-align: center;
 }
 
 .dash-mobile-nav__item iconify-icon {
     font-size: 22px;
-    transition: color var(--transition-fast);
+    color: rgba(255, 255, 255, 0.5);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.dash-mobile-nav__item.active,
 .dash-mobile-nav__item:hover {
-    background: rgba(var(--color-secondary-rgb), 0.16);
-    color: #ffffff;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.dash-mobile-nav__item:hover iconify-icon {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.dash-mobile-nav__item.active {
+    color: var(--color-secondary, #D4AF37); /* Gold active text */
+    font-weight: 700;
+}
+
+.dash-mobile-nav__item.active iconify-icon {
+    color: var(--color-secondary, #D4AF37); /* Gold active icon */
+    transform: translateY(-3px) scale(1.12);
+    filter: drop-shadow(0 2px 8px rgba(212, 175, 55, 0.35)); /* Gold glow */
+}
+
+/* Subtle gold bar indicator at the bottom of the active tab */
+.dash-mobile-nav__item::after {
+    content: '';
+    position: absolute;
+    bottom: 0px;
+    width: 16px;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--color-secondary, #D4AF37);
+    box-shadow: 0 1px 4px rgba(212, 175, 55, 0.4);
+    opacity: 0;
+    transform: scaleX(0);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dash-mobile-nav__item.active::after {
+    opacity: 1;
+    transform: scaleX(1);
 }
 
 /* Pad dash-main so content isn't behind mobile nav */
 @media (max-width: 768px) {
     .dash-content {
-        padding-bottom: 92px !important;
+        padding-bottom: 100px !important;
     }
 }
 
