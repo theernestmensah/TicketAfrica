@@ -223,38 +223,15 @@
         }
     </style>
 </head>
-<body class="bg-dark">
+<body>
 
-    <!-- Header -->
-    <nav class="site-nav nav--transparent" id="main-nav">
-        <div class="container nav-inner">
-            <a href="index.html" class="nav-logo">
-                <div class="nav-logo__mark">
-                    <iconify-icon icon="hugeicons:ticket-01"></iconify-icon>
-                </div>
-                <div class="nav-logo__text">Ticket<span>Africa</span></div>
-            </a>
-            <div class="nav-menu">
-                <a href="events.html" class="nav-link">Explore</a>
-                <a href="voting.html" class="nav-link active">Voting</a>
-                <a href="about.html" class="nav-link">About</a>
-                <a href="contact.html" class="nav-link">Contact</a>
-            </div>
-            <div class="nav-actions">
-                <div id="user-nav">
-                    <!-- Loaded via Clerk -->
-                    <button class="btn btn--secondary btn--sm" id="nav-signin">Sign In</button>
-                    <button class="btn btn--primary btn--sm" id="nav-signup">Get Started</button>
-                </div>
-            </div>
-        </div>
-    </nav>
+    <div id="nav-root"></div>
 
     <main>
         <section class="voting-hero">
             <div class="container">
-                <h1>Community Power</h1>
-                <p>Cast your vote in ongoing competitions, elections, and decision-making polls across Africa.</p>
+                <h1 data-i18n="voting_hero_title">Community Power</h1>
+                <p data-i18n="voting_hero_sub">Cast your vote in ongoing competitions, elections, and decision-making polls across Africa.</p>
             </div>
         </section>
 
@@ -262,7 +239,7 @@
             <div class="container">
                 <div class="section-header" style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:40px;">
                     <div>
-                        <h2 class="section-title">Active Polls</h2>
+                        <h2 class="section-title" data-i18n="voting_section_title">Active Polls</h2>
                     </div>
                 </div>
 
@@ -270,7 +247,7 @@
                     <!-- Loaded dynamically -->
                     <div class="loading-state" style="grid-column: 1/-1; text-align:center; padding: 100px 0;">
                         <iconify-icon icon="hugeicons:loading-03" style="font-size:48px; color: var(--color-text-primary); margin-bottom:20px;"></iconify-icon>
-                        <p>Fetching active polls...</p>
+                        <p data-i18n="voting_fetching_polls">Fetching active polls...</p>
                     </div>
                 </div>
             </div>
@@ -289,57 +266,12 @@
         </div>
     </div>
 
-    <!-- Footer -->
-    <footer class="site-footer">
-        <div class="container footer-grid">
-            <div class="footer-brand">
-                <a href="index.html" class="nav-logo">
-                    <div class="nav-logo__mark">
-                        <iconify-icon icon="hugeicons:ticket-01"></iconify-icon>
-                    </div>
-                    <div class="nav-logo__text">Ticket<span>Africa</span></div>
-                </a>
-                <p class="footer-brand__desc">Empowering African events and communities through seamless ticketing and engagement.</p>
-                <div class="footer-trust-marks">
-                    <div class="footer-trust-mark">
-                        <iconify-icon icon="hugeicons:check-circle-01"></iconify-icon>
-                        Secure Payments
-                    </div>
-                    <div class="footer-trust-mark">
-                        <iconify-icon icon="hugeicons:check-circle-01"></iconify-icon>
-                        Official Partners
-                    </div>
-                </div>
-            </div>
-            <div class="footer-col">
-                <h4 class="footer-col__title">Platform</h4>
-                <div class="footer-col__links">
-                    <a href="events.html" class="footer-col__link">Browse Events</a>
-                    <a href="voting.html" class="footer-col__link">Voting Systems</a>
-                    <a href="about.html" class="footer-col__link">Our Story</a>
-                </div>
-            </div>
-            <div class="footer-col">
-                <h4 class="footer-col__title">Solutions</h4>
-                <div class="footer-col__links">
-                    <a href="organizer-dashboard.html" class="footer-col__link">For Organizers</a>
-                    <a href="#" class="footer-col__link">Partner with Us</a>
-                    <a href="scanner.html" class="footer-col__link">Ticket Scanning</a>
-                </div>
-            </div>
-            <div class="footer-col">
-                <h4 class="footer-col__title">Support</h4>
-                <div class="footer-col__links">
-                    <a href="contact.html" class="footer-col__link">Help Center</a>
-                    <a href="terms.html" class="footer-col__link">Terms of Service</a>
-                    <a href="privacy.html" class="footer-col__link">Privacy Policy</a>
-                </div>
-            </div>
-        </div>
-    </footer>
+    <div id="footer-root"></div>
 
     <!-- Scripts -->
-    
+    <script src="assets/js/core.js"></script>
+    <script src="assets/js/nav.js"></script>
+    <script src="assets/js/layout.js"></script>
     <script src="assets/js/env.js"></script>
     <script type="module" src="/assets/js/db.js"></script>
     <script src="assets/js/voting.js"></script>

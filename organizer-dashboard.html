@@ -129,10 +129,13 @@
         <div class="dash-topbar">
             <div style="display:flex;align-items:center;gap:14px;">
                 <button class="icon-btn" id="sidebar-toggle" aria-label="Toggle menu" onclick="openMobileSidebar()" style="display:none;"><iconify-icon icon="hugeicons:menu-01"></iconify-icon></button>
-                <div class="dash-breadcrumb">Organizer Portal / <strong id="breadcrumb-page">Overview</strong></div>
+                <div class="dash-breadcrumb"><span data-i18n="dash_portal_breadcrumb">Organizer Portal</span> / <strong id="breadcrumb-page" data-i18n="dash_overview">Overview</strong></div>
             </div>
             <div class="dash-topbar__actions">
                 <button class="btn btn--primary btn--sm" id="create-event-btn" onclick="openCreateModal()" style="gap:6px;display:flex;align-items:center;"><iconify-icon icon="hugeicons:add-01"></iconify-icon> New Event</button>
+                <button class="icon-btn" aria-label="Toggle Theme" id="dash-theme-toggle" onclick="window.TA && window.TA.toggleTheme()">
+                    <iconify-icon icon="ph:sun-bold" class="theme-toggle-icon"></iconify-icon>
+                </button>
                 <button class="icon-btn" aria-label="Notifications" id="notif-btn"><iconify-icon icon="hugeicons:notification-03"></iconify-icon></button>
             </div>
         </div>
@@ -141,39 +144,39 @@
                 <div class="page-header"><div><div class="page-header__greeting" id="overview-time-greeting">Good day</div><h1 id="overview-greeting">Your Dashboard</h1></div></div>
                 <div class="panel" style="margin-bottom:24px;">
                     <div class="panel__header">
-                        <div class="panel__title">Launch Checklist</div>
+                        <div class="panel__title" data-i18n="dash_launch_checklist">Launch Checklist</div>
                     </div>
                     <div class="panel__body" style="padding:16px;">
                         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;">
-                            <div style="background:rgba(255,255,255,0.035);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:14px;">
-                                <div style="display:flex;align-items:center;gap:8px;font-weight:700;color:#f0f0f5;margin-bottom:6px;"><iconify-icon icon="hugeicons:calendar-add-02"></iconify-icon> Create event</div>
-                                <div style="font-size:12px;color:rgba(255,255,255,0.55);line-height:1.55;">Add the real event name, venue, date, image, and description.</div>
+                            <div class="checklist-item">
+                                <div class="checklist-item__title"><iconify-icon icon="hugeicons:calendar-add-02"></iconify-icon> Create event</div>
+                                <div class="checklist-item__desc">Add the real event name, venue, date, image, and description.</div>
                             </div>
-                            <div style="background:rgba(255,255,255,0.035);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:14px;">
-                                <div style="display:flex;align-items:center;gap:8px;font-weight:700;color:#f0f0f5;margin-bottom:6px;"><iconify-icon icon="hugeicons:ticket-02"></iconify-icon> Add tickets</div>
-                                <div style="font-size:12px;color:rgba(255,255,255,0.55);line-height:1.55;">Create ticket tiers, prices, capacities, and sale windows before publishing.</div>
+                            <div class="checklist-item">
+                                <div class="checklist-item__title"><iconify-icon icon="hugeicons:ticket-02"></iconify-icon> Add tickets</div>
+                                <div class="checklist-item__desc">Create ticket tiers, prices, capacities, and sale windows before publishing.</div>
                             </div>
-                            <div style="background:rgba(255,255,255,0.035);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:14px;">
-                                <div style="display:flex;align-items:center;gap:8px;font-weight:700;color:#f0f0f5;margin-bottom:6px;"><iconify-icon icon="hugeicons:checkmark-circle-01"></iconify-icon> Publish</div>
-                                <div style="font-size:12px;color:rgba(255,255,255,0.55);line-height:1.55;">Publish only when the event information is final and ready for buyers.</div>
+                            <div class="checklist-item">
+                                <div class="checklist-item__title"><iconify-icon icon="hugeicons:checkmark-circle-01"></iconify-icon> Publish</div>
+                                <div class="checklist-item__desc">Publish only when the event information is final and ready for buyers.</div>
                             </div>
-                            <div style="background:rgba(255,255,255,0.035);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:14px;">
-                                <div style="display:flex;align-items:center;gap:8px;font-weight:700;color:#f0f0f5;margin-bottom:6px;"><iconify-icon icon="hugeicons:qr-code"></iconify-icon> Scan at entry</div>
-                                <div style="font-size:12px;color:rgba(255,255,255,0.55);line-height:1.55;">Use the QR scanner on event day to validate real purchased tickets.</div>
+                            <div class="checklist-item">
+                                <div class="checklist-item__title"><iconify-icon icon="hugeicons:qr-code"></iconify-icon> Scan at entry</div>
+                                <div class="checklist-item__desc">Use the QR scanner on event day to validate real purchased tickets.</div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="stats-grid">
-                    <div class="stat-card"><div class="stat-card__label"><iconify-icon icon="hugeicons:ticket-02"></iconify-icon> Total Tickets Sold</div><div class="stat-card__value" id="stat-tickets">-</div><div class="stat-card__sub">Across all your events</div></div>
-                    <div class="stat-card"><div class="stat-card__label"><iconify-icon icon="hugeicons:money-bag-02"></iconify-icon> Gross Revenue</div><div class="stat-card__value" id="stat-revenue">-</div><div class="stat-card__sub">Before platform fees</div></div>
-                    <div class="stat-card"><div class="stat-card__label"><iconify-icon icon="hugeicons:calendar-01"></iconify-icon> Active Events</div><div class="stat-card__value" id="stat-events">-</div><div class="stat-card__sub">Currently live &amp; scheduled</div></div>
-                    <div class="stat-card"><div class="stat-card__label"><iconify-icon icon="hugeicons:user-multiple-02"></iconify-icon> Ticket Holders</div><div class="stat-card__value" id="stat-attendees">-</div><div class="stat-card__sub">Created after paid orders</div></div>
+                    <div class="stat-card"><div class="stat-card__label"><iconify-icon icon="hugeicons:ticket-02"></iconify-icon> <span data-i18n="dash_total_tickets_sold">Total Tickets Sold</span></div><div class="stat-card__value" id="stat-tickets">-</div><div class="stat-card__sub">Across all your events</div></div>
+                    <div class="stat-card"><div class="stat-card__label"><iconify-icon icon="hugeicons:money-bag-02"></iconify-icon> <span data-i18n="dash_gross_revenue">Gross Revenue</span></div><div class="stat-card__value" id="stat-revenue">-</div><div class="stat-card__sub">Before platform fees</div></div>
+                    <div class="stat-card"><div class="stat-card__label"><iconify-icon icon="hugeicons:calendar-01"></iconify-icon> <span data-i18n="dash_active_events">Active Events</span></div><div class="stat-card__value" id="stat-events">-</div><div class="stat-card__sub">Currently live &amp; scheduled</div></div>
+                    <div class="stat-card"><div class="stat-card__label"><iconify-icon icon="hugeicons:user-multiple-02"></iconify-icon> <span data-i18n="dash_ticket_holders">Ticket Holders</span></div><div class="stat-card__value" id="stat-attendees">-</div><div class="stat-card__sub">Created after paid orders</div></div>
                 </div>
                 <div class="content-grid">
                     <div class="panel"><div class="panel__header"><div class="panel__title">Your Events</div><a href="#" class="panel__link" onclick="showSection('my-events', document.getElementById('nav-events-link')); return false;">View all</a></div><div id="overview-events-container"></div></div>
                     <div style="display:flex;flex-direction:column;gap:16px;">
-                        <div class="payout-card"><div class="payout-label">Available Payout</div><div class="payout-amount" id="payout-balance">GHS 0.00</div><button class="btn btn--primary btn--sm btn--full" onclick="showSection('payouts', document.getElementById('nav-payouts')); document.getElementById('payout-form-wrap').style.display='block';">Request Payout</button></div>
+                        <div class="payout-card"><div class="payout-label" data-i18n="dash_available_payout">Available Payout</div><div class="payout-amount" id="payout-balance">GHS 0.00</div><button class="btn btn--primary btn--sm btn--full" onclick="showSection('payouts', document.getElementById('nav-payouts')); document.getElementById('payout-form-wrap').style.display='block';"><span data-i18n="dash_request_payout">Request Payout</span></button></div>
                         <div class="panel"><div class="panel__header"><div class="panel__title">Quick Actions</div></div><div class="panel__body" style="padding:12px;"><a href="#" class="quick-action" onclick="openCreateModal(); return false;"><iconify-icon icon="hugeicons:add-circle"></iconify-icon> Create New Event <iconify-icon icon="hugeicons:arrow-right-01" class="quick-action__arrow"></iconify-icon></a><a href="scanner.html" class="quick-action"><iconify-icon icon="hugeicons:qr-code"></iconify-icon> Open QR Scanner <iconify-icon icon="hugeicons:arrow-right-01" class="quick-action__arrow"></iconify-icon></a><a href="#" class="quick-action" onclick="showSection('promos', document.getElementById('nav-promos')); togglePromoForm(); return false;"><iconify-icon icon="hugeicons:discount-tag-01"></iconify-icon> Create Promo Code <iconify-icon icon="hugeicons:arrow-right-01" class="quick-action__arrow"></iconify-icon></a><a href="#" class="quick-action" onclick="showSection('analytics', document.getElementById('nav-analytics')); return false;"><iconify-icon icon="hugeicons:chart-increase"></iconify-icon> View Analytics <iconify-icon icon="hugeicons:arrow-right-01" class="quick-action__arrow"></iconify-icon></a></div></div>
                     </div>
                 </div>
@@ -261,7 +264,7 @@
                     <div id="attendees-container"><div class="empty-state"><div class="empty-state__icon"><iconify-icon icon="hugeicons:loading-03"></iconify-icon></div><div class="empty-state__title">Loading attendees...</div></div></div>
                 </div>
             </section>
-            <section id="section-analytics" style="display:none;"><div class="page-header"><div><h1>Analytics</h1></div></div><div class="stats-grid" id="analytics-stats" style="margin-bottom:24px;"><div class="stat-card"><div class="stat-card__label"><iconify-icon icon="hugeicons:money-bag-02"></iconify-icon> Total Revenue</div><div class="stat-card__value" id="a-revenue">-</div><div class="stat-card__sub">All paid orders</div></div><div class="stat-card"><div class="stat-card__label"><iconify-icon icon="hugeicons:ticket-02"></iconify-icon> Tickets Sold</div><div class="stat-card__value" id="a-tickets">-</div><div class="stat-card__sub">Across all events</div></div><div class="stat-card"><div class="stat-card__label"><iconify-icon icon="hugeicons:package-delivered"></iconify-icon> Total Orders</div><div class="stat-card__value" id="a-orders">-</div><div class="stat-card__sub">Completed transactions</div></div><div class="stat-card"><div class="stat-card__label"><iconify-icon icon="hugeicons:calendar-01"></iconify-icon> Active Events</div><div class="stat-card__value" id="a-events">-</div><div class="stat-card__sub">Currently live</div></div></div><div class="content-grid"><div class="panel"><div class="panel__header"><div class="panel__title">Daily Revenue (Last 7 Days)</div></div><div class="panel__body" style="padding:20px;"><canvas id="revenue-chart" height="180" style="width:100%;"></canvas></div></div><div class="panel"><div class="panel__header"><div class="panel__title">Revenue by Event</div></div><div id="event-revenue-list" style="padding:8px 0;"></div></div></div></section>
+            <section id="section-analytics" style="display:none;"><div class="page-header"><div><h1>Analytics</h1></div></div><div class="stats-grid" id="analytics-stats" style="margin-bottom:24px;"><div class="stat-card"><div class="stat-card__label"><iconify-icon icon="hugeicons:money-bag-02"></iconify-icon> Total Revenue</div><div class="stat-card__value" id="a-revenue">-</div><div class="stat-card__sub">All paid orders</div></div><div class="stat-card"><div class="stat-card__label"><iconify-icon icon="hugeicons:ticket-02"></iconify-icon> Tickets Sold</div><div class="stat-card__value" id="a-tickets">-</div><div class="stat-card__sub">Across all events</div></div><div class="stat-card"><div class="stat-card__label"><iconify-icon icon="hugeicons:package-delivered"></iconify-icon> Total Orders</div><div class="stat-card__value" id="a-orders">-</div><div class="stat-card__sub">Completed transactions</div></div><div class="stat-card"><div class="stat-card__label"><iconify-icon icon="hugeicons:calendar-01"></iconify-icon> <span data-i18n="dash_active_events">Active Events</span></div><div class="stat-card__value" id="a-events">-</div><div class="stat-card__sub">Currently live</div></div></div><div class="content-grid"><div class="panel"><div class="panel__header"><div class="panel__title">Daily Revenue (Last 7 Days)</div></div><div class="panel__body" style="padding:20px;"><canvas id="revenue-chart" height="180" style="width:100%;"></canvas></div></div><div class="panel"><div class="panel__header"><div class="panel__title">Revenue by Event</div></div><div id="event-revenue-list" style="padding:8px 0;"></div></div></div></section>
             <section id="section-payouts" class="dash-section" style="display:none;">
                 <div class="page-header section-toolbar">
                     <div>
@@ -270,7 +273,7 @@
                         <p class="dash-section-note">Review settlement activity and request withdrawals from your available balance.</p>
                     </div>
                     <div class="page-header__actions">
-                        <button class="btn btn--primary btn--sm" onclick="document.getElementById('payout-form-wrap').style.display=document.getElementById('payout-form-wrap').style.display==='none'?'block':'none'"><iconify-icon icon="hugeicons:money-send-02"></iconify-icon> Request Payout</button>
+                        <button class="btn btn--primary btn--sm" onclick="document.getElementById('payout-form-wrap').style.display=document.getElementById('payout-form-wrap').style.display==='none'?'block':'none'"><iconify-icon icon="hugeicons:money-send-02"></iconify-icon> <span data-i18n="dash_request_payout">Request Payout</span></button>
                     </div>
                 </div>
                 <div class="payout-workspace">
@@ -597,40 +600,40 @@
                 <input type="hidden" id="me-event-id" />
                 <div style="display:grid;gap:16px;margin-bottom:20px;">
                     <div>
-                        <label style="font-size:12px;font-weight:600;color:rgba(255,255,255,0.5);display:block;margin-bottom:6px;">Event Title *</label>
+                        <label class="dash-label" style="display:block;margin-bottom:6px;">Event Title *</label>
                         <input id="me-title" type="text" required placeholder="Event name"
                             style="width:100%;background:var(--color-bg-elevated);border:1px solid var(--color-border);border-radius:10px;padding:12px 14px;color:var(--color-text-primary);font-size:14px;outline:none;" />
                     </div>
                     <div>
-                        <label style="font-size:12px;font-weight:600;color:rgba(255,255,255,0.5);display:block;margin-bottom:6px;">Description</label>
+                        <label class="dash-label" style="display:block;margin-bottom:6px;">Description</label>
                         <textarea id="me-description" rows="3" placeholder="Describe the event..."
                             style="width:100%;background:var(--color-bg-elevated);border:1px solid var(--color-border);border-radius:10px;padding:12px 14px;color:var(--color-text-primary);font-size:14px;outline:none;resize:vertical;"></textarea>
                     </div>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                         <div>
-                            <label style="font-size:12px;font-weight:600;color:rgba(255,255,255,0.5);display:block;margin-bottom:6px;">Start Date & Time *</label>
+                            <label class="dash-label" style="display:block;margin-bottom:6px;">Start Date & Time *</label>
                             <input id="me-start" type="datetime-local" required
                                 style="width:100%;background:var(--color-bg-elevated);border:1px solid var(--color-border);border-radius:10px;padding:12px 14px;color:var(--color-text-primary);font-size:14px;outline:none;" />
                         </div>
                         <div>
-                            <label style="font-size:12px;font-weight:600;color:rgba(255,255,255,0.5);display:block;margin-bottom:6px;">End Date & Time *</label>
+                            <label class="dash-label" style="display:block;margin-bottom:6px;">End Date & Time *</label>
                             <input id="me-end" type="datetime-local" required
                                 style="width:100%;background:var(--color-bg-elevated);border:1px solid var(--color-border);border-radius:10px;padding:12px 14px;color:var(--color-text-primary);font-size:14px;outline:none;" />
                         </div>
                     </div>
                     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
                         <div>
-                            <label style="font-size:12px;font-weight:600;color:rgba(255,255,255,0.5);display:block;margin-bottom:6px;">Venue Name</label>
+                            <label class="dash-label" style="display:block;margin-bottom:6px;">Venue Name</label>
                             <input id="me-venue" type="text" placeholder="e.g. Accra Sports Stadium"
                                 style="width:100%;background:var(--color-bg-elevated);border:1px solid var(--color-border);border-radius:10px;padding:12px 14px;color:var(--color-text-primary);font-size:14px;outline:none;" />
                         </div>
                         <div>
-                            <label style="font-size:12px;font-weight:600;color:rgba(255,255,255,0.5);display:block;margin-bottom:6px;">City *</label>
+                            <label class="dash-label" style="display:block;margin-bottom:6px;">City *</label>
                             <input id="me-city" type="text" required placeholder="e.g. Accra"
                                 style="width:100%;background:var(--color-bg-elevated);border:1px solid var(--color-border);border-radius:10px;padding:12px 14px;color:var(--color-text-primary);font-size:14px;outline:none;" />
                         </div>
                         <div>
-                            <label style="font-size:12px;font-weight:600;color:rgba(255,255,255,0.5);display:block;margin-bottom:6px;">Country *</label>
+                            <label class="dash-label" style="display:block;margin-bottom:6px;">Country *</label>
                             <select id="me-country" required
                                 style="width:100%;background:var(--color-bg-elevated);border:1px solid var(--color-border);border-radius:10px;padding:12px 14px;color:var(--color-text-primary);font-size:14px;outline:none;">
                                 <option value="Ghana">Ghana</option>
@@ -715,9 +718,9 @@
                         </div>
                         <div>
                             <label
-                                style="font-size:12px;font-weight:600;color:rgba(255,255,255,0.5);display:block;margin-bottom:6px;">Currency</label>
+                                class="dash-label" style="display:block;margin-bottom:6px;">Currency</label>
                             <select id="ce-currency"
-                                style="width:100%;background:#1a1a2e;border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:12px 14px;color:#f0f0f5;font-size:14px;outline:none;">
+                                class="dash-select">
                                 <option value="GHS">GHS</option>
                                 <option value="NGN">NGN</option>
                                 <option value="R">R (ZAR)</option>
@@ -729,14 +732,14 @@
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                         <div>
                             <label
-                                style="font-size:12px;font-weight:600;color:rgba(255,255,255,0.5);display:block;margin-bottom:6px;">Start
+                                class="dash-label" style="display:block;margin-bottom:6px;">Start
                                 Date &amp; Time *</label>
                             <input id="ce-start" type="datetime-local" required
                                 style="width:100%;background:var(--color-bg-elevated);border:1px solid var(--color-border);border-radius:10px;padding:12px 14px;color:var(--color-text-primary);font-size:14px;outline:none;" />
                         </div>
                         <div>
                             <label
-                                style="font-size:12px;font-weight:600;color:rgba(255,255,255,0.5);display:block;margin-bottom:6px;">End
+                                class="dash-label" style="display:block;margin-bottom:6px;">End
                                 Date &amp; Time *</label>
                             <input id="ce-end" type="datetime-local" required
                                 style="width:100%;background:var(--color-bg-elevated);border:1px solid var(--color-border);border-radius:10px;padding:12px 14px;color:var(--color-text-primary);font-size:14px;outline:none;" />
@@ -752,14 +755,14 @@
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                         <div>
                             <label
-                                style="font-size:12px;font-weight:600;color:rgba(255,255,255,0.5);display:block;margin-bottom:6px;">Venue
+                                class="dash-label" style="display:block;margin-bottom:6px;">Venue
                                 Name *</label>
                             <input id="ce-venue" type="text" required placeholder="e.g. Accra Sports Stadium"
                                 style="width:100%;background:var(--color-bg-elevated);border:1px solid var(--color-border);border-radius:10px;padding:12px 14px;color:var(--color-text-primary);font-size:14px;outline:none;" />
                         </div>
                         <div>
                             <label
-                                style="font-size:12px;font-weight:600;color:rgba(255,255,255,0.5);display:block;margin-bottom:6px;">Address</label>
+                                class="dash-label" style="display:block;margin-bottom:6px;">Address</label>
                             <input id="ce-address" type="text" placeholder="Street address"
                                 style="width:100%;background:var(--color-bg-elevated);border:1px solid var(--color-border);border-radius:10px;padding:12px 14px;color:var(--color-text-primary);font-size:14px;outline:none;" />
                         </div>
@@ -877,15 +880,15 @@
                 </div>
                 <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px;">
                     <div>
-                        <label style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.4);display:block;margin-bottom:5px;">Tier Name</label>
+                        <label class="dash-label" style="display:block;margin-bottom:5px;">Tier Name</label>
                         <input name="tier-name-${id}" type="text" placeholder="e.g. General Admission" required style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 12px;color:#f0f0f5;font-size:13px;outline:none;" />
                     </div>
                     <div>
-                        <label style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.4);display:block;margin-bottom:5px;">Price (pesewas)</label>
+                        <label class="dash-label" style="display:block;margin-bottom:5px;">Price (pesewas)</label>
                         <input name="tier-price-${id}" type="number" min="0" placeholder="5000 = GHS 50" required style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 12px;color:#f0f0f5;font-size:13px;outline:none;" />
                     </div>
                     <div>
-                        <label style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.4);display:block;margin-bottom:5px;">Capacity</label>
+                        <label class="dash-label" style="display:block;margin-bottom:5px;">Capacity</label>
                         <input name="tier-capacity-${id}" type="number" min="1" placeholder="e.g. 500" required style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:10px 12px;color:#f0f0f5;font-size:13px;outline:none;" />
                     </div>
                 </div>`;

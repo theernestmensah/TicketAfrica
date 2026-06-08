@@ -1441,3 +1441,83 @@ body {
         color: var(--dash-text-muted);
     }
 }
+
+/* ============================================================
+   APPLE LUXURY CONTRAST OVERRIDES & DASHBOARD CHECKLIST
+   ============================================================ */
+
+/* Checklist items in Organizer Dashboard overview */
+.checklist-item {
+    background: rgba(255, 255, 255, 0.035);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 14px;
+    transition: background-color var(--transition-base), border-color var(--transition-base);
+}
+
+.checklist-item__title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    color: #f0f0f5;
+    margin-bottom: 6px;
+}
+
+.checklist-item__desc {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.55);
+    line-height: 1.55;
+}
+
+[data-theme="light"] .checklist-item {
+    background: var(--color-bg-elevated) !important;
+    border-color: var(--color-border) !important;
+}
+
+[data-theme="light"] .checklist-item__title {
+    color: var(--color-text-primary) !important;
+}
+
+[data-theme="light"] .checklist-item__desc {
+    color: var(--color-text-secondary) !important;
+}
+
+/* Light Theme overrides for modal overlay structures */
+[data-theme="light"] .modal-overlay label,
+[data-theme="light"] .modal-overlay .dash-label,
+[data-theme="light"] .modal-overlay select,
+[data-theme="light"] .modal-overlay h2,
+[data-theme="light"] .modal-overlay div[style*="color:rgba(255,255,255"],
+[data-theme="light"] .modal-overlay div[style*="color: rgba(255,255,255"],
+[data-theme="light"] .modal-overlay span[style*="color:rgba(255,255,255"],
+[data-theme="light"] .modal-overlay span[style*="color: rgba(255,255,255"],
+[data-theme="light"] .modal-overlay label[style*="color:rgba(255,255,255"],
+[data-theme="light"] .modal-overlay label[style*="color: rgba(255,255,255"] {
+    color: var(--color-text-secondary) !important;
+}
+
+[data-theme="light"] .modal-overlay input,
+[data-theme="light"] .modal-overlay select,
+[data-theme="light"] .modal-overlay textarea {
+    background: var(--color-bg-elevated) !important;
+    color: var(--color-text-primary) !important;
+    border-color: var(--color-border) !important;
+}
+
+[data-theme="light"] .modal-overlay [style*="color:rgba(255,255,255,0.3)"],
+[data-theme="light"] .modal-overlay [style*="color:rgba(255,255,255,0.4)"] {
+    color: var(--color-text-muted) !important;
+}
+
+[data-theme="light"] .modal-overlay button[onclick*="close"] {
+    color: var(--color-text-muted) !important;
+}
+
+/* Main Dashboard general selector fixes for custom sub-elements */
+[data-theme="light"] .dash-main [style*="color:rgba(255,255,255,0.55)"],
+[data-theme="light"] .dash-main [style*="color:rgba(255,255,255,0.5)"],
+[data-theme="light"] .dash-main [style*="color:rgba(255, 255, 255, 0.5)"],
+[data-theme="light"] .dash-main [style*="color:rgba(255,255,255,0.4)"] {
+    color: var(--color-text-secondary) !important;
+}

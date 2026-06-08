@@ -128,6 +128,7 @@ window.ConvexDB = {
     // -- Profiles/Users --
     upsertUser: function(args) { return window.ConvexDB.mutation("users:upsertUser", args); },
     getByClerkId: function(clerk_id) { return window.ConvexDB.query("users:getByClerkId", { clerk_id: clerk_id }); },
+    updateLanguagePreference: function(args) { return window.ConvexDB.mutation("users:updateLanguagePreference", args); },
 
     // -- Organizers --
     getOrgByOwner: function(owner_id) { return window.ConvexDB.query("users:getOrgByOwner", { owner_id: owner_id }); },

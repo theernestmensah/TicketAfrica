@@ -184,6 +184,280 @@
         return d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
     };
 
+    /* ── Internationalization (i18n) ────────────────────── */
+    window.TA_LANGUAGES = {
+        en: {
+            hero_headline_1: "Every great",
+            hero_headline_2: "starts here.",
+            hero_headline_accent: "African event",
+            hero_subtext: "Tickets. Verified. Delivered. Across Ghana, Nigeria, Kenya, South Africa & Rwanda.",
+            hero_browse_btn: "Browse Events",
+            hero_organizer_btn: "Sell Tickets",
+            hero_stat_live: "Live Events",
+            hero_stat_countries: "Countries",
+            hero_stat_tickets: "Tickets Issued",
+            hero_stat_ussd: "USSD Access",
+            hero_search_placeholder: "Search events, artists, venues...",
+            hero_country_placeholder: "All Countries",
+            hero_when_placeholder: "Any Date",
+            hero_find_events: "Find Events",
+            hero_chip_ussd_sub: "No internet needed",
+            voting_hero_title: "Community Power",
+            voting_hero_sub: "Cast your vote in ongoing competitions, elections, and decision-making polls across Africa.",
+            voting_section_title: "Active Polls",
+            voting_fetching_polls: "Fetching active polls...",
+            nav_discover: "Discover Events",
+            nav_voting: "Voting & Polls",
+            nav_organizers: "For Organizers",
+            nav_pricing: "Pricing",
+            nav_help: "Help",
+            nav_signin: "Sign in",
+            nav_get_started: "Get Started",
+            nav_as_attendee: "As an Attendee",
+            nav_as_attendee_desc: "Browse & buy event tickets",
+            nav_as_organizer: "As an Organizer",
+            nav_as_organizer_desc: "Create & manage events",
+            nav_my_tickets: "My tickets",
+            nav_org_dashboard: "Organizer dashboard",
+            nav_signout: "Sign out",
+            nav_signed_in: "Signed in",
+            footer_col_platform: "Platform",
+            footer_col_solutions: "Solutions",
+            footer_col_support: "Support",
+            footer_link_browse: "Browse Events",
+            footer_link_voting: "Voting Systems",
+            footer_link_story: "Our Story",
+            footer_link_organizers: "For Organizers",
+            footer_link_partner: "Partner with Us",
+            footer_link_scanning: "Ticket Scanning",
+            footer_link_help: "Help Center",
+            footer_link_terms: "Terms of Service",
+            footer_link_privacy: "Privacy Policy",
+            footer_trust_payments: "Secure Payments",
+            footer_trust_partners: "Official Partners",
+            footer_brand_desc: "Empowering African events and communities through seamless ticketing and engagement.",
+            dash_portal_breadcrumb: "Organizer Portal",
+            dash_overview: "Overview",
+            dash_new_event: "New Event",
+            dash_launch_checklist: "Launch Checklist",
+            dash_total_tickets_sold: "Total Tickets Sold",
+            dash_gross_revenue: "Gross Revenue",
+            dash_active_events: "Active Events",
+            dash_ticket_holders: "Ticket Holders",
+            dash_available_payout: "Available Payout",
+            dash_request_payout: "Request Payout"
+        },
+        fr: {
+            hero_headline_1: "Chaque grand",
+            hero_headline_2: "commence ici.",
+            hero_headline_accent: "événement africain",
+            hero_subtext: "Billets. Vérifiés. Livrés. À travers le Ghana, le Nigéria, le Kenya, l'Afrique du Sud & le Rwanda.",
+            hero_browse_btn: "Parcourir les Événements",
+            hero_organizer_btn: "Vendre des Billets",
+            hero_stat_live: "Événements en Direct",
+            hero_stat_countries: "Pays",
+            hero_stat_tickets: "Billets Émis",
+            hero_stat_ussd: "Accès USSD",
+            hero_search_placeholder: "Rechercher des événements, artistes, lieux...",
+            hero_country_placeholder: "Tous les Pays",
+            hero_when_placeholder: "N'importe quelle date",
+            hero_find_events: "Trouver des Événements",
+            hero_chip_ussd_sub: "Sans connexion internet",
+            voting_hero_title: "Pouvoir de la Communauté",
+            voting_hero_sub: "Votez dans les compétitions, élections et sondages communautaires en cours à travers l'Afrique.",
+            voting_section_title: "Sondages Actifs",
+            voting_fetching_polls: "Récupération des sondages...",
+            nav_discover: "Découvrir les Événements",
+            nav_voting: "Vote & Sondages",
+            nav_organizers: "Pour les Organisateurs",
+            nav_pricing: "Tarifs",
+            nav_help: "Aide",
+            nav_signin: "Se connecter",
+            nav_get_started: "Commencer",
+            nav_as_attendee: "En tant que Participant",
+            nav_as_attendee_desc: "Parcourir & acheter des billets",
+            nav_as_organizer: "En tant qu'Organisateur",
+            nav_as_organizer_desc: "Créer & gérer des événements",
+            nav_my_tickets: "Mes billets",
+            nav_org_dashboard: "Tableau de bord",
+            nav_signout: "Se déconnecter",
+            nav_signed_in: "Connecté",
+            footer_col_platform: "Plateforme",
+            footer_col_solutions: "Solutions",
+            footer_col_support: "Support",
+            footer_link_browse: "Parcourir les Événements",
+            footer_link_voting: "Systèmes de Vote",
+            footer_link_story: "Notre Histoire",
+            footer_link_organizers: "Pour les Organisateurs",
+            footer_link_partner: "Devenir Partenaire",
+            footer_link_scanning: "Scan de Billets",
+            footer_link_help: "Centre d'Aide",
+            footer_link_terms: "Conditions d'Utilisation",
+            footer_link_privacy: "Politique de Confidentialité",
+            footer_trust_payments: "Paiements Sécurisés",
+            footer_trust_partners: "Partenaires Officiels",
+            footer_brand_desc: "Propulser les événements et les communautés en Afrique avec des solutions de billetterie et d'engagement fluides.",
+            dash_portal_breadcrumb: "Portail Organisateur",
+            dash_overview: "Aperçu",
+            dash_new_event: "Nouvel Événement",
+            dash_launch_checklist: "Liste de Lancement",
+            dash_total_tickets_sold: "Billets Vendus",
+            dash_gross_revenue: "Revenu Brut",
+            dash_active_events: "Événements Actifs",
+            dash_ticket_holders: "Détenteurs de Billets",
+            dash_available_payout: "Paiement Disponible",
+            dash_request_payout: "Demander un Paiement"
+        },
+        sw: {
+            hero_headline_1: "Kila tukio kubwa la",
+            hero_headline_2: "huanzia hapa.",
+            hero_headline_accent: "Afrika",
+            hero_subtext: "Tiketi. Zilizothibitishwa. Zilizotumwa. Kote Ghana, Nigeria, Kenya, Afrika Kusini & Rwanda.",
+            hero_browse_btn: "Tafuta Matukio",
+            hero_organizer_btn: "Uza Tiketi",
+            hero_stat_live: "Matukio ya Moja kwa Moja",
+            hero_stat_countries: "Nchi",
+            hero_stat_tickets: "Tiketi Zilizotolewa",
+            hero_stat_ussd: "Njia ya USSD",
+            hero_search_placeholder: "Tafuta matukio, wasanii, maeneo...",
+            hero_country_placeholder: "Nchi Zote",
+            hero_when_placeholder: "Tarehe Yoyote",
+            hero_find_events: "Pata Matukio",
+            hero_chip_ussd_sub: "Bila mtandao",
+            voting_hero_title: "Nguvu ya Jamii",
+            voting_hero_sub: "Piga kura yako kwenye mashindano yanayoendelea, uchaguzi, na kura za maoni kote Afrika.",
+            voting_section_title: "Kura za Maoni Zinazoendelea",
+            voting_fetching_polls: "Inapakia kura za maoni...",
+            nav_discover: "Gundua Matukio",
+            nav_voting: "Kura & Maoni",
+            nav_organizers: "Kwa Waandaaji",
+            nav_pricing: "Bei",
+            nav_help: "Msaada",
+            nav_signin: "Ingia",
+            nav_get_started: "Anza Sasa",
+            nav_as_attendee: "Kama Mhudhuriaji",
+            nav_as_attendee_desc: "Tafuta & nunua tiketi",
+            nav_as_organizer: "Kama Mwandaji",
+            nav_as_organizer_desc: "Unda & dhibiti matukio",
+            nav_my_tickets: "Tiketi zangu",
+            nav_org_dashboard: "Dashibodi ya Mwandaji",
+            nav_signout: "Ondoka",
+            nav_signed_in: "Umeingia kama",
+            footer_col_platform: "Jukwaa",
+            footer_col_solutions: "Suluhisho",
+            footer_col_support: "Msaada",
+            footer_link_browse: "Tafuta Matukio",
+            footer_link_voting: "Mifumo ya Kura",
+            footer_link_story: "Hadithi Yetu",
+            footer_link_organizers: "Kwa Waandaaji",
+            footer_link_partner: "Shirikiana Nasi",
+            footer_link_scanning: "Kuhakiki Tiketi",
+            footer_link_help: "Kituo cha Msaada",
+            footer_link_terms: "Masharti ya Huduma",
+            footer_link_privacy: "Sera ya Faragha",
+            footer_trust_payments: "Malipo Salama",
+            footer_trust_partners: "Washirika Rasmi",
+            footer_brand_desc: "Kuwezesha matukio na jamii za Kiafrika kupitia mifumo ya tiketi na ushirikishwaji rahisi.",
+            dash_portal_breadcrumb: "Lango la Mwandaji",
+            dash_overview: "Maelezo ya Jumla",
+            dash_new_event: "Tukio Jipya",
+            dash_launch_checklist: "Orodha ya Kuanzia",
+            dash_total_tickets_sold: "Tiketi Zilizouzwa",
+            dash_gross_revenue: "Mapato Jumla",
+            dash_active_events: "Matukio Yanayoendelea",
+            dash_ticket_holders: "Wenye Tiketi",
+            dash_available_payout: "Malipo Yanayopatikana",
+            dash_request_payout: "Omba Malipo"
+        }
+    };
+
+    TA.translate = function (key, lang) {
+        const currentLang = lang || document.documentElement.getAttribute('lang') || localStorage.getItem('ta-lang') || 'en';
+        const dictionary = window.TA_LANGUAGES[currentLang] || window.TA_LANGUAGES['en'];
+        return dictionary[key] !== undefined ? dictionary[key] : (window.TA_LANGUAGES['en'][key] !== undefined ? window.TA_LANGUAGES['en'][key] : key);
+    };
+
+    TA.initI18n = function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const queryLang = urlParams.get('lang');
+        const savedLang = localStorage.getItem('ta-lang');
+        const browserLang = (navigator.language || 'en').substring(0, 2);
+        
+        let targetLang = 'en';
+        if (queryLang && window.TA_LANGUAGES[queryLang]) {
+            targetLang = queryLang;
+        } else if (savedLang && window.TA_LANGUAGES[savedLang]) {
+            targetLang = savedLang;
+        } else if (browserLang && window.TA_LANGUAGES[browserLang]) {
+            targetLang = browserLang;
+        }
+
+        document.documentElement.setAttribute('lang', targetLang);
+        localStorage.setItem('ta-lang', targetLang);
+        TA.updateDOMTranslations(targetLang);
+    };
+
+    TA.setLanguage = function (lang) {
+        if (window.TA_LANGUAGES[lang]) {
+            document.documentElement.setAttribute('lang', lang);
+            localStorage.setItem('ta-lang', lang);
+            TA.updateDOMTranslations(lang);
+            
+            // Sync to Convex database if user is logged in
+            if (window.ConvexDB && window.Clerk && window.Clerk.user) {
+                window.ConvexDB.updateLanguagePreference({ preferred_language: lang })
+                    .catch(err => console.warn("[TA] Failed to update language in Convex:", err));
+            }
+            
+            window.dispatchEvent(new CustomEvent('ta-lang-change', { detail: { language: lang } }));
+        }
+    };
+
+    TA.updateDOMTranslations = function (lang) {
+        const currentLang = lang || document.documentElement.getAttribute('lang') || 'en';
+        
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            const translation = TA.translate(key, currentLang);
+            if (translation !== key) {
+                // If element has iconify-icon or specific child elements, replace only text nodes
+                if (el.querySelector('iconify-icon') || el.querySelector('span')) {
+                    let textNode = Array.from(el.childNodes).find(node => node.nodeType === Node.TEXT_NODE);
+                    if (textNode) {
+                        textNode.nodeValue = translation;
+                    } else {
+                        // Fallback: search for child span text
+                        const innerSpan = el.querySelector('span');
+                        if (innerSpan) {
+                            innerSpan.textContent = translation;
+                        } else {
+                            el.innerHTML = translation;
+                        }
+                    }
+                } else {
+                    el.textContent = translation;
+                }
+            }
+        });
+
+        document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+            const key = el.getAttribute('data-i18n-placeholder');
+            el.setAttribute('placeholder', TA.translate(key, currentLang));
+        });
+
+        document.querySelectorAll('[data-i18n-title]').forEach(el => {
+            const key = el.getAttribute('data-i18n-title');
+            el.setAttribute('title', TA.translate(key, currentLang));
+        });
+
+        const label = document.getElementById('nav-lang-label');
+        if (label) {
+            label.textContent = currentLang.toUpperCase();
+        }
+    };
+
+    TA.initI18n();
+
     /* ── Theme Toggle ───────────────────────────────────── */
     TA.initTheme = function () {
         const savedTheme = localStorage.getItem('ta-theme');
@@ -218,6 +492,7 @@
         TA.initTabs();
         TA.initScrollReveal();
         TA.initQuantitySelectors();
+        TA.updateDOMTranslations();
 
         // Animate stat counters when visible
         const observer = new IntersectionObserver(function (entries) {

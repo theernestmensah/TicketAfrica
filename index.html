@@ -133,23 +133,23 @@
 
         <!-- HEADLINE  -  no eyebrow, just power -->
         <h1 class="hero__headline" data-reveal>
-          <span class="hero__headline-line">Every great</span>
-          <span class="hero__headline-line hero__headline-line--accent">African event</span>
-          <span class="hero__headline-line">starts here.</span>
+          <span class="hero__headline-line" data-i18n="hero_headline_1">Every great</span>
+          <span class="hero__headline-line hero__headline-line--accent" data-i18n="hero_headline_accent">African event</span>
+          <span class="hero__headline-line" data-i18n="hero_headline_2">starts here.</span>
         </h1>
 
         <!-- SUBTEXT  -  one line, punchy -->
-        <p class="hero__subtext" data-reveal data-delay="1">
+        <p class="hero__subtext" data-reveal data-delay="1" data-i18n="hero_subtext">
           Tickets. Verified. Delivered. Across Ghana, Nigeria, Kenya, South Africa &amp; Rwanda.
         </p>
 
         <!-- CTAs  -  two, nothing more -->
         <div class="hero__ctas" data-reveal data-delay="2">
           <a href="events.html" class="btn btn--primary hero__cta-primary" id="hero-browse-btn">
-            Browse Events
+            <span data-i18n="hero_browse_btn">Browse Events</span>
             <iconify-icon icon="hugeicons:arrow-right-01"></iconify-icon>
           </a>
-          <a href="for-organizers.html" class="btn btn--secondary hero__cta-secondary" id="hero-organizer-btn">
+          <a href="for-organizers.html" class="btn btn--secondary hero__cta-secondary" id="hero-organizer-btn" data-i18n="hero_organizer_btn">
             Sell Tickets
           </a>
         </div>
@@ -158,22 +158,22 @@
         <div class="hero__stats-row" data-reveal data-delay="3">
           <div class="hero__stat-item">
             <span class="hero__stat-num" id="stat-live-events">248</span>
-            <span class="hero__stat-txt">Live Events</span>
+            <span class="hero__stat-txt" data-i18n="hero_stat_live">Live Events</span>
           </div>
           <div class="hero__stat-sep"> - </div>
           <div class="hero__stat-item">
             <span class="hero__stat-num">5</span>
-            <span class="hero__stat-txt">Countries</span>
+            <span class="hero__stat-txt" data-i18n="hero_stat_countries">Countries</span>
           </div>
           <div class="hero__stat-sep"> - </div>
           <div class="hero__stat-item">
             <span class="hero__stat-num">2M+</span>
-            <span class="hero__stat-txt">Tickets Issued</span>
+            <span class="hero__stat-txt" data-i18n="hero_stat_tickets">Tickets Issued</span>
           </div>
           <div class="hero__stat-sep"> - </div>
           <div class="hero__stat-item">
             <span class="hero__stat-num">*123*88#</span>
-            <span class="hero__stat-txt">USSD Access</span>
+            <span class="hero__stat-txt" data-i18n="hero_stat_ussd">USSD Access</span>
           </div>
         </div>
 
@@ -183,13 +183,13 @@
             <div class="hero__command-field">
               <iconify-icon icon="hugeicons:search-01" class="hero__command-icon"></iconify-icon>
               <input type="text" class="hero__command-input" id="hero-search"
-                placeholder="Search events, artists, venues..." autocomplete="off" />
+                data-i18n-placeholder="hero_search_placeholder" placeholder="Search events, artists, venues..." autocomplete="off" />
             </div>
             <div class="hero__command-divider"></div>
             <div class="hero__command-select-wrap">
               <iconify-icon icon="hugeicons:location-01" class="hero__command-icon"></iconify-icon>
               <select class="hero__command-select" id="hero-country">
-                <option value="">All Countries</option>
+                <option value="" data-i18n="hero_country_placeholder">All Countries</option>
                 <option value="GH">Ghana</option>
                 <option value="NG">Nigeria</option>
                 <option value="KE">Kenya</option>
@@ -201,13 +201,13 @@
             <div class="hero__command-select-wrap">
               <iconify-icon icon="hugeicons:calendar-01" class="hero__command-icon"></iconify-icon>
               <select class="hero__command-select" id="hero-when">
-                <option value="">Any Date</option>
+                <option value="" data-i18n="hero_when_placeholder">Any Date</option>
                 <option>This Week</option>
                 <option>This Month</option>
                 <option>Next 3 Months</option>
               </select>
             </div>
-            <button class="hero__command-btn btn btn--primary"
+            <button class="hero__command-btn btn btn--primary" data-i18n="hero_find_events"
               onclick="window.location='events.html?q='+document.getElementById('hero-search').value+'&country='+document.getElementById('hero-country').value">
               Find Events
             </button>
@@ -227,7 +227,7 @@
       </div>
       <div>
         <div class="hero__chip-title" style="font-family:var(--font-mono);letter-spacing:0.06em;">*123*88#</div>
-        <div class="hero__chip-sub">No internet needed</div>
+        <div class="hero__chip-sub" data-i18n="hero_chip_ussd_sub">No internet needed</div>
       </div>
     </div>
 
