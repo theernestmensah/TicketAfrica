@@ -18,7 +18,7 @@
       <div class="nav-inner">
         <a href="/index.html" class="nav-logo" id="nav-logo">
           <div class="nav-logo__mark">
-            <iconify-icon icon="hugeicons:location-01"></iconify-icon>
+            <iconify-icon icon="hugeicons:ticket-01"></iconify-icon>
           </div>
           <span>Ticket<span>Africa</span></span>
         </a>
@@ -110,7 +110,7 @@
     <div class="nav-mobile-header">
       <a href="/index.html" class="nav-logo">
         <div class="nav-logo__mark">
-          <iconify-icon icon="hugeicons:location-01"></iconify-icon>
+          <iconify-icon icon="hugeicons:ticket-01"></iconify-icon>
         </div>
         <span>Ticket<span>Africa</span></span>
       </a>
@@ -178,7 +178,7 @@
         <div class="footer-brand">
           <a href="/index.html" class="nav-logo" style="margin-bottom:var(--space-2);">
             <div class="nav-logo__mark">
-              <iconify-icon icon="hugeicons:location-01"></iconify-icon>
+              <iconify-icon icon="hugeicons:ticket-01"></iconify-icon>
             </div>
             <span>Ticket<span>Africa</span></span>
           </a>

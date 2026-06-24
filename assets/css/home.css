@@ -2627,3 +2627,280 @@
         width: 100%;
     }
 }
+
+/* Venture-grade homepage layer */
+.hero {
+    min-height: min(900px, calc(100svh - 32px)) !important;
+    background:
+        linear-gradient(118deg, #111827 0%, #4C1D95 42%, #7C3AED 72%, #111827 100%) !important;
+    isolation: isolate;
+}
+
+.hero__orb,
+.hero__orb--1,
+.hero__orb--2,
+.hero__orb--3 {
+    display: none !important;
+}
+
+.hero__bg-mesh {
+    opacity: 0.58 !important;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px) !important;
+    background-size: 56px 56px !important;
+    mask-image: linear-gradient(180deg, transparent 0%, #000 20%, #000 82%, transparent 100%);
+}
+
+.hero__bg-vignette {
+    background:
+        linear-gradient(90deg, rgba(17, 24, 39, 0.90) 0%, rgba(17, 24, 39, 0.36) 48%, rgba(17, 24, 39, 0.72) 100%),
+        linear-gradient(180deg, rgba(17, 24, 39, 0.20) 0%, rgba(17, 24, 39, 0.88) 100%) !important;
+}
+
+.hero__content {
+    padding: clamp(64px, 8vh, 78px) 0 18px !important;
+    justify-content: center !important;
+}
+
+.hero__content .container {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 0.94fr) minmax(360px, 0.68fr);
+    align-items: center;
+    column-gap: clamp(36px, 6vw, 92px);
+    max-width: 1240px;
+}
+
+.hero__content .container > * {
+    grid-column: 1;
+}
+
+.hero__content .container::after,
+.hero__content .container::before {
+    grid-column: 2;
+    grid-row: 1 / span 8;
+}
+
+.hero__content .container::after {
+    content: "";
+    min-height: 500px;
+    border-radius: 8px;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.18) 0 58px, transparent 58px),
+        linear-gradient(90deg, transparent 0 34px, rgba(255, 255, 255, 0.09) 34px 35px, transparent 35px),
+        linear-gradient(180deg, transparent 0 108px, rgba(245, 158, 11, 0.18) 108px 202px, transparent 202px),
+        linear-gradient(180deg, transparent 0 236px, rgba(255, 255, 255, 0.92) 236px 370px, transparent 370px),
+        linear-gradient(180deg, transparent 0 394px, rgba(255, 255, 255, 0.92) 394px 512px, transparent 512px),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.08));
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    box-shadow: 0 34px 90px rgba(17, 24, 39, 0.40), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+    backdrop-filter: blur(24px);
+    transform: perspective(980px) rotateY(-7deg) rotateX(2deg);
+}
+
+.hero__content .container::before {
+    content: "ORGANIZER COMMAND CENTER\A\A GMV TODAY        GHS 482K\A CHECK-INS        18.4K\A FRAUD BLOCKS     312\A\A AFROLIVE FESTIVAL   84% SOLD\A STADIUM NIGHT       12 GATES LIVE\A\A QR VALIDATION  /  PAYOUT CONTROL";
+    z-index: 1;
+    align-self: center;
+    justify-self: stretch;
+    padding: 34px 36px;
+    color: #FFFFFF;
+    white-space: pre-line;
+    font-family: var(--font-mono, "SFMono-Regular", Consolas, monospace);
+    font-size: 13px;
+    line-height: 1.85;
+    letter-spacing: 0.03em;
+    text-shadow: 0 1px 12px rgba(17, 24, 39, 0.28);
+    transform: perspective(980px) rotateY(-7deg) rotateX(2deg);
+}
+
+.hero__eyebrow {
+    width: fit-content;
+    margin: 0 0 22px !important;
+    padding: 8px 12px !important;
+    color: #FDE68A !important;
+    background: rgba(255, 255, 255, 0.10) !important;
+    border-color: rgba(255, 255, 255, 0.18) !important;
+    border-radius: 999px !important;
+    backdrop-filter: blur(16px);
+}
+
+.hero__headline {
+    max-width: 650px !important;
+    margin: 0 0 24px !important;
+    text-align: left !important;
+    font-size: 0 !important;
+    line-height: 0.88 !important;
+    letter-spacing: 0 !important;
+}
+
+.hero__headline::before {
+    content: "Ticket\A Africa";
+    display: block;
+    white-space: pre-line;
+    font-size: clamp(3.8rem, 7.4vw, 6.7rem);
+    line-height: 0.88;
+    letter-spacing: 0;
+    color: #FFFFFF;
+}
+
+.hero__headline-line {
+    display: none !important;
+}
+
+.hero__headline-line--accent {
+    color: #F59E0B !important;
+    background: linear-gradient(135deg, #FFFFFF 0%, #FDE68A 36%, #F59E0B 100%) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+}
+
+.hero__subtext {
+    max-width: 620px !important;
+    margin: 0 0 32px !important;
+    text-align: left !important;
+    font-size: 0 !important;
+    line-height: 1.58 !important;
+    color: rgba(255, 255, 255, 0.86) !important;
+}
+
+.hero__subtext::before {
+    content: "The premium ticketing operating system for concerts, festivals, sport, faith, and culture across African markets.";
+    font-size: clamp(1.05rem, 1.45vw, 1.35rem);
+    line-height: 1.58;
+}
+
+.hero__ctas,
+.hero__stats-row,
+.hero__search-wrap {
+    justify-content: flex-start !important;
+}
+
+.hero__stats-row {
+    width: fit-content;
+    margin-bottom: 24px !important;
+    gap: 14px !important;
+    flex-wrap: nowrap !important;
+    border-radius: 8px !important;
+    background: rgba(255, 255, 255, 0.11) !important;
+    border-color: rgba(255, 255, 255, 0.18) !important;
+}
+
+.hero__stat-item {
+    white-space: nowrap;
+}
+
+.hero__command-inner {
+    max-width: 760px;
+    border-radius: 8px !important;
+    background: rgba(255, 255, 255, 0.96) !important;
+    box-shadow: 0 24px 70px rgba(17, 24, 39, 0.34) !important;
+}
+
+.hero__chip,
+.hero__chip--ussd {
+    border-radius: 8px !important;
+    border-color: rgba(255, 255, 255, 0.20) !important;
+    background: rgba(17, 24, 39, 0.34) !important;
+    backdrop-filter: blur(18px);
+}
+
+.trust-bar {
+    background: #FFFFFF !important;
+    border-color: rgba(17, 24, 39, 0.10) !important;
+    box-shadow: 0 16px 50px rgba(17, 24, 39, 0.06);
+}
+
+.trust-bar__item {
+    color: #374151 !important;
+    font-weight: 700;
+}
+
+.trust-bar__item iconify-icon {
+    color: #7C3AED !important;
+}
+
+.event-card,
+.category-card,
+.city-card,
+.payment-method-card,
+.security-feature,
+.pricing-card {
+    border-radius: 8px !important;
+    background: #FFFFFF !important;
+    border-color: rgba(17, 24, 39, 0.10) !important;
+    box-shadow: 0 14px 38px rgba(17, 24, 39, 0.07) !important;
+}
+
+.event-card:hover,
+.category-card:hover,
+.city-card:hover,
+.security-feature:hover,
+.pricing-card:hover {
+    border-color: rgba(124, 58, 237, 0.28) !important;
+    box-shadow: 0 22px 56px rgba(17, 24, 39, 0.12) !important;
+    transform: translateY(-4px);
+}
+
+@media (max-width: 1100px) {
+    .hero__content .container {
+        grid-template-columns: 1fr;
+    }
+
+    .hero__content .container::before,
+    .hero__content .container::after {
+        display: none;
+    }
+
+    .hero__headline,
+    .hero__subtext {
+        text-align: center !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
+
+    .hero__eyebrow,
+    .hero__stats-row {
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
+
+    .hero__ctas,
+    .hero__stats-row,
+    .hero__search-wrap {
+        justify-content: center !important;
+    }
+}
+
+@media (max-width: 640px) {
+    .hero {
+        min-height: auto !important;
+    }
+
+    .hero__content {
+        padding-top: 76px !important;
+        padding-bottom: 14px !important;
+    }
+
+    .hero__headline::before {
+        font-size: clamp(3.4rem, 16vw, 4.7rem) !important;
+    }
+
+    .hero__ctas {
+        width: 100%;
+        margin-bottom: 20px !important;
+    }
+
+    .hero__stats-row {
+        width: 100%;
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        margin-bottom: 18px !important;
+        padding: 12px !important;
+    }
+
+    .hero__stat-sep {
+        display: none;
+    }
+}

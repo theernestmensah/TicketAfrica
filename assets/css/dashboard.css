@@ -2509,3 +2509,279 @@ body.dash-sidebar-open {
         min-height: 44px;
     }
 }
+
+/* Venture-grade dashboard layer */
+.auth-gate {
+    background:
+        linear-gradient(135deg, rgba(17, 24, 39, 0.92), rgba(76, 29, 149, 0.92)),
+        #111827 !important;
+}
+
+.auth-gate__card {
+    border-radius: 8px !important;
+    background: rgba(255, 255, 255, 0.96) !important;
+    color: #111827 !important;
+    box-shadow: 0 34px 90px rgba(17, 24, 39, 0.32) !important;
+}
+
+.auth-gate__card h2 {
+    color: #111827 !important;
+}
+
+.auth-gate__card p {
+    color: #4B5563 !important;
+}
+
+.dash-sidebar {
+    width: 292px !important;
+    background:
+        linear-gradient(180deg, rgba(17, 24, 39, 0.20), rgba(17, 24, 39, 0.06)),
+        linear-gradient(180deg, #3B0764 0%, #5B21B6 46%, #7C3AED 100%) !important;
+}
+
+.dash-main {
+    margin-left: 292px;
+    background:
+        linear-gradient(180deg, rgba(124, 58, 237, 0.10) 0%, rgba(249, 250, 251, 0) 360px),
+        linear-gradient(90deg, rgba(124, 58, 237, 0.045) 0 1px, transparent 1px),
+        linear-gradient(180deg, rgba(124, 58, 237, 0.035) 0 1px, transparent 1px),
+        #F9FAFB !important;
+    background-size: auto, 52px 52px, 52px 52px, auto !important;
+}
+
+.dash-topbar {
+    top: 0;
+    min-height: 76px !important;
+    background: rgba(255, 255, 255, 0.88) !important;
+    backdrop-filter: blur(22px) saturate(150%) !important;
+}
+
+.dash-content {
+    max-width: 1560px !important;
+}
+
+.page-header {
+    margin-bottom: 22px;
+}
+
+.page-header__greeting {
+    color: #7C3AED !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.10em !important;
+    text-transform: uppercase;
+}
+
+.dash-command-strip {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 22px;
+    align-items: center;
+    margin: 0 0 24px;
+    padding: clamp(22px, 3vw, 34px);
+    border-radius: 8px;
+    color: #FFFFFF;
+    background:
+        linear-gradient(135deg, rgba(17, 24, 39, 0.22), rgba(17, 24, 39, 0)),
+        linear-gradient(135deg, #4C1D95 0%, #7C3AED 62%, #5B21B6 100%);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    box-shadow: 0 24px 64px rgba(76, 29, 149, 0.24);
+    overflow: hidden;
+    position: relative;
+}
+
+.dash-command-strip::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.055) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.055) 1px, transparent 1px);
+    background-size: 42px 42px;
+    opacity: 0.46;
+    pointer-events: none;
+}
+
+.dash-command-strip > * {
+    position: relative;
+    z-index: 1;
+}
+
+.dash-command-strip__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    color: #FDE68A;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.dash-command-strip h2 {
+    margin: 0;
+    max-width: 760px;
+    color: #FFFFFF;
+    font-family: var(--font-display, 'Sora', sans-serif);
+    font-size: clamp(26px, 3vw, 42px);
+    line-height: 1.02;
+    letter-spacing: 0;
+}
+
+.dash-command-strip p {
+    max-width: 670px;
+    margin: 12px 0 0;
+    color: rgba(255, 255, 255, 0.82);
+    line-height: 1.6;
+}
+
+.dash-command-strip__actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.dash-command-strip__actions .btn {
+    border-radius: 8px;
+}
+
+.dash-command-strip__actions .btn--secondary {
+    color: #FFFFFF;
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.22);
+}
+
+.stats-grid {
+    grid-template-columns: repeat(4, minmax(170px, 1fr)) !important;
+    gap: 18px !important;
+}
+
+.stat-card,
+.panel,
+.dash-filter-panel,
+.dash-kpi,
+.quick-action,
+.empty-state {
+    border-radius: 8px !important;
+}
+
+.stat-card {
+    min-height: 158px;
+    padding: 22px !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::after {
+    content: "";
+    position: absolute;
+    left: 22px;
+    right: 22px;
+    bottom: 14px;
+    height: 3px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #7C3AED, #F59E0B);
+    opacity: 0.55;
+}
+
+.stat-card__label {
+    color: #4B5563 !important;
+    font-size: 11px !important;
+}
+
+.stat-card__value {
+    margin-top: 14px;
+    font-size: clamp(30px, 3vw, 44px) !important;
+}
+
+.panel {
+    box-shadow: 0 18px 44px rgba(17, 24, 39, 0.08) !important;
+}
+
+.panel__header {
+    min-height: 70px !important;
+    padding: 20px 24px !important;
+    background: linear-gradient(180deg, #FFFFFF 0%, #F9FAFB 100%) !important;
+}
+
+.panel__title {
+    font-size: 15px !important;
+}
+
+.checklist-item {
+    border-radius: 8px !important;
+    background: linear-gradient(180deg, #FFFFFF, #F9FAFB) !important;
+    border-color: rgba(124, 58, 237, 0.14) !important;
+    box-shadow: 0 10px 26px rgba(17, 24, 39, 0.05);
+}
+
+.checklist-item__title iconify-icon {
+    color: #7C3AED;
+}
+
+.table-shell,
+.events-table {
+    border-radius: 8px !important;
+}
+
+.events-table th {
+    height: 48px;
+}
+
+.events-table td {
+    height: 58px;
+}
+
+.quick-action {
+    min-height: 54px;
+    border-color: rgba(17, 24, 39, 0.10) !important;
+}
+
+.quick-action:hover {
+    color: #4C1D95 !important;
+    border-color: rgba(124, 58, 237, 0.24) !important;
+    box-shadow: 0 12px 30px rgba(124, 58, 237, 0.12) !important;
+}
+
+.dash-mobile-nav {
+    border-radius: 8px !important;
+    background: rgba(17, 24, 39, 0.92) !important;
+    box-shadow: 0 22px 54px rgba(17, 24, 39, 0.30) !important;
+}
+
+.dash-mobile-nav__item {
+    border-radius: 8px !important;
+}
+
+@media (max-width: 900px) {
+    .dash-main {
+        margin-left: 0 !important;
+    }
+
+    .dash-sidebar {
+        width: min(86vw, 320px) !important;
+    }
+
+    .dash-command-strip {
+        grid-template-columns: 1fr;
+    }
+
+    .dash-command-strip__actions {
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 640px) {
+    .dash-command-strip {
+        padding: 20px;
+    }
+
+    .dash-command-strip h2 {
+        font-size: 28px;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr !important;
+    }
+}

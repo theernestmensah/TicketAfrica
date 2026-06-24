@@ -139,6 +139,18 @@
         <div class="dash-content">
             <section id="section-overview">
                 <div class="page-header"><div><div class="page-header__greeting" id="overview-time-greeting">Good day</div><h1 id="overview-greeting">Your Dashboard</h1></div></div>
+                <div class="dash-command-strip">
+                    <div>
+                        <div class="dash-command-strip__eyebrow"><iconify-icon icon="hugeicons:rocket-01"></iconify-icon> Control tower</div>
+                        <h2>Run sales, access, payouts, and event-day operations from one command surface.</h2>
+                        <p>Track demand, protect entries, settle revenue, and move from launch planning to live scanning without leaving the organizer dashboard.</p>
+                    </div>
+                    <div class="dash-command-strip__actions">
+                        <button class="btn btn--primary btn--sm" onclick="openCreateModal()"><iconify-icon icon="hugeicons:add-01"></iconify-icon> New Event</button>
+                        <a href="scanner.html" class="btn btn--secondary btn--sm"><iconify-icon icon="hugeicons:qr-code"></iconify-icon> Scanner</a>
+                        <button class="btn btn--secondary btn--sm" onclick="showSection('payouts', document.getElementById('nav-payouts')); document.getElementById('payout-form-wrap').style.display='block';"><iconify-icon icon="hugeicons:money-send-02"></iconify-icon> Payouts</button>
+                    </div>
+                </div>
                 <div class="panel" style="margin-bottom:24px;">
                     <div class="panel__header">
                         <div class="panel__title" data-i18n="dash_launch_checklist">Launch Checklist</div>
