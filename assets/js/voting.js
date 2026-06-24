@@ -27,7 +27,7 @@ async function loadAllPolls() {
     try {
         const polls = await window.ConvexDB.listPublicPolls();
         if (!polls || !polls.length) {
-            list.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:100px 0;"><p style="color:rgba(255,255,255,0.4);">No active polls at the moment.</p></div>`;
+            list.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><p class="empty-state__text">No active polls at the moment.</p></div>`;
             return;
         }
         list.innerHTML = polls.map(p => `
@@ -45,7 +45,7 @@ async function loadAllPolls() {
         `).join('');
     } catch (e) {
         console.error("Polls load error", e);
-        list.innerHTML = `<p>Error loading polls.</p>`;
+        list.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><p class="empty-state__text">Error loading polls.</p></div>`;
     }
 }
 

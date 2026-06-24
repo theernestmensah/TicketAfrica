@@ -82,7 +82,7 @@ function setText(id, value) {
 }
 
 const ORDER_STATUS = {
-    paid: { label: 'Paid', color: '#22c55e', bg: 'rgba(34,197,94,0.12)' },
+    paid: { label: 'Paid', color: '#15803D', bg: 'rgba(21,128,61,0.12)' },
     pending: { label: 'Pending', color: '#f59e0b', bg: 'rgba(245,158,11,0.12)' },
     refunded: { label: 'Refunded', color: '#7C3AED', bg: 'rgba(124,58,237,0.12)' },
     failed: { label: 'Failed', color: '#ef4444', bg: 'rgba(239,68,68,0.12)' },
@@ -90,12 +90,12 @@ const ORDER_STATUS = {
 const PAYOUT_STATUS = {
     pending: { label: 'Pending', color: '#f59e0b', bg: 'rgba(245,158,11,0.12)' },
     processing: { label: 'Processing', color: '#38bdf8', bg: 'rgba(56,189,248,0.12)' },
-    completed: { label: 'Completed', color: '#22c55e', bg: 'rgba(34,197,94,0.12)' },
+    completed: { label: 'Completed', color: '#15803D', bg: 'rgba(21,128,61,0.12)' },
     failed: { label: 'Failed', color: '#ef4444', bg: 'rgba(239,68,68,0.12)' },
 };
 const STAFF_STATUS = {
     pending: { label: 'Invited', color: '#f59e0b', bg: 'rgba(245,158,11,0.12)' },
-    active: { label: 'Active', color: '#22c55e', bg: 'rgba(34,197,94,0.12)' },
+    active: { label: 'Active', color: '#15803D', bg: 'rgba(21,128,61,0.12)' },
     revoked: { label: 'Revoked', color: '#ef4444', bg: 'rgba(239,68,68,0.12)' },
 };
 
@@ -439,7 +439,7 @@ async function loadPromos() {
             <td class="td-meta">${esc(p.event_title || 'All Events')}</td>
             <td>${p.uses}${p.max_uses ? ' / ' + p.max_uses : ' / unlimited'}</td>
             <td>${p.expires_at ? fmtDate(p.expires_at) : 'Never'}</td>
-            <td>${statusChip(p.active ? 'active' : 'off', { active: { label: 'Active', color: '#22c55e', bg: 'rgba(34,197,94,0.12)' }, off: { label: 'Off', color: '#ef4444', bg: 'rgba(239,68,68,0.12)' } })}</td>
+            <td>${statusChip(p.active ? 'active' : 'off', { active: { label: 'Active', color: '#15803D', bg: 'rgba(21,128,61,0.12)' }, off: { label: 'Off', color: '#ef4444', bg: 'rgba(239,68,68,0.12)' } })}</td>
             <td>
                 <div class="inline-actions">
                     ${p.active ? `<button onclick="deactivatePromo('${escAttr(p._id)}')" class="dash-mini-button dash-mini-button--warn">Deactivate</button>` : ''}
@@ -514,7 +514,7 @@ async function loadMessages() {
         container.innerHTML = msgs.map(m => `<div class="message-card">
             <div class="message-card__head">
                 <div class="message-card__subject">${esc(m.subject)}</div>
-                ${statusChip(m.channel, { email: { label: 'Email', color: '#38bdf8', bg: 'rgba(56,189,248,0.12)' }, sms: { label: 'SMS', color: '#f59e0b', bg: 'rgba(245,158,11,0.12)' }, both: { label: 'Email + SMS', color: '#22c55e', bg: 'rgba(34,197,94,0.12)' } })}
+                ${statusChip(m.channel, { email: { label: 'Email', color: '#38bdf8', bg: 'rgba(56,189,248,0.12)' }, sms: { label: 'SMS', color: '#f59e0b', bg: 'rgba(245,158,11,0.12)' }, both: { label: 'Email + SMS', color: '#15803D', bg: 'rgba(21,128,61,0.12)' } })}
             </div>
             <div class="message-card__body">${esc(m.body.substring(0, 140))}${m.body.length > 140 ? '...' : ''}</div>
             <div class="message-card__meta">Sent to <strong>${esc(m.sent_to)}</strong> attendees - ${fmtDate(m.sent_at)} - ${esc(m.event_title || 'All Events')}</div>
@@ -691,7 +691,7 @@ function addPollOptionRow() {
 
 const POLL_STATUS = {
     draft: { label: 'Draft', color: 'var(--color-text-secondary)', bg: 'var(--color-bg-elevated)' },
-    active: { label: 'Active', color: '#22c55e', bg: 'rgba(34,197,94,0.12)' },
+    active: { label: 'Active', color: '#15803D', bg: 'rgba(21,128,61,0.12)' },
     completed: { label: 'Completed', color: '#7C3AED', bg: 'rgba(124,58,237,0.12)' },
 };
 

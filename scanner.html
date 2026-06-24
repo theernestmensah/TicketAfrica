@@ -61,7 +61,7 @@
             align-items: center;
             gap: 6px;
             font-size: 12px;
-            color: #22C55E;
+            color: #15803D;
             font-weight: 600;
         }
 
@@ -69,8 +69,8 @@
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background: #22C55E;
-            box-shadow: 0 0 6px #22C55E;
+            background: #16A34A;
+            box-shadow: 0 0 6px rgba(22, 163, 74, 0.72);
         }
 
         /* Layout */
@@ -104,7 +104,7 @@
         .camera-feed {
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, var(--color-bg-elevated) 0%, #1a0540 50%, var(--color-bg-elevated) 100%);
+            background: linear-gradient(135deg, #0F172A 0%, #2E1065 52%, #111827 100%);
             border-radius: 0;
             display: flex;
             align-items: center;
@@ -191,7 +191,7 @@
             right: 0;
             text-align: center;
             font-size: 13px;
-            color: rgba(255, 255, 255, 0.5);
+            color: rgba(255, 255, 255, 0.78);
         }
 
         .camera-controls {
@@ -264,8 +264,8 @@
         }
 
         .result-icon--valid {
-            background: rgba(34, 197, 94, 0.15);
-            border: 2px solid rgba(34, 197, 94, 0.5);
+            background: rgba(21, 128, 61, 0.18);
+            border: 2px solid rgba(21, 128, 61, 0.58);
         }
 
         .result-icon--invalid {
@@ -290,7 +290,7 @@
         }
 
         .result-label--valid {
-            color: #22C55E;
+            color: #BBF7D0;
         }
 
         .result-label--invalid {
@@ -384,7 +384,7 @@
         }
 
         .scan-stat--valid .scan-stat__value {
-            color: #22C55E;
+            color: #15803D;
         }
 
         .scan-stat--invalid .scan-stat__value {
@@ -485,7 +485,7 @@
         }
 
         .scan-item__icon--valid {
-            background: rgba(34, 197, 94, 0.12);
+            background: rgba(21, 128, 61, 0.12);
         }
 
         .scan-item__icon--invalid {
@@ -524,7 +524,7 @@
         }
 
         .scan-item__status--valid {
-            color: #22C55E;
+            color: #15803D;
         }
 
         .scan-item__status--invalid {
@@ -563,9 +563,9 @@
         }
 
         .demo-scan-btn--valid {
-            background: rgba(34, 197, 94, 0.1);
-            color: #22C55E;
-            border-color: rgba(34, 197, 94, 0.3);
+            background: rgba(21, 128, 61, 0.10);
+            color: #15803D;
+            border-color: rgba(21, 128, 61, 0.30);
         }
 
         .demo-scan-btn--invalid {
@@ -712,8 +712,8 @@
                     <div id="qr-reader" style="position:absolute;inset:0;z-index:1;display:none;"></div>
                     <div style="text-align:center;z-index:2;position:relative;">
                         <div style="font-size:72px;margin-bottom:16px;opacity:0.3;"><iconify-icon icon="hugeicons:camera-01"></iconify-icon></div>
-                        <div style="font-size:14px;color:rgba(255,255,255,0.4);">Camera inactive</div>
-                        <div style="font-size:12px;color:rgba(255,255,255,0.2);margin-top:4px;">Grant camera access to
+                        <div style="font-size:14px;color:rgba(255,255,255,0.86);font-weight:600;">Camera inactive</div>
+                        <div style="font-size:12px;color:rgba(255,255,255,0.64);margin-top:4px;">Grant camera access to
                             begin scanning</div>
                     </div>
                     <div class="scan-frame">
@@ -846,7 +846,7 @@
             overlay.className = 'scan-result-overlay scan-result-overlay--' + (status === 'valid' ? 'valid' : status === 'used' ? 'used' : 'invalid');
 
             const config = {
-                valid: { icon: `<iconify-icon icon="hugeicons:tick-01" style="width:40px;height:40px;"></iconify-icon>`, cls: 'valid', label: 'VALID ENTRY', border: 'rgba(34,197,94,0.4)' },
+                valid: { icon: `<iconify-icon icon="hugeicons:tick-01" style="width:40px;height:40px;"></iconify-icon>`, cls: 'valid', label: 'VALID ENTRY', border: 'rgba(21,128,61,0.48)' },
                 invalid: { icon: `<iconify-icon icon="hugeicons:cancel-01" style="width:40px;height:40px;"></iconify-icon>`, cls: 'invalid', label: 'INVALID TICKET', border: 'rgba(239,68,68,0.4)' },
                 used: { icon: `<iconify-icon icon="hugeicons:alert-02" style="width:40px;height:40px;"></iconify-icon>`, cls: 'used', label: 'ALREADY USED', border: 'rgba(245,158,11,0.4)' }
             };
@@ -866,7 +866,7 @@
           <div class="result-card__row"><span>Scanned at</span><span>${ts()}</span></div>
           ${status === 'used' ? `<div class="result-card__row"><span>First scanned</span><span style="color:#F59E0B;">${firstScanned}</span></div>` : ''}
         </div>
-        <button style="padding:10px 32px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:8px;color:var(--color-text-primary);font-size:14px;font-weight:600;cursor:pointer;margin-top:8px;" id="scan-again-btn">Scan Next -></button>`;
+        <button style="padding:10px 32px;background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.24);border-radius:8px;color:#FFFFFF;font-size:14px;font-weight:600;cursor:pointer;margin-top:8px;" id="scan-again-btn">Scan Next -></button>`;
 
             camera.appendChild(overlay);
             document.getElementById('scan-again-btn').addEventListener('click', function () { overlay.remove(); });

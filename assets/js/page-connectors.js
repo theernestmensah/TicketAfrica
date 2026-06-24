@@ -330,7 +330,7 @@ async function initVotingPage() {
         try {
             const polls = await window.ConvexDB.listPublicPolls();
             if (!polls || !polls.length) {
-                list.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:100px 0;"><p style="color:rgba(255,255,255,0.4);">No active polls at the moment.</p></div>`;
+                list.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><p class="empty-state__text">No active polls at the moment.</p></div>`;
                 return;
             }
             list.innerHTML = polls.map(p => `
@@ -348,7 +348,7 @@ async function initVotingPage() {
             `).join('');
         } catch (e) {
             console.error('[TA] Polls load error:', e);
-            list.innerHTML = `<p style="color:rgba(255,255,255,0.5);text-align:center;padding:40px;">Error loading polls.</p>`;
+            list.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><p class="empty-state__text">Error loading polls.</p></div>`;
         }
     };
 
@@ -366,7 +366,7 @@ async function initVotingPage() {
             const poll = await window.ConvexDB.getPollDetails(pollId);
             if (typeof window.renderPollDetails === 'function') window.renderPollDetails(poll);
         } catch (e) {
-            content.innerHTML = `<p style="color:red;">Error loading poll details.</p>`;
+            content.innerHTML = `<p style="color:var(--color-error);">Error loading poll details.</p>`;
         }
     };
 
@@ -802,7 +802,7 @@ async function initVerifyPage() {
             if (resultContainer) {
                 resultContainer.style.display = 'block';
                 resultContainer.innerHTML = result.valid
-                    ? `<div style="text-align:center;padding:var(--space-6);background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);border-radius:var(--radius-xl);">
+                    ? `<div style="text-align:center;padding:var(--space-6);background:rgba(21,128,61,0.10);border:1px solid rgba(21,128,61,0.30);border-radius:var(--radius-xl);">
                         <iconify-icon icon="ph:check-circle-fill" style="font-size:48px;color:var(--color-success);"></iconify-icon>
                         <h3 style="color:var(--color-success);margin-top:var(--space-3);">Authentic Ticket ✓</h3>
                         <p style="color:var(--color-text-secondary);margin-top:var(--space-2);">Holder: <strong>${escapeHtml(result.attendee_name || 'Valid Holder')}</strong></p>

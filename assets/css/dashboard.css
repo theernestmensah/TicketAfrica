@@ -18,7 +18,7 @@ body {
     --dash-black: #111827;
     --dash-gold: #F59E0B;
     --dash-blue: #3b82f6;
-    --dash-green: #22c55e;
+    --dash-green: #15803D;
     --dash-amber: #F59E0B;
     --dash-red: #ef4444;
     --dash-shadow-sm: 0 1px 2px rgba(17, 24, 39, 0.04), 0 1px 1px rgba(17, 24, 39, 0.03);
@@ -540,9 +540,9 @@ body {
 }
 
 .dash-mini-button--success {
-    background: rgba(34, 197, 94, 0.08);
-    border-color: rgba(34, 197, 94, 0.28);
-    color: #22c55e;
+    background: rgba(21, 128, 61, 0.08);
+    border-color: rgba(21, 128, 61, 0.28);
+    color: #15803D;
 }
 
 .dash-mini-button--info {
@@ -2285,4 +2285,227 @@ body {
 .empty-state button,
 .empty-state .btn {
     margin-top: 20px !important;
+}
+
+/* Executive dashboard polish and device hardening */
+.dash-sidebar {
+    color: #FFFFFF !important;
+    background: linear-gradient(180deg, #4C1D95 0%, #6D28D9 48%, #7C3AED 100%) !important;
+    box-shadow: 12px 0 42px rgba(76, 29, 149, 0.18);
+}
+
+body.dash-sidebar-open {
+    overflow: hidden;
+}
+
+.dash-sidebar__logo-text,
+.dash-user__name {
+    color: #FFFFFF !important;
+}
+
+.dash-sidebar__logo-text span {
+    color: #FDE68A !important;
+}
+
+.dash-sidebar__logo-mark {
+    background: rgba(255, 255, 255, 0.14) !important;
+    color: #FFFFFF !important;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.dash-sidebar__context,
+.dash-nav-section,
+.dash-user__org {
+    color: rgba(255, 255, 255, 0.72) !important;
+}
+
+.dash-nav-link {
+    color: rgba(255, 255, 255, 0.84) !important;
+    min-height: 46px;
+}
+
+.dash-nav-link:hover {
+    color: #FFFFFF !important;
+    background: rgba(255, 255, 255, 0.14) !important;
+}
+
+.dash-nav-link.active {
+    color: #4C1D95 !important;
+    background: #FFFFFF !important;
+    box-shadow: 0 10px 26px rgba(17, 24, 39, 0.18);
+}
+
+.dash-nav-link.active iconify-icon {
+    color: #7C3AED;
+}
+
+.dash-nav-link .badge-count {
+    background: #F59E0B !important;
+    color: #111827 !important;
+}
+
+.dash-user:hover {
+    background: rgba(255, 255, 255, 0.14) !important;
+}
+
+.dash-main {
+    background:
+        linear-gradient(180deg, rgba(124, 58, 237, 0.07) 0%, rgba(249, 250, 251, 0) 300px),
+        #F9FAFB !important;
+}
+
+.dash-topbar {
+    background: rgba(255, 255, 255, 0.92) !important;
+    border-bottom: 1px solid rgba(17, 24, 39, 0.10) !important;
+    box-shadow: 0 10px 28px rgba(17, 24, 39, 0.05);
+}
+
+.dash-content {
+    width: 100%;
+    max-width: 1480px;
+    padding: clamp(20px, 3vw, 36px);
+}
+
+.page-header {
+    align-items: flex-end;
+}
+
+.page-header h1 {
+    letter-spacing: 0;
+}
+
+.stat-card,
+.panel,
+.dash-filter-panel,
+.dash-kpi,
+.quick-action,
+.empty-state {
+    background: #FFFFFF !important;
+    border: 1px solid rgba(17, 24, 39, 0.10) !important;
+    box-shadow: 0 14px 36px rgba(17, 24, 39, 0.07) !important;
+}
+
+.stat-card__label,
+.dash-label,
+.panel__subtitle,
+.dash-section-note,
+.empty-state__desc,
+.empty-state__text {
+    color: #4B5563 !important;
+}
+
+.stat-card__value,
+.panel__title,
+.empty-state__title,
+.td-title,
+.td-value {
+    color: #111827 !important;
+}
+
+.dash-input,
+.dash-select,
+.dash-textarea {
+    background: #FFFFFF !important;
+    color: #111827 !important;
+    border: 1px solid rgba(17, 24, 39, 0.14) !important;
+}
+
+.dash-input::placeholder,
+.dash-textarea::placeholder {
+    color: #6B7280 !important;
+}
+
+.dash-input:focus,
+.dash-select:focus,
+.dash-textarea:focus {
+    border-color: #7C3AED !important;
+    box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.14) !important;
+}
+
+.table-shell {
+    border: 1px solid rgba(17, 24, 39, 0.10);
+    border-radius: 14px;
+    overflow: auto;
+    background: #FFFFFF;
+    box-shadow: 0 12px 32px rgba(17, 24, 39, 0.06);
+}
+
+.events-table {
+    min-width: 780px;
+}
+
+.events-table th {
+    background: #F3F4F6 !important;
+    color: #374151 !important;
+}
+
+.events-table td {
+    background: #FFFFFF;
+    color: #111827 !important;
+}
+
+.payout-card {
+    background: linear-gradient(135deg, #4C1D95 0%, #7C3AED 60%, #5B21B6 100%) !important;
+    color: #FFFFFF !important;
+}
+
+.payout-label {
+    color: rgba(255, 255, 255, 0.76) !important;
+}
+
+.payout-amount {
+    color: #FFFFFF !important;
+}
+
+@media (max-width: 900px) {
+    .dash-sidebar {
+        box-shadow: 16px 0 48px rgba(17, 24, 39, 0.24);
+    }
+
+    .dash-topbar {
+        min-height: 68px;
+        padding: 0 16px;
+    }
+
+    .dash-content {
+        padding: 18px 16px 112px;
+    }
+}
+
+@media (max-width: 640px) {
+    .stats-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .section-toolbar,
+    .page-header {
+        align-items: flex-start;
+    }
+
+    .page-header__actions,
+    .section-toolbar .page-header__actions {
+        width: 100%;
+    }
+
+    .page-header__actions .btn,
+    .section-toolbar .page-header__actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .panel__header {
+        align-items: flex-start;
+    }
+
+    .events-table {
+        min-width: 0;
+    }
+
+    .events-table tr {
+        box-shadow: 0 12px 28px rgba(17, 24, 39, 0.07) !important;
+    }
+
+    .events-table td {
+        min-height: 44px;
+    }
 }

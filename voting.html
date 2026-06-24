@@ -21,9 +21,13 @@
     <style>
         .voting-hero {
             padding: 120px 0 60px;
-            background: radial-gradient(circle at 20% 30%, rgba(124, 58, 237, 0.15), transparent 40%),
-                        radial-gradient(circle at 80% 70%, rgba(245, 158, 11, 0.1), transparent 40%);
+            background:
+                radial-gradient(circle at 18% 24%, rgba(245, 158, 11, 0.22), transparent 38%),
+                radial-gradient(circle at 82% 68%, rgba(255, 255, 255, 0.12), transparent 34%),
+                linear-gradient(135deg, #4C1D95 0%, #7C3AED 56%, #5B21B6 100%);
+            color: #FFFFFF;
             text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.14);
         }
         .voting-hero h1 {
             font-size: clamp(32px, 5vw, 56px);
@@ -35,7 +39,7 @@
         }
         .voting-hero p {
             font-size: 18px;
-            color: var(--color-text-secondary);
+            color: rgba(255, 255, 255, 0.84);
             max-width: 600px;
             margin: 0 auto 40px;
         }
@@ -62,9 +66,9 @@
             overflow: hidden;
         }
         .poll-card:hover {
-            border-color: var(--color-text-primary);
+            border-color: rgba(124, 58, 237, 0.42);
             transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            box-shadow: 0 20px 40px rgba(17, 24, 39, 0.12);
         }
         .poll-card__status {
             position: absolute;
@@ -76,7 +80,7 @@
             border-radius: 20px;
             text-transform: uppercase;
         }
-        .status--active { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+        .status--active { background: rgba(21, 128, 61, 0.12); color: #15803D; }
         .status--completed { background: rgba(124, 58, 237, 0.15); color: #7C3AED; }
 
         .poll-card__title {
@@ -118,20 +122,22 @@
         }
         .v-modal.active { display: flex; }
         .v-modal__card {
-            background: #12121e;
-            border: 1px solid var(--color-border-light);
+            background: #FFFFFF;
+            color: #111827;
+            border: 1px solid rgba(17, 24, 39, 0.12);
             border-radius: var(--radius-2xl);
             width: 100%;
             max-width: 500px;
             padding: 40px;
             position: relative;
+            box-shadow: 0 28px 80px rgba(17, 24, 39, 0.28);
         }
         .v-modal__close {
             position: absolute;
             top: 20px;
             right: 20px;
-            background: var(--color-bg-elevated);
-            border: 1px solid var(--color-border);
+            background: #F9FAFB;
+            border: 1px solid rgba(17, 24, 39, 0.12);
             color: var(--color-text-primary);
             width: 32px;
             height: 32px;
@@ -143,11 +149,11 @@
             transition: all var(--transition-fast);
         }
         .v-modal__close:hover {
-            background: var(--color-border);
+            background: rgba(124, 58, 237, 0.08);
         }
         .v-option {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid var(--color-border);
+            background: #F9FAFB;
+            border: 1px solid rgba(17, 24, 39, 0.12);
             border-radius: var(--radius-lg);
             padding: 16px 20px;
             margin-bottom: 12px;
@@ -158,12 +164,12 @@
             transition: all var(--transition-fast);
         }
         .v-option:hover {
-            background: rgba(255,255,255,0.06);
-            border-color: rgba(255,255,255,0.2);
+            background: rgba(124, 58, 237, 0.07);
+            border-color: rgba(124, 58, 237, 0.28);
         }
         .v-option.selected {
-            border-color: var(--color-text-primary);
-            background: rgba(124, 58, 237, 0.1);
+            border-color: var(--color-primary);
+            background: rgba(124, 58, 237, 0.10);
         }
         .v-option__label {
             font-weight: 600;
@@ -173,11 +179,11 @@
             width: 20px;
             height: 20px;
             border-radius: 50%;
-            border: 2px solid var(--color-border);
+            border: 2px solid rgba(17, 24, 39, 0.24);
             position: relative;
         }
         .v-option.selected .v-option__radio {
-            border-color: var(--color-text-primary);
+            border-color: var(--color-primary);
         }
         .v-option.selected .v-option__radio::after {
             content: '';
@@ -189,7 +195,7 @@
 
         .results-bar-wrap {
             height: 8px;
-            background: rgba(255,255,255,0.05);
+            background: rgba(17, 24, 39, 0.08);
             border-radius: 4px;
             margin-top: 8px;
             width: 100%;

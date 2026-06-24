@@ -278,7 +278,7 @@
                 status.style.color = type === 'error'
                     ? '#EF4444'
                     : type === 'success'
-                        ? '#22C55E'
+                        ? '#15803D'
                         : 'var(--color-text-muted)';
             }
 
@@ -398,14 +398,14 @@
                       <div class="result-icon-large ${result.already_used ? 'result-icon-large--invalid' : 'result-icon-large--valid'}">
                         <iconify-icon icon="${result.already_used ? 'hugeicons:alert-02' : 'hugeicons:tick-01'}" style="width:40px;height:40px;"></iconify-icon>
                       </div>
-                      <h2 style="color:${result.already_used ? '#F59E0B' : '#22C55E'};margin-bottom:8px;">
+                      <h2 style="color:${result.already_used ? '#F59E0B' : '#15803D'};margin-bottom:8px;">
                         ${result.already_used ? 'Warning: Ticket Already Used' : 'Authentic Ticket'}
                       </h2>
                       <p style="color:var(--color-text-muted);font-size:var(--text-sm);">${safeMessage}</p>
                       ${usedWarning}
                       <div class="ticket-detail-grid">
                         <div class="ticket-detail-item"><div class="ticket-detail-item__label">Reference</div><div class="ticket-detail-item__value" style="font-family:var(--font-mono);">${safeRef}</div></div>
-                        <div class="ticket-detail-item"><div class="ticket-detail-item__label">Status</div><div class="ticket-detail-item__value" style="color:${result.already_used ? '#F59E0B' : '#22C55E'};">${result.already_used ? 'Already Used' : 'Valid'}</div></div>
+                        <div class="ticket-detail-item"><div class="ticket-detail-item__label">Status</div><div class="ticket-detail-item__value" style="color:${result.already_used ? '#F59E0B' : '#15803D'};">${result.already_used ? 'Already Used' : 'Valid'}</div></div>
                         <div class="ticket-detail-item"><div class="ticket-detail-item__label">Event</div><div class="ticket-detail-item__value">${safeEventTitle}</div></div>
                         <div class="ticket-detail-item"><div class="ticket-detail-item__label">Ticket Type</div><div class="ticket-detail-item__value">${safeTicketType}</div></div>
                         <div class="ticket-detail-item"><div class="ticket-detail-item__label">Date</div><div class="ticket-detail-item__value">${escapeHtml(dateStr)}</div></div>

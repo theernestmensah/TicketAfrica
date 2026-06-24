@@ -1000,7 +1000,7 @@
                     });
 
                     async function finishCheckout(reference) {
-                        btn.innerHTML = '<iconify-icon icon="hugeicons:tick-01" style="margin-right:8px; color:#22c55e;"></iconify-icon> Payment Approved!';
+                        btn.innerHTML = '<iconify-icon icon="hugeicons:tick-01" style="margin-right:8px; color:#15803D;"></iconify-icon> Payment Approved!';
 
                         if (!reference) throw new Error('Missing Paystack payment reference.');
                         await window.ConvexDB.verifyPaystackPayment({ order_id: orderId, reference: reference });

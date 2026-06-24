@@ -1820,6 +1820,42 @@
             });
         });
     </script>
+    <script>
+        (function () {
+            function setMobileSidebar(open) {
+                var sidebar = document.getElementById('dash-sidebar');
+                var overlay = document.getElementById('sidebar-overlay');
+                if (sidebar) sidebar.classList.toggle('open', !!open);
+                if (overlay) overlay.style.display = open ? 'block' : 'none';
+                document.body.classList.toggle('dash-sidebar-open', !!open);
+            }
+
+            window.openMobileSidebar = function () { setMobileSidebar(true); };
+            window.closeMobileSidebar = function () { setMobileSidebar(false); };
+
+            function bindMobileSidebar() {
+                var toggle = document.getElementById('sidebar-toggle');
+                var overlay = document.getElementById('sidebar-overlay');
+                if (toggle && !toggle.dataset.sidebarBound) {
+                    toggle.dataset.sidebarBound = 'true';
+                    toggle.addEventListener('click', function (event) {
+                        event.preventDefault();
+                        setMobileSidebar(true);
+                    });
+                }
+                if (overlay && !overlay.dataset.sidebarBound) {
+                    overlay.dataset.sidebarBound = 'true';
+                    overlay.addEventListener('click', function () { setMobileSidebar(false); });
+                }
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', bindMobileSidebar);
+            } else {
+                bindMobileSidebar();
+            }
+        })();
+    </script>
 
 </body>
 
