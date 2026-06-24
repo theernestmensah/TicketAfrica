@@ -36,11 +36,11 @@ export async function initClerk() {
         await clerk.load({
             appearance: {
                 variables: {
-                    colorPrimary: '#D4AF37',
-                    colorBackground: '#191919',
-                    colorText: '#ffffff',
-                    colorInputBackground: 'rgba(255, 255, 255, 0.05)',
-                    colorInputText: '#ffffff',
+                    colorPrimary: '#7C3AED',
+                    colorBackground: '#F9FAFB',
+                    colorText: '#111827',
+                    colorInputBackground: '#FFFFFF',
+                    colorInputText: '#111827',
                     borderRadius: '0.75rem',
                 },
             },

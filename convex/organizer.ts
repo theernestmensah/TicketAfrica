@@ -1,7 +1,6 @@
 ﻿import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
 import { api, internal } from "./_generated/api";
-import { action, internalMutation, internalQuery } from "./_generated/server";
 import { sanitizeText, sanitizeEmail, sanitizePhone, sanitizeAlphanumeric, sanitizeHtml } from "./sanitize";
 
 async function getCurrentUser(ctx: any) {
@@ -57,18 +56,6 @@ function scanResponse(
 
 function signedLedgerAmount(entry: any) {
     return entry.direction === "credit" ? entry.amount : -entry.amount;
-}
-
-function toMajorAmount(minorAmount: number) {
-    return (minorAmount / 100).toFixed(2);
-}
-
-function moolreChannelForPayout(method: string, provider?: string) {
-    const normalized = (provider || "").toLowerCase();
-    if (method === "bank") return "2";
-    if (normalized.includes("telecel") || normalized.includes("vodafone")) return "6";
-    if (normalized.includes("airtel") || normalized.includes("tigo") || normalized === "at") return "7";
-    return "1";
 }
 
 async function getOrganizerBalance(ctx: any, orgId: any) {
@@ -404,7 +391,7 @@ export const requestPayout = mutation({
     handler: async (ctx, args) => {
         await assertOrgAccess(ctx, args.org_id);
         const balance = await getOrganizerBalance(ctx, args.org_id);
-        const payoutFee = Number(process.env.MOOLRE_PAYOUT_FEE_MINOR || 0);
+        const payoutFee = Number(process.env.PAYOUT_FEE_MINOR || 0);
         const grossAmount = args.amount + payoutFee;
         if (args.amount < 100) throw new Error("Payout amount is too small.");
         if (grossAmount > balance.available) {
@@ -449,13 +436,7 @@ export const requestPayout = mutation({
                 account: "organizer",
                 direction: "debit",
                 amount: payoutFee,
-                description: "Moolre payout fee deducted from organizer balance",
-            });
-        }
-
-        if (process.env.MOOLRE_AUTO_PROCESS_PAYOUTS === "true") {
-            await ctx.scheduler.runAfter(0, api.organizer.processMoolrePayout, {
-                payout_id: payoutId,
+                description: "Payout fee deducted from organizer balance",
             });
         }
 
@@ -464,157 +445,6 @@ export const requestPayout = mutation({
 });
 
 // â”€â”€ Attendee Messages â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
-export const getPayoutForProcessing = internalQuery({
-    args: { payout_id: v.id("payouts") },
-    handler: async (ctx, args) => {
-        const payout = await ctx.db.get(args.payout_id);
-        if (!payout) throw new Error("Payout not found.");
-        return payout;
-    },
-});
-
-export const markPayoutProcessing = internalMutation({
-    args: { payout_id: v.id("payouts"), reference: v.string() },
-    handler: async (ctx, args) => {
-        const payout = await ctx.db.get(args.payout_id);
-        if (!payout) throw new Error("Payout not found.");
-        await ctx.db.patch(args.payout_id, {
-            status: "processing",
-            reference: args.reference,
-        });
-        return { success: true };
-    },
-});
-
-export const markPayoutCompleted = internalMutation({
-    args: {
-        payout_id: v.id("payouts"),
-        reference: v.string(),
-    },
-    handler: async (ctx, args) => {
-        const payout = await ctx.db.get(args.payout_id);
-        if (!payout) throw new Error("Payout not found.");
-        await ctx.db.patch(args.payout_id, {
-            status: "completed",
-            reference: args.reference,
-            processed_at: new Date().toISOString(),
-        });
-        return { success: true };
-    },
-});
-
-export const markPayoutFailed = internalMutation({
-    args: {
-        payout_id: v.id("payouts"),
-        reference: v.string(),
-    },
-    handler: async (ctx, args) => {
-        const payout = await ctx.db.get(args.payout_id);
-        if (!payout) throw new Error("Payout not found.");
-        await ctx.db.patch(args.payout_id, {
-            status: "failed",
-            reference: args.reference,
-            processed_at: new Date().toISOString(),
-        });
-        const ledgerBase = {
-            org_id: payout.org_id,
-            payout_id: args.payout_id,
-            currency: payout.currency,
-            reference: args.reference,
-            created_at: new Date().toISOString(),
-        };
-        await ctx.db.insert("ledger_entries", {
-            ...ledgerBase,
-            type: "payout_reserve",
-            account: "organizer",
-            direction: "credit",
-            amount: payout.amount,
-            description: "Failed payout reserve released",
-        });
-        if ((payout.payout_fee || 0) > 0) {
-            await ctx.db.insert("ledger_entries", {
-                ...ledgerBase,
-                type: "payout_fee",
-                account: "organizer",
-                direction: "credit",
-                amount: payout.payout_fee,
-                description: "Failed payout fee released",
-            });
-        }
-        return { success: true };
-    },
-});
-
-export const processMoolrePayout = action({
-    args: { payout_id: v.id("payouts") },
-    handler: async (ctx, args): Promise<{ success: boolean; reference: string; message: string }> => {
-        const apiUser = process.env.MOOLRE_API_USER;
-        const apiKey = process.env.MOOLRE_API_KEY;
-        const accountNumber = process.env.MOOLRE_ACCOUNT_NUMBER;
-        const baseUrl = process.env.MOOLRE_BASE_URL || "https://api.moolre.com";
-        if (!apiUser) throw new Error("MOOLRE_API_USER is not configured.");
-        if (!apiKey) throw new Error("MOOLRE_API_KEY is not configured.");
-        if (!accountNumber) throw new Error("MOOLRE_ACCOUNT_NUMBER is not configured.");
-
-        const payout = await ctx.runQuery(internal.organizer.getPayoutForProcessing, {
-            payout_id: args.payout_id,
-        });
-        if (payout.status !== "pending") {
-            return {
-                success: payout.status === "completed",
-                reference: payout.reference || "",
-                message: `Payout is already ${payout.status}.`,
-            };
-        }
-
-        const reference = payout.reference || `TA-PAY-${Date.now().toString(36).toUpperCase()}`;
-        await ctx.runMutation(internal.organizer.markPayoutProcessing, {
-            payout_id: args.payout_id,
-            reference,
-        });
-
-        const res = await fetch(`${baseUrl}/open/transact/transfer`, {
-            method: "POST",
-            headers: {
-                "content-type": "application/json",
-                "X-API-USER": apiUser,
-                "X-API-KEY": apiKey,
-            },
-            body: JSON.stringify({
-                type: 1,
-                channel: moolreChannelForPayout(payout.method, payout.account_details.provider),
-                currency: payout.currency,
-                amount: toMajorAmount(payout.amount),
-                receiver: payout.account_details.number,
-                sublistid: payout.method === "bank" ? payout.account_details.provider : undefined,
-                externalref: reference,
-                reference: `Ticket Africa payout ${reference}`,
-                accountnumber: accountNumber,
-            }),
-        });
-        const body = await res.json().catch(() => null);
-        const successful = res.ok && String(body?.status) === "1";
-        if (!successful) {
-            await ctx.runMutation(internal.organizer.markPayoutFailed, {
-                payout_id: args.payout_id,
-                reference,
-            });
-            throw new Error(body?.message || `Moolre transfer failed with ${res.status}`);
-        }
-
-        await ctx.runMutation(internal.organizer.markPayoutCompleted, {
-            payout_id: args.payout_id,
-            reference,
-        });
-
-        return {
-            success: true,
-            reference,
-            message: Array.isArray(body?.message) ? body.message.join(" ") : body?.message || "Payout sent.",
-        };
-    },
-});
 
 export const listMessagesByOrg = query({
     args: { org_id: v.id("organizations"), limit: v.optional(v.number()) },

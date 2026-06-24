@@ -35,37 +35,19 @@ if (!env.ok) {
   blockers.push("Could not read Convex production environment variables.");
   line(false, "Convex env", env.stderr.trim());
 } else {
-  const hasMoolreApiUser = /^MOOLRE_API_USER=/m.test(env.stdout);
-  const hasMoolreApiKey = /^MOOLRE_API_KEY=/m.test(env.stdout);
-  const hasMoolrePublicKey = /^MOOLRE_PUBLIC_KEY=/m.test(env.stdout);
-  const hasMoolreAccountNumber = /^MOOLRE_ACCOUNT_NUMBER=/m.test(env.stdout);
-  const hasMoolreWebhookSecret = /^MOOLRE_WEBHOOK_SECRET=/m.test(env.stdout);
-  const hasMoolreSmsVasKey = /^MOOLRE_SMS_VAS_KEY=/m.test(env.stdout);
-  const hasMoolreSmsSenderId = /^MOOLRE_SMS_SENDER_ID=/m.test(env.stdout);
+  const hasPaystackSecretKey = /^PAYSTACK_SECRET_KEY=/m.test(env.stdout);
   const hasClerkWebhookSecret = /^CLERK_WEBHOOK_SECRET=/m.test(env.stdout);
   const hasBrevoApiKey = /^BREVO_API_KEY=/m.test(env.stdout);
   const hasBrevoSenderEmail = /^BREVO_SENDER_EMAIL=/m.test(env.stdout);
   const hasUpstashRedisUrl = /^UPSTASH_REDIS_REST_URL=/m.test(env.stdout);
   const hasUpstashRedisToken = /^UPSTASH_REDIS_REST_TOKEN=/m.test(env.stdout);
   line(hasClerkWebhookSecret, "CLERK_WEBHOOK_SECRET", hasClerkWebhookSecret ? "configured" : "missing");
-  line(hasMoolreApiUser, "MOOLRE_API_USER", hasMoolreApiUser ? "configured" : "missing");
-  line(hasMoolreApiKey, "MOOLRE_API_KEY", hasMoolreApiKey ? "configured" : "missing");
-  line(hasMoolrePublicKey, "MOOLRE_PUBLIC_KEY", hasMoolrePublicKey ? "configured" : "missing");
-  line(hasMoolreAccountNumber, "MOOLRE_ACCOUNT_NUMBER", hasMoolreAccountNumber ? "configured" : "missing");
-  line(hasMoolreWebhookSecret, "MOOLRE_WEBHOOK_SECRET", hasMoolreWebhookSecret ? "configured" : "missing");
-  line(hasMoolreSmsVasKey, "MOOLRE_SMS_VAS_KEY", hasMoolreSmsVasKey ? "configured" : "missing");
-  line(hasMoolreSmsSenderId, "MOOLRE_SMS_SENDER_ID", hasMoolreSmsSenderId ? "configured" : "missing");
+  line(hasPaystackSecretKey, "PAYSTACK_SECRET_KEY", hasPaystackSecretKey ? "configured" : "missing");
   line(hasBrevoApiKey, "BREVO_API_KEY", hasBrevoApiKey ? "configured" : "missing");
   line(hasBrevoSenderEmail, "BREVO_SENDER_EMAIL", hasBrevoSenderEmail ? "configured" : "missing");
   line(hasUpstashRedisUrl, "UPSTASH_REDIS_REST_URL", hasUpstashRedisUrl ? "configured" : "missing");
   line(hasUpstashRedisToken, "UPSTASH_REDIS_REST_TOKEN", hasUpstashRedisToken ? "configured" : "missing");
-  if (!hasMoolreApiUser) blockers.push("Set MOOLRE_API_USER in Convex production.");
-  if (!hasMoolreApiKey) blockers.push("Set MOOLRE_API_KEY in Convex production.");
-  if (!hasMoolrePublicKey) blockers.push("Set MOOLRE_PUBLIC_KEY in Convex production.");
-  if (!hasMoolreAccountNumber) blockers.push("Set MOOLRE_ACCOUNT_NUMBER in Convex production.");
-  if (!hasMoolreWebhookSecret) blockers.push("Set MOOLRE_WEBHOOK_SECRET in Convex production.");
-  if (!hasMoolreSmsVasKey) blockers.push("Set MOOLRE_SMS_VAS_KEY in Convex production.");
-  if (!hasMoolreSmsSenderId) blockers.push("Set MOOLRE_SMS_SENDER_ID in Convex production.");
+  if (!hasPaystackSecretKey) blockers.push("Set PAYSTACK_SECRET_KEY in Convex production.");
   if (!hasBrevoApiKey) blockers.push("Set BREVO_API_KEY in Convex production.");
   if (!hasBrevoSenderEmail) blockers.push("Set BREVO_SENDER_EMAIL in Convex production.");
   if (!hasUpstashRedisUrl) blockers.push("Set UPSTASH_REDIS_REST_URL in Convex production.");
@@ -105,11 +87,11 @@ if (!spec.ok) {
     "events.js:getEventBySlug",
     "events.js:getTicketTiers",
     "payments.js:createCheckout",
-    "payments.js:initiateMoolrePaymentLink",
-    "payments.js:verifyMoolrePayment",
+    "payments.js:setPaystackReference",
+    "payments.js:verifyPaystackPayment",
+    "payments.js:verifyPaystackReference",
     "organizer.js:getPayoutBalance",
     "organizer.js:requestPayout",
-    "organizer.js:processMoolrePayout",
     "organizer.js:checkInTicket",
     "organizer.js:listScanEventsByEvent",
     "messages.js:deliverQueued",

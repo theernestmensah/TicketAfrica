@@ -79,25 +79,28 @@
     document.addEventListener('DOMContentLoaded', async () => {
       let reference = getReference();
       const order_id = getOrderId();
-      const provider = new URLSearchParams(window.location.search).get('provider') || 'moolre';
+      let provider = new URLSearchParams(window.location.search).get('provider') || 'paystack';
       try {
         await waitForConvex();
         if (!reference && order_id) {
           const payment = await window.ConvexDB.getPaymentReference({ order_id });
           reference = payment?.reference;
+          if (!new URLSearchParams(window.location.search).has('provider') && payment?.gateway) {
+            provider = payment.gateway;
+          }
         }
         if (!reference) {
           finish('Payment reference missing', 'We could not find a transaction reference for this order.');
           return;
         }
-        if (provider === 'paystack') {
-          if (order_id) {
-            await window.ConvexDB.verifyPaystackPayment({ order_id, reference });
-          } else {
-            await window.ConvexDB.verifyPaystackReference({ reference });
-          }
+        if (provider !== 'paystack') {
+          finish('Unsupported payment provider', 'This checkout can only confirm Paystack transactions.');
+          return;
+        }
+        if (order_id) {
+          await window.ConvexDB.verifyPaystackPayment({ order_id, reference });
         } else {
-          await window.ConvexDB.verifyMoolrePayment({ order_id: order_id || undefined, reference });
+          await window.ConvexDB.verifyPaystackReference({ reference });
         }
         finish('Payment confirmed', 'Your transaction has been verified. Your tickets will appear in your account.');
       } catch (error) {

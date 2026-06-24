@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -651,7 +651,7 @@
                     </div>
 
                     <div class="pay-method" id="pm-wallet" data-method="wallet">
-                        <div class="pay-method__icon" style="background:rgba(139, 92, 246,0.15);"><iconify-icon icon="ph:ticket" style="vertical-align:middle;"></iconify-icon></div>
+                        <div class="pay-method__icon" style="background:rgba(124, 58, 237,0.15);"><iconify-icon icon="ph:ticket" style="vertical-align:middle;"></iconify-icon></div>
                         <div class="pay-method__info">
                             <div class="pay-method__name">Ticket Africa Wallet</div>
                             <div class="pay-method__desc">Balance: GHS 0.00  -  Insufficient funds</div>
@@ -786,7 +786,7 @@
     <script src="assets/js/page-connectors.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // â”€â”€ Read cart from URL params â”€â”€
+            // ── Read cart from URL params ──
             const params = new URLSearchParams(window.location.search);
             const eventId = params.get('event') || '';
             const tierId = params.get('tier') || '';
@@ -814,7 +814,7 @@
                 deliveryCount.textContent = `${qty}x QR code ticket${qty === 1 ? '' : 's'} (PDF + digital)`;
             }
 
-            // â”€â”€ Payment method selection â”€â”€
+            // ── Payment method selection ──
             const methods = document.querySelectorAll('.pay-method');
             const momoPanel = document.getElementById('momo-panel');
             methods.forEach(function (m) {
@@ -825,7 +825,7 @@
                 });
             });
 
-            // â”€â”€ MoMo network selection â”€â”€
+            // ── MoMo network selection ──
             document.querySelectorAll('.momo-network').forEach(function (n) {
                 n.addEventListener('click', function () {
                     document.querySelectorAll('.momo-network').forEach(x => x.classList.remove('active'));
@@ -833,7 +833,7 @@
                 });
             });
 
-            // â”€â”€ Promo code (Convex-backed) â”€â”€
+            // ── Promo code (Convex-backed) ──
             let appliedPromo = null;
             document.getElementById('apply-promo-btn').addEventListener('click', async function () {
                 const code = document.getElementById('promo-input').value.trim().toUpperCase();
@@ -855,7 +855,7 @@
                 }
             });
 
-            // â”€â”€ Checkout session timer â”€â”€
+            // ── Checkout session timer ──
             let seconds = 527;
             const timerDisplay = document.getElementById('timer-value');
             const timer = setInterval(function () {
@@ -871,7 +871,94 @@
                 timerDisplay.textContent = m + ':' + String(s).padStart(2, '0');
             }, 1000);
 
-            // â”€â”€ Complete Purchase (Enhanced Payment Integration) â”€â”€
+            // ── Complete Purchase (Enhanced Payment Integration) ──
+            function makePaystackReference(orderId) {
+                const compactOrder = String(orderId || '')
+                    .replace(/[^a-zA-Z0-9]/g, '')
+                    .slice(-16)
+                    .toUpperCase()
+                    .padStart(8, '0');
+                return `TKA_${compactOrder}_${Date.now().toString(36).toUpperCase()}`;
+            }
+
+            function getSelectedPaymentChannels() {
+                const method = document.querySelector('.pay-method.selected')?.dataset.method;
+                if (method === 'wallet') throw new Error('Ticket Africa Wallet payments are not available yet.');
+                if (method === 'momo') return ['mobile_money'];
+                if (method === 'card') return ['card'];
+                if (method === 'bank') return ['bank_transfer'];
+                return ['card', 'bank_transfer', 'mobile_money'];
+            }
+
+            function loadPaystackInline() {
+                if (window.PaystackPop) return Promise.resolve();
+                return new Promise((resolve, reject) => {
+                    const existing = document.getElementById('paystack-inline-js');
+                    if (existing) {
+                        existing.addEventListener('load', resolve, { once: true });
+                        existing.addEventListener('error', () => reject(new Error('Could not load Paystack checkout.')), { once: true });
+                        return;
+                    }
+                    const script = document.createElement('script');
+                    script.id = 'paystack-inline-js';
+                    script.src = 'https://js.paystack.co/v2/inline.js';
+                    script.async = true;
+                    script.onload = resolve;
+                    script.onerror = () => reject(new Error('Could not load Paystack checkout.'));
+                    document.head.appendChild(script);
+                });
+            }
+
+            function openPaystackCheckout(options) {
+                return new Promise((resolve, reject) => {
+                    const onSuccess = (transaction) => resolve(transaction?.reference || options.reference);
+                    const onCancel = () => reject(new Error('Payment was cancelled.'));
+
+                    if (!window.PaystackPop) {
+                        reject(new Error('Paystack checkout is not available.'));
+                        return;
+                    }
+
+                    try {
+                        const popup = new window.PaystackPop();
+                        if (typeof popup.newTransaction === 'function') {
+                            popup.newTransaction({
+                                key: options.key,
+                                email: options.email,
+                                amount: options.amount,
+                                currency: options.currency,
+                                reference: options.reference,
+                                channels: options.channels,
+                                metadata: options.metadata,
+                                onSuccess,
+                                onCancel,
+                            });
+                            return;
+                        }
+                    } catch (error) {
+                        console.warn('[checkout] Paystack v2 popup unavailable, trying legacy setup.', error);
+                    }
+
+                    if (typeof window.PaystackPop.setup === 'function') {
+                        const handler = window.PaystackPop.setup({
+                            key: options.key,
+                            email: options.email,
+                            amount: options.amount,
+                            currency: options.currency,
+                            ref: options.reference,
+                            channels: options.channels,
+                            metadata: options.metadata,
+                            callback: onSuccess,
+                            onClose: onCancel,
+                        });
+                        handler.openIframe();
+                        return;
+                    }
+
+                    reject(new Error('Paystack checkout is not available.'));
+                });
+            }
+
             document.getElementById('complete-purchase-btn').addEventListener('click', async function () {
                 const terms = document.getElementById('terms-check');
                 if (!terms.checked) { TA.toast('Please accept the Terms of Service to continue', 'warning'); return; }
@@ -898,6 +985,8 @@
                     const total = subtotal + fee + 1;
 
                     if (!window.ConvexDB) throw new Error("Database not connected.");
+                    const paystackKey = window.ENV?.PAYSTACK_PUBLIC_KEY;
+                    if (!paystackKey) throw new Error("Paystack public key is not configured.");
 
                     // Step 1: Create Order in Convex
                     const { orderId } = await window.ConvexDB.createCheckout({
@@ -913,8 +1002,8 @@
                     async function finishCheckout(reference) {
                         btn.innerHTML = '<iconify-icon icon="hugeicons:tick-01" style="margin-right:8px; color:#22c55e;"></iconify-icon> Payment Approved!';
 
-                        if (!reference) throw new Error('Missing Moolre payment reference.');
-                        await window.ConvexDB.verifyMoolrePayment({ order_id: orderId, reference: reference });
+                        if (!reference) throw new Error('Missing Paystack payment reference.');
+                        await window.ConvexDB.verifyPaystackPayment({ order_id: orderId, reference: reference });
 
                         if (window.TAMail) {
                             window.TAMail.sendTicketConfirmation({
@@ -935,22 +1024,32 @@
                         document.getElementById('success-modal').style.display = 'flex';
                     }
 
-                    // Step 2: Initialize Moolre hosted payment link
-                    btn.innerHTML = '<iconify-icon icon="hugeicons:credit-card" class="spin" style="margin-right:8px;"></iconify-icon> Connecting to Moolre...';
+                    // Step 2: Open Paystack checkout
+                    btn.innerHTML = '<iconify-icon icon="hugeicons:credit-card" class="spin" style="margin-right:8px;"></iconify-icon> Connecting to Paystack...';
 
-                    const convexSiteUrl = window.ENV?.CONVEX_SITE_URL || (window.ENV?.CONVEX_URL || '').replace('.convex.cloud', '.convex.site');
-                    if (!convexSiteUrl) throw new Error('Convex HTTP endpoint is not configured.');
-                    const callbackUrl = `${convexSiteUrl}/moolre/webhook`;
-                    const redirectUrl = `${window.location.origin}/payment-callback.html?provider=moolre&order_id=${encodeURIComponent(orderId)}`;
-                    const paymentLink = await window.ConvexDB.initiateMoolrePaymentLink({
+                    const reference = makePaystackReference(orderId);
+                    await window.ConvexDB.setPaystackReference({
                         order_id: orderId,
                         buyer_email: email,
-                        callback_url: callbackUrl,
-                        redirect_url: redirectUrl,
+                        reference,
                     });
 
-                    if (!paymentLink?.authorization_url) throw new Error('Moolre did not return a payment link.');
-                    window.location.href = paymentLink.authorization_url;
+                    await loadPaystackInline();
+                    const verifiedReference = await openPaystackCheckout({
+                        key: paystackKey,
+                        email,
+                        amount: Math.round(total * 100),
+                        currency: 'GHS',
+                        reference,
+                        channels: getSelectedPaymentChannels(),
+                        metadata: {
+                            order_id: orderId,
+                            buyer_name: (firstName + ' ' + lastName).trim(),
+                            buyer_phone: phone,
+                            ticket_africa_order_id: orderId,
+                        },
+                    });
+                    await finishCheckout(verifiedReference);
 
                 } catch (e) {
                     console.error('Checkout error:', e);

@@ -114,9 +114,6 @@ export const deliverQueued = action({
         const brevoApiKey = process.env.BREVO_API_KEY;
         const senderEmail = process.env.BREVO_SENDER_EMAIL;
         const senderName = process.env.BREVO_SENDER_NAME || "Ticket Africa";
-        const moolreSmsVasKey = process.env.MOOLRE_SMS_VAS_KEY;
-        const moolreSmsSenderId = process.env.MOOLRE_SMS_SENDER_ID || "TicketAfrica";
-        const moolreBaseUrl = process.env.MOOLRE_BASE_URL || "https://api.moolre.com";
 
         const messages = await ctx.runQuery(internal.messages.listQueued, { limit: args.limit || 25 });
         let sent = 0;
@@ -125,32 +122,11 @@ export const deliverQueued = action({
         for (const message of messages) {
             try {
                 if (message.channel === "sms") {
-                    if (!moolreSmsVasKey) throw new Error("MOOLRE_SMS_VAS_KEY is not configured.");
-                    if (!message.recipient_phone) throw new Error("SMS recipient phone is missing.");
-
-                    const res = await fetch(`${moolreBaseUrl}/open/sms/send`, {
-                        method: "POST",
-                        headers: {
-                            "content-type": "application/json",
-                            "X-API-VASKEY": moolreSmsVasKey,
-                        },
-                        body: JSON.stringify({
-                            type: 1,
-                            senderid: moolreSmsSenderId,
-                            messages: [{
-                                recipient: normalizePhoneForMoolre(message.recipient_phone),
-                                message: message.body.slice(0, 160),
-                                ref: message._id,
-                            }],
-                        }),
+                    await ctx.runMutation(internal.messages.markFailed, {
+                        message_id: message._id,
+                        error: "No SMS delivery provider is configured.",
                     });
-                    const body = await res.json().catch(() => null);
-                    if (!res.ok || String(body?.status) !== "1") {
-                        throw new Error(body?.message || `Moolre SMS returned ${res.status}`);
-                    }
-
-                    await ctx.runMutation(internal.messages.markSent, { message_id: message._id });
-                    sent += 1;
+                    failed += 1;
                     continue;
                 }
 
@@ -239,12 +215,6 @@ export const checkBrevoConfig = action({
         };
     },
 });
-
-function normalizePhoneForMoolre(phone: string): string {
-    const digits = phone.replace(/\D/g, "");
-    if (digits.startsWith("0")) return `233${digits.slice(1)}`;
-    return digits;
-}
 
 function escapeHtml(value: unknown): string {
     return String(value ?? "")

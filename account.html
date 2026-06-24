@@ -122,21 +122,21 @@
 
         /* Ticket card */
         .ticket-card {
-            background: #191919;
+            background: var(--color-primary);
             backdrop-filter: blur(24px);
-            border: 1px solid rgba(212, 175, 55, 0.2);
+            border: 1px solid rgba(var(--color-accent-rgb), 0.28);
             border-radius: var(--radius-2xl);
             overflow: hidden;
             position: relative;
             transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
-            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.24), 0 0 1px 1px rgba(212, 175, 55, 0.15) inset;
+            box-shadow: 0 24px 64px rgba(17, 24, 39, 0.18), 0 0 1px 1px rgba(var(--color-accent-rgb), 0.15) inset;
             transform-style: preserve-3d;
         }
 
         .ticket-card:hover {
             transform: translateY(-8px) rotateX(2deg) rotateY(2deg);
-            box-shadow: 0 32px 80px rgba(0, 0, 0, 0.32), 0 0 8px 1px rgba(212, 175, 55, 0.25) inset, var(--shadow-glow);
-            border-color: rgba(212, 175, 55, 0.4);
+            box-shadow: 0 32px 80px rgba(17, 24, 39, 0.24), 0 0 8px 1px rgba(var(--color-accent-rgb), 0.25) inset, var(--shadow-glow);
+            border-color: rgba(var(--color-accent-rgb), 0.45);
         }
 
         .ticket-card--upcoming {
@@ -149,7 +149,7 @@
 
         .ticket-card__top {
             padding: var(--space-5);
-            background: linear-gradient(135deg, #191919, #0f0f0f);
+            background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary));
             position: relative;
             min-height: 100px;
             display: flex;
@@ -248,7 +248,7 @@
             justify-content: center;
             font-size: 3.5rem;
             padding: 6px;
-            color: #191919;
+            color: #111827;
         }
 
         .ticket-card__actions {
@@ -258,21 +258,21 @@
             background: var(--color-bg-card);
         }
 
-        [data-theme="light"] .ticket-card__bottom,
-        [data-theme="light"] .ticket-card__qr,
-        [data-theme="light"] .ticket-card__actions {
+        .ticket-card__bottom,
+        .ticket-card__qr,
+        .ticket-card__actions {
             background: #ffffff;
         }
 
-        [data-theme="light"] .account-nav__avatar {
-            background: #191919;
+        .account-nav__avatar {
+            background: var(--color-primary);
             color: #ffffff;
         }
 
-        [data-theme="light"] .order-row__img {
-            background: #191919;
+        .order-row__img {
+            background: var(--color-primary);
             color: #ffffff;
-            border-color: rgba(25, 25, 25, 0.2);
+            border-color: rgba(var(--color-primary-rgb), 0.22);
         }
 
         /* Page sections */

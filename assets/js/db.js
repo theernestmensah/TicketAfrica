@@ -188,8 +188,6 @@ window.ConvexDB = {
     createOrder: function(args) { return window.ConvexDB.mutation("organizer:createOrder", args); },
     createCheckout: function(args) { return window.ConvexDB.mutation("payments:createCheckout", args); },
     getPaymentReference: function(args) { return window.ConvexDB.query("payments:getPaymentReference", args); },
-    initiateMoolrePaymentLink: function(args) { return window.ConvexDB.action("payments:initiateMoolrePaymentLink", args); },
-    verifyMoolrePayment: function(args) { return window.ConvexDB.action("payments:verifyMoolrePayment", args); },
     setPaystackReference: function(args) { return window.ConvexDB.mutation("payments:setPaystackReference", args); },
     verifyPaystackPayment: function(args) { return window.ConvexDB.action("payments:verifyPaystackPayment", args); },
     verifyPaystackReference: function(args) { return window.ConvexDB.action("payments:verifyPaystackReference", args); },
@@ -211,7 +209,6 @@ window.ConvexDB = {
     getPayoutBalance: function(org_id) { return window.ConvexDB.query("organizer:getPayoutBalance", { org_id: org_id }); },
     listLedgerByOrg: function(org_id, limit) { return window.ConvexDB.query("organizer:listLedgerByOrg", { org_id: org_id, limit: limit || 50 }); },
     requestPayout: function(args) { return window.ConvexDB.mutation("organizer:requestPayout", args); },
-    processMoolrePayout: function(payout_id) { return window.ConvexDB.action("organizer:processMoolrePayout", { payout_id: payout_id }); },
 
     // -- Analytics --
     getOrgAnalytics: function(org_id) { return window.ConvexDB.query("organizer:getOrgAnalytics", { org_id: org_id }); },

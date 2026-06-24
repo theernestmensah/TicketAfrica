@@ -1,4 +1,4 @@
-/* Organizer Dashboard Styles — Unified with $10B Light Luxury Palette */
+/* Organizer Dashboard Styles - Ticket Africa Standard Palette */
 
 * {
     box-sizing: border-box;
@@ -7,23 +7,23 @@
 }
 
 body {
-    --dash-bg: #0b0b0d; /* Premium obsidian dark */
-    --dash-surface: #171717; /* Elevated dark card surface */
-    --dash-surface-soft: #212121;
-    --dash-border: rgba(255, 255, 255, 0.08);
-    --dash-border-strong: rgba(255, 255, 255, 0.16);
-    --dash-text: #ffffff;
-    --dash-text-secondary: rgba(255, 255, 255, 0.75);
-    --dash-text-muted: rgba(255, 255, 255, 0.45);
-    --dash-black: #0b0b0d;
-    --dash-gold: #D4AF37; /* Liquid Gold */
+    --dash-bg: #F9FAFB;
+    --dash-surface: #FFFFFF;
+    --dash-surface-soft: #F3F4F6;
+    --dash-border: rgba(17, 24, 39, 0.10);
+    --dash-border-strong: rgba(17, 24, 39, 0.16);
+    --dash-text: #111827;
+    --dash-text-secondary: #374151;
+    --dash-text-muted: #6B7280;
+    --dash-black: #111827;
+    --dash-gold: #F59E0B;
     --dash-blue: #3b82f6;
     --dash-green: #22c55e;
-    --dash-amber: #f59e0b;
+    --dash-amber: #F59E0B;
     --dash-red: #ef4444;
-    --dash-shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.25);
-    --dash-shadow-md: 0 14px 40px rgba(0, 0, 0, 0.45);
-    --dash-shadow-lg: 0 22px 70px rgba(0, 0, 0, 0.55);
+    --dash-shadow-sm: 0 1px 2px rgba(17, 24, 39, 0.04), 0 1px 1px rgba(17, 24, 39, 0.03);
+    --dash-shadow-md: 0 14px 40px rgba(17, 24, 39, 0.08), 0 2px 8px rgba(17, 24, 39, 0.04);
+    --dash-shadow-lg: 0 22px 70px rgba(17, 24, 39, 0.12), 0 4px 16px rgba(17, 24, 39, 0.06);
     font-family: var(--font-body, 'Inter', sans-serif);
     background: var(--dash-bg);
     color: var(--dash-text);
@@ -32,25 +32,10 @@ body {
     overflow-x: hidden;
 }
 
-/* Light theme variables overrides */
-[data-theme="light"] body {
-    --dash-bg: #f5f6f8;
-    --dash-surface: #ffffff;
-    --dash-surface-soft: #f9fafb;
-    --dash-border: rgba(17, 24, 39, 0.1);
-    --dash-border-strong: rgba(17, 24, 39, 0.16);
-    --dash-text: #111827;
-    --dash-text-secondary: #4b5563;
-    --dash-text-muted: #6b7280;
-    --dash-shadow-sm: 0 1px 2px rgba(17, 24, 39, 0.04), 0 1px 1px rgba(17, 24, 39, 0.03);
-    --dash-shadow-md: 0 14px 40px rgba(17, 24, 39, 0.08), 0 2px 8px rgba(17, 24, 39, 0.04);
-    --dash-shadow-lg: 0 22px 70px rgba(17, 24, 39, 0.12), 0 4px 16px rgba(17, 24, 39, 0.06);
-}
-
 /* ── Sidebar ── */
 .dash-sidebar {
     width: 272px;
-    background: #171717;
+    background: linear-gradient(180deg, #5B21B6 0%, #7C3AED 58%, #4C1D95 100%);
     border-right: 1px solid rgba(var(--color-primary-rgb), 0.1);
     display: flex;
     flex-direction: column;
@@ -158,7 +143,7 @@ body {
 }
 
 .dash-nav-link:hover {
-    background: rgba(212, 175, 55, 0.08); /* gold hover tint */
+    background: rgba(245, 158, 11, 0.08); /* gold hover tint */
     color: var(--color-text-primary);
 }
 
@@ -609,86 +594,86 @@ body {
     font-size: 11px;
 }
 
-/* Light theme contrast fixes for dashboard-only dark accents and inline legacy styles. */
-[data-theme="light"] .dash-sidebar {
+/* Dashboard contrast fixes for accent panels and inline legacy styles. */
+.dash-sidebar {
     background: #191919;
     border-right-color: rgba(25, 25, 25, 0.14);
     color: #ffffff;
 }
 
-[data-theme="light"] .dash-sidebar__logo {
+.dash-sidebar__logo {
     border-bottom-color: rgba(255, 255, 255, 0.08);
 }
 
-[data-theme="light"] .dash-sidebar__logo-text,
-[data-theme="light"] .dash-user__name {
+.dash-sidebar__logo-text,
+.dash-user__name {
     color: #ffffff;
 }
 
-[data-theme="light"] .dash-sidebar__context,
-[data-theme="light"] .dash-nav-section,
-[data-theme="light"] .dash-user__org {
+.dash-sidebar__context,
+.dash-nav-section,
+.dash-user__org {
     color: rgba(255, 255, 255, 0.55);
 }
 
-[data-theme="light"] .dash-nav-link {
+.dash-nav-link {
     color: rgba(255, 255, 255, 0.72);
 }
 
-[data-theme="light"] .dash-nav-link:hover {
-    background: rgba(212, 175, 55, 0.12);
+.dash-nav-link:hover {
+    background: rgba(245, 158, 11, 0.12);
     color: #ffffff;
 }
 
-[data-theme="light"] .dash-nav-link.active {
+.dash-nav-link.active {
     color: #191919;
 }
 
-[data-theme="light"] .dash-nav-link .badge-count {
+.dash-nav-link .badge-count {
     color: #191919;
 }
 
-[data-theme="light"] .dash-sidebar__bottom {
+.dash-sidebar__bottom {
     border-top-color: rgba(255, 255, 255, 0.08);
 }
 
-[data-theme="light"] .payout-card {
+.payout-card {
     background: #191919;
     color: #ffffff;
 }
 
-[data-theme="light"] .dash-topbar {
+.dash-topbar {
     background: rgba(255, 255, 255, 0.9);
 }
 
-[data-theme="light"] .payout-label {
+.payout-label {
     color: rgba(255, 255, 255, 0.65);
 }
 
-[data-theme="light"] .payout-amount {
+.payout-amount {
     color: #ffffff;
 }
 
-[data-theme="light"] .dash-main [style*="color:#f0f0f5"],
-[data-theme="light"] .dash-main [style*="color: #f0f0f5"],
-[data-theme="light"] .dash-main [style*="color:rgba(255,255,255"],
-[data-theme="light"] .dash-main [style*="color: rgba(255,255,255"] {
+.dash-main [style*="color:#f0f0f5"],
+.dash-main [style*="color: #f0f0f5"],
+.dash-main [style*="color:rgba(255,255,255"],
+.dash-main [style*="color: rgba(255,255,255"] {
     color: var(--color-text-secondary) !important;
 }
 
-[data-theme="light"] .dash-main [style*="background:rgba(255,255,255"],
-[data-theme="light"] .dash-main [style*="background: rgba(255,255,255"] {
+.dash-main [style*="background:rgba(255,255,255"],
+.dash-main [style*="background: rgba(255,255,255"] {
     background: var(--color-bg-elevated) !important;
 }
 
-[data-theme="light"] .dash-main [style*="border:1px solid rgba(255,255,255"],
-[data-theme="light"] .dash-main [style*="border: 1px solid rgba(255,255,255"] {
+.dash-main [style*="border:1px solid rgba(255,255,255"],
+.dash-main [style*="border: 1px solid rgba(255,255,255"] {
     border-color: var(--color-border) !important;
 }
 
-[data-theme="light"] .dash-main input,
-[data-theme="light"] .dash-main select,
-[data-theme="light"] .dash-main textarea {
+.dash-main input,
+.dash-main select,
+.dash-main textarea {
     color: var(--color-text-primary) !important;
 }
 
@@ -1036,7 +1021,7 @@ body {
     z-index: 1;
 }
 
-[data-theme="light"] .payout-helper {
+.payout-helper {
     color: rgba(255, 255, 255, 0.72);
 }
 
@@ -1281,13 +1266,13 @@ body {
     min-height: 76px;
 }
 
-[data-theme="light"] .dash-main {
+.dash-main {
     background:
         linear-gradient(180deg, rgba(255, 255, 255, 0.76) 0%, rgba(245, 246, 248, 0) 280px),
         var(--dash-bg);
 }
 
-[data-theme="light"] .dash-topbar {
+.dash-topbar {
     background: rgba(255, 255, 255, 0.82);
     border-bottom-color: var(--dash-border);
 }
@@ -1529,55 +1514,55 @@ body {
     line-height: 1.55;
 }
 
-[data-theme="light"] .checklist-item {
+.checklist-item {
     background: var(--color-bg-elevated) !important;
     border-color: var(--color-border) !important;
 }
 
-[data-theme="light"] .checklist-item__title {
+.checklist-item__title {
     color: var(--color-text-primary) !important;
 }
 
-[data-theme="light"] .checklist-item__desc {
+.checklist-item__desc {
     color: var(--color-text-secondary) !important;
 }
 
 /* Light Theme overrides for modal overlay structures */
-[data-theme="light"] .modal-overlay label,
-[data-theme="light"] .modal-overlay .dash-label,
-[data-theme="light"] .modal-overlay select,
-[data-theme="light"] .modal-overlay h2,
-[data-theme="light"] .modal-overlay div[style*="color:rgba(255,255,255"],
-[data-theme="light"] .modal-overlay div[style*="color: rgba(255,255,255"],
-[data-theme="light"] .modal-overlay span[style*="color:rgba(255,255,255"],
-[data-theme="light"] .modal-overlay span[style*="color: rgba(255,255,255"],
-[data-theme="light"] .modal-overlay label[style*="color:rgba(255,255,255"],
-[data-theme="light"] .modal-overlay label[style*="color: rgba(255,255,255"] {
+.modal-overlay label,
+.modal-overlay .dash-label,
+.modal-overlay select,
+.modal-overlay h2,
+.modal-overlay div[style*="color:rgba(255,255,255"],
+.modal-overlay div[style*="color: rgba(255,255,255"],
+.modal-overlay span[style*="color:rgba(255,255,255"],
+.modal-overlay span[style*="color: rgba(255,255,255"],
+.modal-overlay label[style*="color:rgba(255,255,255"],
+.modal-overlay label[style*="color: rgba(255,255,255"] {
     color: var(--color-text-secondary) !important;
 }
 
-[data-theme="light"] .modal-overlay input,
-[data-theme="light"] .modal-overlay select,
-[data-theme="light"] .modal-overlay textarea {
+.modal-overlay input,
+.modal-overlay select,
+.modal-overlay textarea {
     background: var(--color-bg-elevated) !important;
     color: var(--color-text-primary) !important;
     border-color: var(--color-border) !important;
 }
 
-[data-theme="light"] .modal-overlay [style*="color:rgba(255,255,255,0.3)"],
-[data-theme="light"] .modal-overlay [style*="color:rgba(255,255,255,0.4)"] {
+.modal-overlay [style*="color:rgba(255,255,255,0.3)"],
+.modal-overlay [style*="color:rgba(255,255,255,0.4)"] {
     color: var(--color-text-muted) !important;
 }
 
-[data-theme="light"] .modal-overlay button[onclick*="close"] {
+.modal-overlay button[onclick*="close"] {
     color: var(--color-text-muted) !important;
 }
 
 /* Main Dashboard general selector fixes for custom sub-elements */
-[data-theme="light"] .dash-main [style*="color:rgba(255,255,255,0.55)"],
-[data-theme="light"] .dash-main [style*="color:rgba(255,255,255,0.5)"],
-[data-theme="light"] .dash-main [style*="color:rgba(255, 255, 255, 0.5)"],
-[data-theme="light"] .dash-main [style*="color:rgba(255,255,255,0.4)"] {
+.dash-main [style*="color:rgba(255,255,255,0.55)"],
+.dash-main [style*="color:rgba(255,255,255,0.5)"],
+.dash-main [style*="color:rgba(255, 255, 255, 0.5)"],
+.dash-main [style*="color:rgba(255,255,255,0.4)"] {
     color: var(--color-text-secondary) !important;
 }
 
@@ -1712,9 +1697,6 @@ body {
     overflow-y: auto;
 }
 
-[data-theme="dark"] .wizard-preview-side {
-    background: rgba(255, 255, 255, 0.01);
-}
 
 /* Active step card visibility controller */
 .wizard-step-card {
@@ -1824,7 +1806,7 @@ body {
     color: var(--color-text-primary);
 }
 
-[data-theme="light"] .rich-editor-btn:hover {
+.rich-editor-btn:hover {
     background: rgba(0, 0, 0, 0.05);
 }
 
@@ -2038,8 +2020,8 @@ body {
     height: 38px;
     width: 130px;
     opacity: 0.85;
-    background: linear-gradient(90deg, 
-        #000 0%, #000 4%, transparent 4%, transparent 6%, 
+    background: linear-gradient(90deg,
+        #000 0%, #000 4%, transparent 4%, transparent 6%,
         #000 6%, #000 12%, transparent 12%, transparent 14%,
         #000 14%, #000 16%, transparent 16%, transparent 22%,
         #000 22%, #000 24%, transparent 24%, transparent 28%,
@@ -2054,22 +2036,6 @@ body {
         #000 92%, #000 96%, transparent 96%, transparent 100%);
 }
 
-[data-theme="dark"] .barcode-svg {
-    background: linear-gradient(90deg, 
-        #fff 0%, #fff 4%, transparent 4%, transparent 6%, 
-        #fff 6%, #fff 12%, transparent 12%, transparent 14%,
-        #fff 14%, #fff 16%, transparent 16%, transparent 22%,
-        #fff 22%, #fff 24%, transparent 24%, transparent 28%,
-        #fff 28%, #fff 34%, transparent 34%, transparent 36%,
-        #fff 36%, #fff 42%, transparent 42%, transparent 44%,
-        #fff 44%, #fff 46%, transparent 46%, transparent 50%,
-        #fff 50%, #fff 56%, transparent 56%, transparent 60%,
-        #fff 60%, #fff 66%, transparent 66%, transparent 68%,
-        #fff 68%, #fff 70%, transparent 70%, transparent 74%,
-        #fff 74%, #fff 80%, transparent 80%, transparent 84%,
-        #fff 84%, #fff 90%, transparent 90%, transparent 92%,
-        #fff 92%, #fff 96%, transparent 96%, transparent 100%);
-}
 
 .ticket-preview-price-range {
     text-align: right;
@@ -2231,8 +2197,8 @@ body {
     border-radius: 16px !important;
     overflow: hidden !important;
     box-shadow: var(--dash-shadow-sm) !important;
-    transition: transform var(--transition-base, 250ms ease), 
-                box-shadow var(--transition-base, 250ms ease), 
+    transition: transform var(--transition-base, 250ms ease),
+                box-shadow var(--transition-base, 250ms ease),
                 border-color var(--transition-base, 250ms ease) !important;
 }
 
@@ -2320,4 +2286,3 @@ body {
 .empty-state .btn {
     margin-top: 20px !important;
 }
-

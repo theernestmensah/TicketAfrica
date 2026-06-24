@@ -191,8 +191,8 @@ export default defineSchema({
             v.literal("ticket_sale"),
             v.literal("ticket_africa_fee"),
             v.literal("sms_delivery_fee"),
-            v.literal("moolre_buyer_fee"),
-            v.literal("moolre_collection_fee"),
+            v.literal("gateway_buyer_fee"),
+            v.literal("gateway_collection_fee"),
             v.literal("payout_reserve"),
             v.literal("payout_fee"),
             v.literal("refund")
@@ -200,7 +200,7 @@ export default defineSchema({
         account: v.union(
             v.literal("organizer"),
             v.literal("ticket_africa"),
-            v.literal("moolre"),
+            v.literal("payment_processor"),
             v.literal("buyer")
         ),
         direction: v.union(v.literal("credit"), v.literal("debit")),

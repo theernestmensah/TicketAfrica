@@ -34,20 +34,29 @@ export const syncClerkUser = internalMutation({
     },
     handler: async (ctx, args) => {
         const role = args.role ?? "buyer";
+        const email = args.email.trim().toLowerCase();
         const existingUser = await ctx.db
             .query("users")
             .withIndex("by_clerk_id", (q) => q.eq("clerk_id", args.clerk_id))
             .unique();
 
         if (existingUser) {
+            const emailOwner = await ctx.db
+                .query("users")
+                .withIndex("by_email", (q) => q.eq("email", email))
+                .first();
+            if (emailOwner && emailOwner._id !== existingUser._id) {
+                throw new Error("This email is already registered to another account.");
+            }
+
             const updates: {
                 email: string;
                 first_name: string;
                 last_name: string;
-                phone: string;
-                role: "buyer" | "organizer" | "admin";
+                phone?: string;
+                role?: "buyer" | "organizer" | "admin";
             } = {
-                email: args.email,
+                email,
                 first_name: args.first_name,
                 last_name: args.last_name,
             };
@@ -59,9 +68,29 @@ export const syncClerkUser = internalMutation({
             return existingUser._id;
         }
 
+        const existingEmailUser = await ctx.db
+            .query("users")
+            .withIndex("by_email", (q) => q.eq("email", email))
+            .first();
+
+        if (existingEmailUser?.clerk_id && existingEmailUser.clerk_id !== args.clerk_id) {
+            throw new Error("This email is already registered to another account.");
+        }
+
+        if (existingEmailUser) {
+            await ctx.db.patch(existingEmailUser._id, {
+                clerk_id: args.clerk_id,
+                first_name: args.first_name,
+                last_name: args.last_name,
+                phone: args.phone,
+                role: existingEmailUser.role === "admin" ? "admin" : role,
+            });
+            return existingEmailUser._id;
+        }
+
         const userId = await ctx.db.insert("users", {
             clerk_id: args.clerk_id,
-            email: args.email,
+            email,
             first_name: args.first_name,
             last_name: args.last_name,
             phone: args.phone,
@@ -73,7 +102,7 @@ export const syncClerkUser = internalMutation({
         await ctx.runMutation(internal.messages.enqueue, {
             type: isOrganizer ? "welcome_organizer" : "welcome_buyer",
             channel: "email",
-            recipient_email: args.email.trim().toLowerCase(),
+            recipient_email: email,
             recipient_phone: args.phone,
             recipient_name: args.first_name,
             user_id: userId,

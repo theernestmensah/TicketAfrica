@@ -44,10 +44,7 @@
               <div class="nav-dropdown__item" style="cursor:pointer;" onclick="document.getElementById('nav-currency-label').innerText='KSh';"><div class="nav-dropdown__item-content"><span class="nav-dropdown__item-title">KSh (KES)</span></div></div>
               <div class="nav-dropdown__item" style="cursor:pointer;" onclick="document.getElementById('nav-currency-label').innerText='$';"><div class="nav-dropdown__item-content"><span class="nav-dropdown__item-title">$ (USD)</span></div></div>
             </div>
-          </div>
-          <button id="nav-theme-toggle" aria-label="Toggle Theme" style="background:none;border:none;color:var(--color-text-primary);cursor:pointer;display:flex;align-items:center;justify-content:center;width:32px;height:32px;margin-right:8px;font-size:20px;transition:var(--transition-fast);">
-            <iconify-icon icon="ph:sun-bold" class="theme-toggle-icon"></iconify-icon>
-          </button>
+          </div>
           <a href="/login.html" class="btn btn--secondary btn--sm" id="nav-login">Sign in</a>
           <div class="nav-dropdown" id="nav-signup-dd">
             <button class="btn btn--primary btn--sm nav-dropdown__trigger" id="nav-signup" style="display:inline-flex;align-items:center;gap:6px;">
@@ -141,11 +138,7 @@
       <a href="/help.html" class="nav-mobile-link" id="mob-help">
         <iconify-icon icon="hugeicons:help-circle"></iconify-icon>
         Help Center
-      </a>
-      <a href="#" class="nav-mobile-link" id="mob-theme-toggle">
-        <iconify-icon icon="ph:sun-bold" class="theme-toggle-icon"></iconify-icon>
-        Toggle Theme
-      </a>
+      </a>
     </div>
     <div class="nav-mobile-actions">
       <div class="nav-mobile-account" id="mob-user-card" hidden>
@@ -313,22 +306,7 @@
                 </button>
             </div>`;
       document.body.insertAdjacentHTML('beforeend', chatHtml);
-    }
-
-    // Theme toggles
-    const deskToggle = document.getElementById('nav-theme-toggle');
-    const mobToggle = document.getElementById('mob-theme-toggle');
-    if (deskToggle) deskToggle.addEventListener('click', () => window.TA && window.TA.toggleTheme());
-    if (mobToggle) {
-        mobToggle.addEventListener('click', (e) => {
-            e.preventDefault();
-            window.TA && window.TA.toggleTheme();
-        });
-    }
-    // Set initial icon state based on current document theme
-    if (window.TA && window.TA.updateThemeUI) {
-        window.TA.updateThemeUI(document.documentElement.getAttribute('data-theme') || 'dark');
-    }
+    }
   }
 
   if (document.readyState === 'loading') {

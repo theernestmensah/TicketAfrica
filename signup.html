@@ -1139,6 +1139,22 @@
 
         function validateEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
 
+        function signupErrorMessage(err) {
+            const first = err?.errors?.[0] || {};
+            const raw = String(first.longMessage || first.message || err?.message || '').toLowerCase();
+            const code = String(first.code || err?.code || '').toLowerCase();
+            if (
+                code.includes('identifier') ||
+                code.includes('email') && code.includes('exists') ||
+                raw.includes('already') ||
+                raw.includes('taken') ||
+                raw.includes('exists')
+            ) {
+                return 'An account already exists with this email. Please sign in instead.';
+            }
+            return first.longMessage || first.message || err?.message || 'Registration failed. Please try again.';
+        }
+
         // â”€â”€ Form Submit â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         document.getElementById('signup-form').addEventListener('submit', async function (e) {
             e.preventDefault();
@@ -1239,8 +1255,7 @@
                 }
             } catch (err) {
                 alertEl.classList.add('show');
-                const msg = err?.errors?.[0]?.message || err?.message || 'Registration failed. Please try again.';
-                document.getElementById('auth-alert-msg').textContent = msg;
+                document.getElementById('auth-alert-msg').textContent = signupErrorMessage(err);
                 btn.classList.remove('loading');
                 btn.disabled = false;
             }
@@ -1275,8 +1290,7 @@
                 });
             } catch (err) {
                 alertEl.classList.add('show');
-                document.getElementById('auth-alert-msg').textContent =
-                    err?.message || 'Social sign-up failed. Please try again.';
+                document.getElementById('auth-alert-msg').textContent = signupErrorMessage(err);
                 btn.disabled = false;
                 btn.style.opacity = '';
             }

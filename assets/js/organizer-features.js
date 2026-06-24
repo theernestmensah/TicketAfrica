@@ -84,7 +84,7 @@ function setText(id, value) {
 const ORDER_STATUS = {
     paid: { label: 'Paid', color: '#22c55e', bg: 'rgba(34,197,94,0.12)' },
     pending: { label: 'Pending', color: '#f59e0b', bg: 'rgba(245,158,11,0.12)' },
-    refunded: { label: 'Refunded', color: '#8b5cf6', bg: 'rgba(139,92,246,0.12)' },
+    refunded: { label: 'Refunded', color: '#7C3AED', bg: 'rgba(124,58,237,0.12)' },
     failed: { label: 'Failed', color: '#ef4444', bg: 'rgba(239,68,68,0.12)' },
 };
 const PAYOUT_STATUS = {
@@ -257,10 +257,10 @@ async function loadAnalytics() {
                 return `<div style="padding:12px 20px;border-bottom:1px solid var(--color-border);">
                     <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
                         <span style="font-size:13px;font-weight:600;color:var(--color-text-primary);">${esc(ev.title)}</span>
-                        <span style="font-size:13px;font-weight:700;color:#8b5cf6;">${fmtCurrency(ev.revenue)}</span>
+                        <span style="font-size:13px;font-weight:700;color:#7C3AED;">${fmtCurrency(ev.revenue)}</span>
                     </div>
                     <div style="height:4px;background:var(--color-bg-elevated);border-radius:2px;">
-                        <div style="height:4px;border-radius:2px;background:linear-gradient(90deg,#8b5cf6,#ec4899);width:${pct}%;"></div>
+                        <div style="height:4px;border-radius:2px;background:linear-gradient(90deg,#7C3AED,#F59E0B);width:${pct}%;"></div>
                     </div>
                     <div style="font-size:11px;color:var(--color-text-muted);margin-top:4px;">${ev.orders} orders</div>
                 </div>`;
@@ -287,14 +287,13 @@ function drawRevenueChart(dailyData) {
     ctx.clearRect(0, 0, W, H);
 
     // Grid lines
-    const isLight = document.documentElement.getAttribute('data-theme') === 'light';
-    ctx.strokeStyle = isLight ? 'rgba(25,25,25,0.1)' : 'rgba(255,255,255,0.06)';
+    ctx.strokeStyle = 'rgba(17,24,39,0.1)';
     ctx.lineWidth = 1;
     for (let i = 0; i <= 4; i++) {
         const y = pad.top + chartH - (i / 4) * chartH;
         ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(W - pad.right, y); ctx.stroke();
         const val = (maxRev * i / 4 / 100).toFixed(0);
-        ctx.fillStyle = isLight ? 'rgba(25,25,25,0.5)' : 'rgba(255,255,255,0.3)';
+        ctx.fillStyle = 'rgba(17,24,39,0.5)';
         ctx.font = '10px Inter, sans-serif';
         ctx.textAlign = 'right';
         ctx.fillText('GHS' + val, pad.left - 6, y + 4);
@@ -307,8 +306,8 @@ function drawRevenueChart(dailyData) {
         const y = pad.top + chartH - barH;
 
         const grad = ctx.createLinearGradient(0, y, 0, y + barH);
-        grad.addColorStop(0, '#8b5cf6');
-        grad.addColorStop(1, 'rgba(139,92,246,0.3)');
+        grad.addColorStop(0, '#7C3AED');
+        grad.addColorStop(1, 'rgba(124,58,237,0.3)');
         ctx.fillStyle = grad;
         ctx.beginPath();
         ctx.roundRect(x, y, barW, barH, [3, 3, 0, 0]);
@@ -374,9 +373,8 @@ async function loadPayouts() {
             <td>${statusChip(p.status, PAYOUT_STATUS)}</td>
             <td class="td-meta">${esc(p.reference || '-')}</td>
             <td class="td-meta">${fmtDate(p.requested_at)}</td>
-            <td>${p.status === 'pending' ? `<button class="dash-mini-button" onclick="processPayout('${escAttr(p._id)}')">Send</button>` : ''}</td>
         </tr>`);
-        container.innerHTML = ledgerHtml + renderTable(['Net Amount', 'Fee', 'Method', 'Account', 'Status', 'Reference', 'Requested', 'Action'], rows);
+        container.innerHTML = ledgerHtml + renderTable(['Net Amount', 'Fee', 'Method', 'Account', 'Status', 'Reference', 'Requested'], rows);
     } catch (e) {
         container.innerHTML = emptyState('hugeicons:money-send-02', 'Could not load payouts', '');
         setText('payouts-panel-subtitle', 'Payout activity could not be loaded.');
@@ -410,21 +408,8 @@ async function submitPayoutRequest() {
     }
 }
 
-async function processPayout(payoutId) {
-    if (!window.ConvexDB?.processMoolrePayout) return window.TA?.toast('Payout processor is not connected.', 'error');
-    try {
-        const result = await window.ConvexDB.processMoolrePayout(payoutId);
-        window.TA?.toast(result?.message || 'Payout sent through Moolre.', 'success');
-        loadPayouts();
-    } catch (e) {
-        window.TA?.toast('Payout failed: ' + (e.message || 'Unknown error'), 'error');
-        loadPayouts();
-    }
-}
-
 window.loadPayouts = loadPayouts;
 window.submitPayoutRequest = submitPayoutRequest;
-window.processPayout = processPayout;
 
 /* ── PROMO CODES ──────────────────────────────────────── */
 function togglePromoForm() {
@@ -707,7 +692,7 @@ function addPollOptionRow() {
 const POLL_STATUS = {
     draft: { label: 'Draft', color: 'var(--color-text-secondary)', bg: 'var(--color-bg-elevated)' },
     active: { label: 'Active', color: '#22c55e', bg: 'rgba(34,197,94,0.12)' },
-    completed: { label: 'Completed', color: '#8b5cf6', bg: 'rgba(139,92,246,0.12)' },
+    completed: { label: 'Completed', color: '#7C3AED', bg: 'rgba(124,58,237,0.12)' },
 };
 
 async function loadPolls() {

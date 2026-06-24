@@ -70,9 +70,9 @@ input, select, textarea, button {
     left: 16px;
     right: 16px;
     z-index: 200;
-    background: rgba(11, 11, 13, 0.88); /* Deep luxury obsidian dark */
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+    background: linear-gradient(135deg, rgba(91, 33, 182, 0.96), rgba(124, 58, 237, 0.94));
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    box-shadow: 0 12px 40px rgba(76, 29, 149, 0.28);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     padding: 6px 12px;
@@ -120,17 +120,17 @@ input, select, textarea, button {
 }
 
 .dash-mobile-nav__item.active {
-    color: var(--color-secondary, #D4AF37); /* Gold active text */
+    color: var(--color-accent, #F59E0B);
     font-weight: 700;
 }
 
 .dash-mobile-nav__item.active iconify-icon {
-    color: var(--color-secondary, #D4AF37); /* Gold active icon */
+    color: var(--color-accent, #F59E0B);
     transform: translateY(-3px) scale(1.12);
-    filter: drop-shadow(0 2px 8px rgba(212, 175, 55, 0.35)); /* Gold glow */
+    filter: drop-shadow(0 2px 8px rgba(245, 158, 11, 0.35));
 }
 
-/* Subtle gold bar indicator at the bottom of the active tab */
+/* Subtle accent bar indicator at the bottom of the active tab */
 .dash-mobile-nav__item::after {
     content: '';
     position: absolute;
@@ -138,8 +138,8 @@ input, select, textarea, button {
     width: 16px;
     height: 3px;
     border-radius: 2px;
-    background: var(--color-secondary, #D4AF37);
-    box-shadow: 0 1px 4px rgba(212, 175, 55, 0.4);
+    background: var(--color-accent, #F59E0B);
+    box-shadow: 0 1px 4px rgba(245, 158, 11, 0.4);
     opacity: 0;
     transform: scaleX(0);
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
