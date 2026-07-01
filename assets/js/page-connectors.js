@@ -564,7 +564,7 @@ async function loadPurchaseHistory(email) {
         const rows = orders.map(order => {
             const d = new Date(order._creationTime || Date.now());
             const dateStr = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-            const amount = ((order.total_amount || 0) / 100).toFixed(2);
+            const amount = moneyFromMinor(order.total_amount || 0, order.currency || 'GHS');
             const statusColor = (order.status === 'confirmed' || order.status === 'paid') ? 'var(--color-success)' :
                                 order.status === 'pending' ? 'var(--color-warning)' : 'var(--color-text-muted)';
             return `
@@ -575,7 +575,7 @@ async function loadPurchaseHistory(email) {
                         <div class="order-row__meta">${escapeHtml(dateStr)} - ${escapeHtml((order.items || []).map(i => `${i.tier_name || 'Ticket'} x${i.quantity || 1}`).join(', ') || '1 ticket')}</div>
                     </div>
                     <div>
-                        <div class="order-row__amount">GHS ${amount}</div>
+                        <div class="order-row__amount">${amount}</div>
                         <div class="order-row__ref" style="color:${statusColor};">${escapeHtml((order.status || 'confirmed').charAt(0).toUpperCase() + (order.status||'confirmed').slice(1))}</div>
                     </div>
                 </div>`;
@@ -592,8 +592,8 @@ async function loadPurchaseHistory(email) {
                     ...orders.map(o => {
                         const d = new Date(o._creationTime || 0).toLocaleDateString();
                         const tickets = (o.items||[]).map(i=>`${i.tier_name}x${i.quantity}`).join('+');
-                        const amt = ((o.total_amount||0)/100).toFixed(2);
-                        return `"${d}","${o.event_title || ''}","${tickets}","GHS ${amt}","${o.status || ''}"`;
+                        const amt = moneyFromMinor(o.total_amount || 0, o.currency || 'GHS');
+                        return `"${d}","${o.event_title || ''}","${tickets}","${amt}","${o.status || ''}"`;
                     })
                 ].join('\n');
                 const blob = new Blob([csv], { type: 'text/csv' });
@@ -943,7 +943,7 @@ async function initEventDetailPage() {
                     const currency = event.currency || 'GHS';
                     return `
                     <div class="ticket-tier ${isSoldOut ? 'sold-out' : ''} ${index === firstAvailableIndex ? 'selected' : ''}" id="tier-${tier._id}"
-                         data-price="${tier.price / 100}" data-name="${escapeAttr(tier.name)}" data-tier-id="${escapeAttr(tier._id)}">
+                         data-price="${tier.price / 100}" data-name="${escapeAttr(tier.name)}" data-tier-id="${escapeAttr(tier._id)}" data-currency="${escapeAttr(currency)}">
                         <div class="ticket-tier__info">
                             <div class="ticket-tier__name">${escapeHtml(tier.name)}</div>
                             <div class="ticket-tier__desc">${escapeHtml(tier.description || '')}</div>
@@ -975,8 +975,9 @@ async function initEventDetailPage() {
                 }
                 const qty   = parseInt(document.getElementById('qty-display')?.textContent) || 1;
                 const price = parseFloat(selectedTier.dataset.price) || 0;
+                const currency = (selectedTier.dataset.currency || event.currency || 'GHS').toUpperCase();
                 const total = price * qty + Math.round(price * qty * 0.05) + 1;
-                const url = `checkout.html?event=${event._id}&tier=${selectedTier.dataset.tierId || ''}&tier_name=${encodeURIComponent(selectedTier.dataset.name)}&qty=${qty}&price=${price}&total=${total.toFixed(2)}`;
+                const url = `checkout.html?event=${event._id}&tier=${selectedTier.dataset.tierId || ''}&tier_name=${encodeURIComponent(selectedTier.dataset.name)}&qty=${qty}&price=${price}&total=${total.toFixed(2)}&currency=${encodeURIComponent(currency)}`;
                 window.location.href = url;
             }, { once: true });
         }

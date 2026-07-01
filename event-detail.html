@@ -848,8 +848,10 @@
             let selectedPrice = 350;
             let selectedTierId = null;
             let selectedTierName = 'Ticket';
+            let eventCurrency = 'GHS';
             let qty = 2;
             const maxQty = 6;
+            const formatMoney = (amount) => `${eventCurrency} ${Number(amount || 0).toFixed(2)}`;
 
             function updateSummary() {
                 const subtotal = selectedPrice * qty;
@@ -861,9 +863,9 @@
                 const t = document.getElementById('total');
                 const row = document.querySelector('#order-summary .order-row:first-child span:first-child');
                 const btn = document.getElementById('buy-now-btn');
-                if (s) s.textContent = 'GH\u20B5 ' + subtotal.toFixed(2);
-                if (sf) sf.textContent = 'GH\u20B5 ' + fee.toFixed(2);
-                if (t) t.textContent = 'GH\u20B5 ' + total.toFixed(2);
+                if (s) s.textContent = formatMoney(subtotal);
+                if (sf) sf.textContent = formatMoney(fee);
+                if (t) t.textContent = formatMoney(total);
                 if (row) row.textContent = selectedTierName + ' \u00D7 ' + qty;
                 if (btn) {
                     const eventId = document.getElementById('event-cover')?.dataset.eventId || '';
@@ -874,7 +876,7 @@
                         return;
                     }
 
-                    btn.textContent = 'Buy Tickets \u2014 GH\u20B5 ' + total.toFixed(2);
+                    btn.textContent = 'Buy Tickets \u2014 ' + formatMoney(total);
                     btn.removeAttribute('aria-disabled');
                     // Pass order info in URL
                     const params = new URLSearchParams({
@@ -884,6 +886,7 @@
                         qty: qty,
                         price: selectedPrice,
                         total: total,
+                        currency: eventCurrency,
                     });
                     btn.href = 'checkout.html?' + params.toString();
                 }
@@ -929,6 +932,7 @@
                         return;
                     }
                     document.body.classList.add('event-ready');
+                    eventCurrency = (event.currency || 'GHS').toUpperCase();
 
                     // Update page title & meta
                     document.title = event.title + ' \u2014 Abonten Tickets';
@@ -986,7 +990,7 @@
                         tiers.forEach(function (tier, i) {
                             const avail = tier.capacity - tier.sold;
                             const soldOut = avail <= 0;
-                            const priceGHS = (tier.price / 100).toFixed(2);
+                            const price = (tier.price / 100).toFixed(2);
                             const div = document.createElement('div');
                             div.className = 'ticket-tier' + (soldOut ? ' sold-out' : '') + (i === 0 && !soldOut ? ' selected' : '');
                             div.dataset.price = (tier.price / 100);
@@ -996,7 +1000,7 @@
                                 <div class="ticket-tier__radio"></div>
                                 <div class="ticket-tier__header">
                                     <span class="ticket-tier__name">${tier.name}</span>
-                                    <span class="ticket-tier__price">GH\u20B5 ${priceGHS}</span>
+                                    <span class="ticket-tier__price">${eventCurrency} ${price}</span>
                                 </div>
                                 ${tier.description ? `<div class="ticket-tier__desc">${tier.description}</div>` : ''}
                                 <div class="ticket-tier__avail" style="color:${avail < 50 ? 'var(--color-error)' : 'var(--color-warning)'}">

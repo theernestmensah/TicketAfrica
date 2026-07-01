@@ -797,22 +797,80 @@
             const tierName = params.get('tier_name') || 'Ticket';
             const qty = parseInt(params.get('qty')) || 2;
             const pricePerUnit = parseFloat(params.get('price')) || 0;
-            const totalFromUrl = parseFloat(params.get('total')) || 0;
+            let checkoutCurrency = (params.get('currency') || 'GHS').trim().toUpperCase();
+            const supportedCheckoutCurrencies = new Set(['GHS']);
+            const smsDeliveryFee = 1;
+            const formatMoney = (amount, currency = checkoutCurrency) => `${currency} ${Number(amount || 0).toFixed(2)}`;
 
-            // Populate order card
-            if (pricePerUnit > 0) {
+            function setCheckoutBlocked(message) {
+                const btn = document.getElementById('complete-purchase-btn');
+                if (btn) {
+                    btn.disabled = true;
+                    btn.innerHTML = `<iconify-icon icon="hugeicons:alert-02" style="width:18px;height:18px;"></iconify-icon> ${message}`;
+                }
+            }
+
+            function refreshOrderDisplay() {
                 const subtotal = pricePerUnit * qty;
                 const fee = Math.round(subtotal * 0.05);
-                const total = subtotal + fee + 1;
+                const total = subtotal + fee + smsDeliveryFee;
                 const qLine = document.querySelector('.order-line');
-                if (qLine) qLine.innerHTML = `<span>${tierName} x ${qty}</span><span>GHS ${subtotal.toFixed(2)}</span>`;
-                document.querySelectorAll('.order-line')[1] && (document.querySelectorAll('.order-line')[1].innerHTML = `<span>Subtotal</span><span>GHS ${subtotal.toFixed(2)}</span>`);
-                document.querySelectorAll('.order-line')[2] && (document.querySelectorAll('.order-line')[2].innerHTML = `<span>Service fee (5%)</span><span>GHS ${fee.toFixed(2)}</span>`);
+                if (qLine) qLine.innerHTML = `<span>${tierName} x ${qty}</span><span>${formatMoney(subtotal)}</span>`;
+                document.querySelectorAll('.order-line')[1] && (document.querySelectorAll('.order-line')[1].innerHTML = `<span>Subtotal</span><span>${formatMoney(subtotal)}</span>`);
+                document.querySelectorAll('.order-line')[2] && (document.querySelectorAll('.order-line')[2].innerHTML = `<span>Service fee (5%)</span><span>${formatMoney(fee)}</span>`);
+                document.querySelectorAll('.order-line')[3] && (document.querySelectorAll('.order-line')[3].innerHTML = `<span>SMS delivery</span><span>${formatMoney(smsDeliveryFee)}</span>`);
                 const totalEl = document.querySelector('.order-total');
-                if (totalEl) totalEl.innerHTML = `<span>Total</span><span>GHS ${total.toFixed(2)}</span>`;
+                if (totalEl) totalEl.innerHTML = `<span>Total</span><span>${formatMoney(total)}</span>`;
                 const btn = document.getElementById('complete-purchase-btn');
-                if (btn) btn.innerHTML = `<iconify-icon icon="hugeicons:shield-01" style="width:18px;height:18px;"></iconify-icon> Complete Secure Purchase  -  GHS ${total.toFixed(2)}`;
+                if (btn && !btn.disabled) btn.innerHTML = `<iconify-icon icon="hugeicons:shield-01" style="width:18px;height:18px;"></iconify-icon> Complete Secure Purchase  -  ${formatMoney(total)}`;
+
+                const walletDesc = document.querySelector('#pm-wallet .pay-method__desc');
+                if (walletDesc) walletDesc.textContent = `Balance: ${formatMoney(0)} - Insufficient funds`;
             }
+
+            function enforceCheckoutCurrency() {
+                if (!supportedCheckoutCurrencies.has(checkoutCurrency)) {
+                    setCheckoutBlocked(`${checkoutCurrency} checkout is not live yet`);
+                    const paymentSection = document.getElementById('payment-section');
+                    if (paymentSection && !document.getElementById('currency-blocker')) {
+                        paymentSection.insertAdjacentHTML('afterbegin', `<div class="checkout-timer" id="currency-blocker" style="background:rgba(245,158,11,0.10);border-color:rgba(245,158,11,0.35);color:#92400E;">${checkoutCurrency} sales are not enabled yet. Please switch the event to GHS or enable this currency in the payment configuration.</div>`);
+                    }
+                    return false;
+                }
+                document.getElementById('currency-blocker')?.remove();
+                const btn = document.getElementById('complete-purchase-btn');
+                if (btn) btn.disabled = false;
+                return true;
+            }
+
+            refreshOrderDisplay();
+            enforceCheckoutCurrency();
+
+            async function hydrateEventDetails() {
+                if (!eventId || !window.ConvexDB) return;
+                try {
+                    const event = await window.ConvexDB.getEventById(eventId);
+                    if (!event) return;
+                    checkoutCurrency = (event.currency || checkoutCurrency || 'GHS').toUpperCase();
+                    const eventName = document.querySelector('.order-card__event-name');
+                    if (eventName) eventName.textContent = event.title || 'Selected Event';
+                    const eventMeta = document.querySelector('.order-card__event-meta');
+                    if (eventMeta) {
+                        const startsAt = new Date(event.start_date || Date.now());
+                        const date = startsAt.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+                        const place = [event.location?.venue_name, event.location?.city].filter(Boolean).join(' - ');
+                        eventMeta.textContent = [date, place].filter(Boolean).join(' - ');
+                    }
+                    refreshOrderDisplay();
+                    enforceCheckoutCurrency();
+                } catch (error) {
+                    console.warn('[checkout] Could not load event details', error);
+                }
+            }
+
+            window.addEventListener('convex-ready', hydrateEventDetails, { once: true });
+            if (window.ConvexDB) hydrateEventDetails();
+
             const deliveryCount = document.getElementById('ticket-delivery-count');
             if (deliveryCount) {
                 deliveryCount.textContent = `${qty}x QR code ticket${qty === 1 ? '' : 's'} (PDF + digital)`;
@@ -986,7 +1044,11 @@
                 try {
                     const subtotal = pricePerUnit * qty;
                     const fee = Math.round(subtotal * 0.05);
-                    const total = subtotal + fee + 1;
+                    const total = subtotal + fee + smsDeliveryFee;
+
+                    if (!supportedCheckoutCurrencies.has(checkoutCurrency)) {
+                        throw new Error(`${checkoutCurrency} checkout is not enabled yet.`);
+                    }
 
                     if (!window.ConvexDB) throw new Error("Database not connected.");
                     const paystackKey = window.ENV?.PAYSTACK_PUBLIC_KEY;
@@ -1000,7 +1062,7 @@
                         buyer_phone: phone,
                         items: [{ tier_id: tierId, tier_name: tierName, quantity: qty, unit_price: Math.round(pricePerUnit * 100) }],
                         total_amount: Math.round(total * 100),
-                        currency: 'GHS'
+                        currency: checkoutCurrency
                     });
 
                     async function finishCheckout(reference) {
@@ -1019,6 +1081,7 @@
                                 event_venue: '',
                                 items: [{ tier_name: tierName, quantity: qty }],
                                 total_amount: Math.round(total * 100),
+                                currency: checkoutCurrency,
                             }).catch(e => console.warn('[checkout] email error', e));
                         }
 
@@ -1043,7 +1106,7 @@
                         key: paystackKey,
                         email,
                         amount: Math.round(total * 100),
-                        currency: 'GHS',
+                        currency: checkoutCurrency,
                         reference,
                         channels: getSelectedPaymentChannels(),
                         metadata: {

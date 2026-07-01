@@ -2630,10 +2630,14 @@
 
 /* Venture-grade homepage layer */
 .hero {
-    min-height: min(900px, calc(100svh - 32px)) !important;
+    min-height: min(760px, calc(100svh - 32px)) !important;
     background:
         linear-gradient(118deg, #111827 0%, #4C1D95 42%, #7C3AED 72%, #111827 100%) !important;
     isolation: isolate;
+}
+
+.hero__canvas {
+    display: none !important;
 }
 
 .hero__orb,
@@ -2666,10 +2670,9 @@
 .hero__content .container {
     position: relative;
     display: grid;
-    grid-template-columns: minmax(0, 0.94fr) minmax(360px, 0.68fr);
+    grid-template-columns: minmax(0, 1fr);
     align-items: center;
-    column-gap: clamp(36px, 6vw, 92px);
-    max-width: 1240px;
+    max-width: 980px;
 }
 
 .hero__content .container > * {
@@ -2678,12 +2681,11 @@
 
 .hero__content .container::after,
 .hero__content .container::before {
-    grid-column: 2;
-    grid-row: 1 / span 8;
+    content: none !important;
+    display: none !important;
 }
 
 .hero__content .container::after {
-    content: "";
     min-height: 500px;
     border-radius: 8px;
     background:
@@ -2700,7 +2702,6 @@
 }
 
 .hero__content .container::before {
-    content: "ORGANIZER COMMAND CENTER\A\A GMV TODAY        GHS 482K\A CHECK-INS        18.4K\A FRAUD BLOCKS     312\A\A AFROLIVE FESTIVAL   84% SOLD\A STADIUM NIGHT       12 GATES LIVE\A\A QR VALIDATION  /  PAYOUT CONTROL";
     z-index: 1;
     align-self: center;
     justify-self: stretch;

@@ -855,12 +855,13 @@
                                 <div>
                                     <label class="dash-label" style="display:block;margin-bottom:6px;">Currency</label>
                                     <select id="ce-currency" class="dash-select" style="width:100%;">
-                                        <option value="GHS">GHS (Ghanian Cedi)</option>
-                                        <option value="NGN">NGN (Nigerian Naira)</option>
-                                        <option value="R">ZAR (South African Rand)</option>
-                                        <option value="KSh">KES (Kenyan Shilling)</option>
-                                        <option value="USD">USD (US Dollar)</option>
+                                        <option value="GHS">GHS (Ghanaian Cedi) - live checkout</option>
+                                        <option value="NGN" disabled>NGN (Nigerian Naira) - coming soon</option>
+                                        <option value="ZAR" disabled>ZAR (South African Rand) - coming soon</option>
+                                        <option value="KES" disabled>KES (Kenyan Shilling) - coming soon</option>
+                                        <option value="USD" disabled>USD (US Dollar) - coming soon</option>
                                     </select>
+                                    <span style="font-size:11px;color:var(--color-text-muted);display:block;margin-top:4px;">Only GHS events can be published until additional payout and payment rails are enabled.</span>
                                 </div>
                             </div>
                             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">

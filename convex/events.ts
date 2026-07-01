@@ -3,6 +3,37 @@ import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import { sanitizeText, sanitizeHtml } from "./sanitize";
 
+function normalizeCurrency(value: string) {
+    return sanitizeText(value).trim().toUpperCase();
+}
+
+function supportedCheckoutCurrencies() {
+    const raw = process.env.SUPPORTED_CHECKOUT_CURRENCIES || "GHS";
+    return new Set(raw.split(",").map((currency) => currency.trim().toUpperCase()).filter(Boolean));
+}
+
+function assertDateRange(startDate: string, endDate: string) {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
+        throw new Error("Event dates must be valid.");
+    }
+    if (end <= start) {
+        throw new Error("Event end date must be after the start date.");
+    }
+}
+
+function assertTierWindow(salesStart: string, salesEnd: string) {
+    const start = new Date(salesStart);
+    const end = new Date(salesEnd);
+    if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
+        throw new Error("Ticket sale dates must be valid.");
+    }
+    if (end <= start) {
+        throw new Error("Ticket sales end date must be after the sales start date.");
+    }
+}
+
 async function getCurrentUser(ctx: any) {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Authentication required.");
@@ -183,6 +214,10 @@ export const createEvent = mutation({
         await assertOrgAccess(ctx, args.org_id);
         const user = await getCurrentUser(ctx);
         const sanitizedTitle = sanitizeText(args.title);
+        const currency = normalizeCurrency(args.currency);
+        assertDateRange(args.start_date, args.end_date);
+        if (!currency) throw new Error("Currency is required.");
+
         const slug = sanitizedTitle.toLowerCase().replace(/[^a-z0-9]+/g, "-") + "-" + Date.now();
         const eventId = await ctx.db.insert("events", {
             org_id: args.org_id,
@@ -193,7 +228,7 @@ export const createEvent = mutation({
             start_date: args.start_date,
             end_date: args.end_date,
             cover_image: args.cover_image ?? "",
-            currency: args.currency,
+            currency,
             status: "draft",
             location: {
                 venue_name: sanitizeText(args.venue_name),
@@ -255,7 +290,10 @@ export const updateEvent = mutation({
         if (fields.start_date !== undefined) patch.start_date = fields.start_date;
         if (fields.end_date !== undefined) patch.end_date = fields.end_date;
         if (fields.cover_image !== undefined) patch.cover_image = fields.cover_image;
-        if (fields.currency !== undefined) patch.currency = fields.currency;
+        if (fields.currency !== undefined) patch.currency = normalizeCurrency(fields.currency);
+        if (fields.start_date !== undefined || fields.end_date !== undefined) {
+            assertDateRange(patch.start_date || existing.start_date, patch.end_date || existing.end_date);
+        }
 
         if (venue_name !== undefined || city !== undefined || country !== undefined || address !== undefined) {
             patch.location = {
@@ -276,7 +314,38 @@ export const updateEvent = mutation({
 export const publishEvent = mutation({
     args: { event_id: v.id("events") },
     handler: async (ctx, args) => {
-        await assertEventAccess(ctx, args.event_id);
+        const event = await assertEventAccess(ctx, args.event_id);
+        assertDateRange(event.start_date, event.end_date);
+
+        const supportedCurrencies = supportedCheckoutCurrencies();
+        const eventCurrency = normalizeCurrency(event.currency || "");
+        if (!supportedCurrencies.has(eventCurrency)) {
+            throw new Error(`Checkout is not enabled for ${eventCurrency}. Supported currencies: ${Array.from(supportedCurrencies).join(", ")}.`);
+        }
+
+        const tiers = await ctx.db
+            .query("ticket_tiers")
+            .withIndex("by_event", (q) => q.eq("event_id", args.event_id))
+            .collect();
+        if (!tiers.length) {
+            throw new Error("Add at least one ticket tier before publishing.");
+        }
+
+        const now = Date.now();
+        const saleableTier = tiers.find((tier: any) => {
+            assertTierWindow(tier.sales_start, tier.sales_end);
+            if (!Number.isInteger(tier.price) || tier.price < 0) {
+                throw new Error(`Invalid price for ${tier.name}.`);
+            }
+            if (!Number.isInteger(tier.capacity) || tier.capacity <= 0) {
+                throw new Error(`Invalid capacity for ${tier.name}.`);
+            }
+            return (tier.sold || 0) < tier.capacity && new Date(tier.sales_end).getTime() > now;
+        });
+        if (!saleableTier) {
+            throw new Error("At least one ticket tier must be available for sale before publishing.");
+        }
+
         await ctx.db.patch(args.event_id, { status: "published" });
         return args.event_id;
     },
@@ -322,6 +391,14 @@ export const addTicketTier = mutation({
     },
     handler: async (ctx, args) => {
         await assertEventAccess(ctx, args.event_id);
+        if (!Number.isInteger(args.price) || args.price < 0) {
+            throw new Error("Ticket price must be a non-negative whole number in minor units.");
+        }
+        if (!Number.isInteger(args.capacity) || args.capacity <= 0) {
+            throw new Error("Ticket capacity must be at least 1.");
+        }
+        assertTierWindow(args.sales_start, args.sales_end);
+
         return await ctx.db.insert("ticket_tiers", {
             event_id: args.event_id,
             name: sanitizeText(args.name),

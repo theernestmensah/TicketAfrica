@@ -28,6 +28,10 @@ function line(status, label, detail = "") {
   console.log(`${marker} ${label}${detail ? ` - ${detail}` : ""}`);
 }
 
+function warn(label, detail = "") {
+  console.log(`WARN ${label}${detail ? ` - ${detail}` : ""}`);
+}
+
 const blockers = [];
 
 const env = run(npx, ["convex", "env", "list", "--prod"]);
@@ -45,13 +49,14 @@ if (!env.ok) {
   line(hasPaystackSecretKey, "PAYSTACK_SECRET_KEY", hasPaystackSecretKey ? "configured" : "missing");
   line(hasBrevoApiKey, "BREVO_API_KEY", hasBrevoApiKey ? "configured" : "missing");
   line(hasBrevoSenderEmail, "BREVO_SENDER_EMAIL", hasBrevoSenderEmail ? "configured" : "missing");
-  line(hasUpstashRedisUrl, "UPSTASH_REDIS_REST_URL", hasUpstashRedisUrl ? "configured" : "missing");
-  line(hasUpstashRedisToken, "UPSTASH_REDIS_REST_TOKEN", hasUpstashRedisToken ? "configured" : "missing");
+  if (hasUpstashRedisUrl && hasUpstashRedisToken) {
+    line(true, "Upstash Redis", "configured");
+  } else {
+    warn("Upstash Redis", "missing; public cache functions will fall back to direct Convex queries");
+  }
   if (!hasPaystackSecretKey) blockers.push("Set PAYSTACK_SECRET_KEY in Convex production.");
   if (!hasBrevoApiKey) blockers.push("Set BREVO_API_KEY in Convex production.");
   if (!hasBrevoSenderEmail) blockers.push("Set BREVO_SENDER_EMAIL in Convex production.");
-  if (!hasUpstashRedisUrl) blockers.push("Set UPSTASH_REDIS_REST_URL in Convex production.");
-  if (!hasUpstashRedisToken) blockers.push("Set UPSTASH_REDIS_REST_TOKEN in Convex production.");
 }
 
 const events = run(npx, [

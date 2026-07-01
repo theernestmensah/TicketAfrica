@@ -8,6 +8,15 @@ function normalizeEmail(email: string) {
     return email.trim().toLowerCase();
 }
 
+function normalizeCurrency(value: string) {
+    return String(value || "").trim().toUpperCase();
+}
+
+function supportedCheckoutCurrencies() {
+    const raw = process.env.SUPPORTED_CHECKOUT_CURRENCIES || "GHS";
+    return new Set(raw.split(",").map((currency) => normalizeCurrency(currency)).filter(Boolean));
+}
+
 function isPositiveInteger(value: number) {
     return Number.isInteger(value) && value > 0;
 }
@@ -81,6 +90,13 @@ export const createCheckout = mutation({
         const event = await ctx.db.get(args.event_id);
         if (!event) throw new Error("Event not found");
         if (event.status !== "published") throw new Error("This event is not available for checkout.");
+        const currency = normalizeCurrency(args.currency);
+        if (!supportedCheckoutCurrencies().has(currency)) {
+            throw new Error(`Checkout is not enabled for ${currency}.`);
+        }
+        if (normalizeCurrency(event.currency) !== currency) {
+            throw new Error("Checkout currency does not match this event.");
+        }
 
         let expectedSubtotal = 0;
         const validatedItems = [];
@@ -138,7 +154,7 @@ export const createCheckout = mutation({
             buyer_phone: sanitizedBuyerPhone || undefined,
             items: validatedItems,
             total_amount: expectedTotal,
-            currency: args.currency,
+            currency,
             status: "pending",
             created_at: new Date().toISOString(),
         });
@@ -301,7 +317,7 @@ export const completeVerifiedOrder = internalMutation({
         if (!order) throw new Error("Order not found");
         if (order.status === "paid") return { success: true }; // Already processed
         if (args.amount < order.total_amount) throw new Error("Verified payment amount is less than this order total.");
-        if (order.currency.toUpperCase() !== args.currency.toUpperCase()) throw new Error("Verified payment currency does not match this order.");
+        if (normalizeCurrency(order.currency) !== normalizeCurrency(args.currency)) throw new Error("Verified payment currency does not match this order.");
 
         const existingRef = await ctx.db
             .query("orders")

@@ -16,6 +16,7 @@ import type * as http from "../http.js";
 import type * as messages from "../messages.js";
 import type * as organizer from "../organizer.js";
 import type * as payments from "../payments.js";
+import type * as sanitize from "../sanitize.js";
 import type * as users from "../users.js";
 
 import type {
@@ -33,6 +34,7 @@ declare const fullApi: ApiFromModules<{
   messages: typeof messages;
   organizer: typeof organizer;
   payments: typeof payments;
+  sanitize: typeof sanitize;
   users: typeof users;
 }>;
 
