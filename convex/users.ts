@@ -23,6 +23,15 @@ function identityEmail(identity: any, fallback?: string) {
     return String(identity.email || identity.emailAddress || fallback || "").trim().toLowerCase();
 }
 
+function resolveRole(
+    existingRole: "buyer" | "organizer" | "admin" | undefined,
+    requestedRole: "buyer" | "organizer"
+) {
+    if (existingRole === "admin") return "admin";
+    if (existingRole === "organizer" || requestedRole === "organizer") return "organizer";
+    return "buyer";
+}
+
 // Get a user by their Clerk ID
 export const getByClerkId = query({
     args: { clerk_id: v.string() },
@@ -63,7 +72,7 @@ export const upsertUser = mutation({
         const email = identityEmail(identity, args.email);
         if (!email) throw new Error("Authenticated email is required.");
 
-        const role: "buyer" = "buyer";
+        const requestedRole = args.role ?? "buyer";
         const existing = await ctx.db
             .query("users")
             .withIndex("by_clerk_id", (q) => q.eq("clerk_id", clerkId))
@@ -82,6 +91,7 @@ export const upsertUser = mutation({
                 email,
                 first_name: sanitizeText(args.first_name),
                 last_name: sanitizeText(args.last_name),
+                role: resolveRole(existing.role, requestedRole),
             };
 
             if (args.phone !== undefined) updates.phone = sanitizePhone(args.phone);
@@ -104,11 +114,12 @@ export const upsertUser = mutation({
                 last_name: sanitizeText(args.last_name),
                 phone: args.phone !== undefined ? sanitizePhone(args.phone) : undefined,
                 preferred_language: args.preferred_language,
-                role: existingEmailUser.role === "admin" ? "admin" : role,
+                role: resolveRole(existingEmailUser.role, requestedRole),
             });
             return existingEmailUser._id;
         }
 
+        const role = resolveRole(undefined, requestedRole);
         const userId = await ctx.db.insert("users", {
             clerk_id: clerkId,
             email,
