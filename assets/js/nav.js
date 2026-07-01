@@ -1,5 +1,5 @@
 /* ============================================================
-   ABONTEN TICKETS — Navigation Logic
+   AbontenTickets — Navigation Logic
    ============================================================ */
 
 (function () {

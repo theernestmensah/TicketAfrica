@@ -1,5 +1,5 @@
 -- =============================================================================
--- Abonten Tickets — Supabase Database Schema
+-- AbontenTickets — Supabase Database Schema
 -- Migration: 001_initial_schema.sql
 --
 -- Run this in Supabase SQL Editor or via `supabase db push`

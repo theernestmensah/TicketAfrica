@@ -1,6 +1,6 @@
 /**
  * @file supabase.js
- * @description Supabase client singleton for Abonten Tickets.
+ * @description Supabase client singleton for AbontenTickets.
  *
  * SETUP:
  *   Replace the placeholder values in /assets/js/config.js with your

@@ -106,10 +106,10 @@ export const syncClerkUser = internalMutation({
             recipient_phone: args.phone,
             recipient_name: args.first_name,
             user_id: userId,
-            subject: isOrganizer ? "Welcome to Abonten Tickets for Organizers" : "Welcome to Abonten Tickets",
+            subject: isOrganizer ? "Welcome to AbontenTickets for Organizers" : "Welcome to AbontenTickets",
             body: isOrganizer
-                ? `Hi ${args.first_name}, welcome to Abonten Tickets. Your organizer account is ready. You can create your first event, add ticket tiers, and prepare for your first buyers.`
-                : `Hi ${args.first_name}, welcome to Abonten Tickets. Your account is ready. When organizers publish events, you can discover them, pay locally, and receive secure QR-code tickets.`,
+                ? `Hi ${args.first_name}, welcome to AbontenTickets. Your organizer account is ready. You can create your first event, add ticket tiers, and prepare for your first buyers.`
+                : `Hi ${args.first_name}, welcome to AbontenTickets. Your account is ready. When organizers publish events, you can discover them, pay locally, and receive secure QR-code tickets.`,
             template_key: isOrganizer ? "welcome_organizer" : "welcome_buyer",
             data: {
                 first_name: args.first_name,

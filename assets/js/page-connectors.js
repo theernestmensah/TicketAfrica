@@ -1,7 +1,7 @@
 /**
  * page-connectors.js
  * ─────────────────────────────────────────────────────────────────────────────
- * Abonten Tickets — Page-level Convex data connectors.
+ * AbontenTickets — Page-level Convex data connectors.
  *
  * Each connector is self-contained and fires only on the relevant page.
  * All connectors wait for 'convex-ready' before querying.
@@ -44,7 +44,7 @@ function moneyFromMinor(amount, currency) {
 
 window.downloadTicketFile = function downloadTicketFile(ticketCode, eventTitle, ticketType, eventDate, venue) {
     const lines = [
-        'Abonten Tickets Ticket',
+        'AbontenTickets Ticket',
         '',
         `Event: ${eventTitle || 'Event'}`,
         `Ticket: ${ticketType || 'Ticket'}`,
@@ -852,7 +852,7 @@ async function initEventDetailPage() {
         if (!event) return;
 
         // Update <title> and meta-description
-        document.title = `${event.title} — Abonten Tickets`;
+        document.title = `${event.title} — AbontenTickets`;
         const metaDesc = document.querySelector('meta[name="description"]');
         if (metaDesc) metaDesc.setAttribute('content', event.description || event.title);
 
@@ -976,8 +976,11 @@ async function initEventDetailPage() {
                 const qty   = parseInt(document.getElementById('qty-display')?.textContent) || 1;
                 const price = parseFloat(selectedTier.dataset.price) || 0;
                 const currency = (selectedTier.dataset.currency || event.currency || 'GHS').toUpperCase();
-                const total = price * qty + Math.round(price * qty * 0.05) + 1;
-                const url = `checkout.html?event=${event._id}&tier=${selectedTier.dataset.tierId || ''}&tier_name=${encodeURIComponent(selectedTier.dataset.name)}&qty=${qty}&price=${price}&total=${total.toFixed(2)}&currency=${encodeURIComponent(currency)}`;
+                const subtotalMinor = Math.round(price * 100) * qty;
+                const serviceFeeMinor = Math.round(subtotalMinor * 0.05);
+                const processingFeeMinor = Math.round(subtotalMinor * 0.035);
+                const totalMinor = subtotalMinor + serviceFeeMinor + processingFeeMinor + 100;
+                const url = `checkout.html?event=${event._id}&tier=${selectedTier.dataset.tierId || ''}&tier_name=${encodeURIComponent(selectedTier.dataset.name)}&qty=${qty}&price=${price}&total=${(totalMinor / 100).toFixed(2)}&currency=${encodeURIComponent(currency)}`;
                 window.location.href = url;
             }, { once: true });
         }

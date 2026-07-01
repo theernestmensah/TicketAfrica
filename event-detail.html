@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description"
         content="Selected Event  -  Buy tickets for this event at Accra Sports Stadium. Multiple ticket tiers available with mobile money payment." />
-    <title>Selected Event  -  Abonten Tickets</title>
+    <title>Selected Event  -  AbontenTickets</title>
     <script src="assets/js/env.js"></script>
     <script type="module" src="/assets/js/db.js"></script>
     <link rel="stylesheet" href="assets/css/core.css" />
@@ -641,7 +641,7 @@
                     <div class="detail-section__title">About This Event</div>
                     <div style="color:var(--color-text-secondary);line-height:1.8;font-size:var(--text-base);">
                         <p style="margin-bottom:var(--space-4);">Event details load from the organizer's published event record.</p>
-                        <p style="margin-bottom:var(--space-4);">Abonten Tickets is launch-stage. No tickets have been sold yet, and this page will only show real event information once an organizer publishes an event.</p>
+                        <p style="margin-bottom:var(--space-4);">AbontenTickets is launch-stage. No tickets have been sold yet, and this page will only show real event information once an organizer publishes an event.</p>
                     </div>
                 </div>
 
@@ -778,16 +778,17 @@
                 <div class="order-summary" id="order-summary">
                     <div class="order-summary__title">Order Summary</div>
                     <div class="order-row"><span>VIP Section x 2</span><span id="subtotal">GHS 700.00</span></div>
-                    <div class="order-row"><span>Service fee (5%)</span><span id="service-fee">GHS 35.00</span></div>
+                    <div class="order-row"><span>AbontenTickets service fee (5%)</span><span id="service-fee">GHS 35.00</span></div>
+                    <div class="order-row"><span>Payment processing (3.5%)</span><span id="processing-fee">GHS 24.50</span></div>
                     <div class="order-row"><span>SMS delivery</span><span>GHS 1.00</span></div>
-                    <div class="order-row order-total"><span>Total</span><span id="total">GHS 736.00</span></div>
+                    <div class="order-row order-total"><span>Total</span><span id="total">GHS 760.50</span></div>
                 </div>
 
                 <!-- CTA -->
                 <div style="margin-top:var(--space-5);display:flex;flex-direction:column;gap:var(--space-3);">
                     <a href="checkout.html" class="btn btn--primary btn--full btn--lg" id="buy-now-btn">
                         <iconify-icon icon="hugeicons:ticket-01" style="width:18px;height:18px;"></iconify-icon>
-                        Buy Tickets  -  GHS 736.00
+                        Buy Tickets  -  GHS 760.50
                     </a>
                     <button class="btn btn--ghost btn--full" id="add-to-wallet-btn"
                         onclick="TA.toast('Add to wallet  -  sign in first','info')">
@@ -852,20 +853,29 @@
             let qty = 2;
             const maxQty = 6;
             const formatMoney = (amount) => `${eventCurrency} ${Number(amount || 0).toFixed(2)}`;
+            const formatMoneyMinor = (minorAmount) => formatMoney(Number(minorAmount || 0) / 100);
+
+            function calculateTotals() {
+                const subtotalMinor = Math.round(selectedPrice * 100) * qty;
+                const serviceFeeMinor = Math.round(subtotalMinor * 0.05);
+                const processingFeeMinor = Math.round(subtotalMinor * 0.035);
+                const smsDeliveryFeeMinor = 100;
+                const totalMinor = subtotalMinor + serviceFeeMinor + processingFeeMinor + smsDeliveryFeeMinor;
+                return { subtotalMinor, serviceFeeMinor, processingFeeMinor, smsDeliveryFeeMinor, totalMinor };
+            }
 
             function updateSummary() {
-                const subtotal = selectedPrice * qty;
-                const fee = Math.round(subtotal * 0.05);
-                const sms = 1;
-                const total = subtotal + fee + sms;
+                const totals = calculateTotals();
                 const s = document.getElementById('subtotal');
                 const sf = document.getElementById('service-fee');
+                const pf = document.getElementById('processing-fee');
                 const t = document.getElementById('total');
                 const row = document.querySelector('#order-summary .order-row:first-child span:first-child');
                 const btn = document.getElementById('buy-now-btn');
-                if (s) s.textContent = formatMoney(subtotal);
-                if (sf) sf.textContent = formatMoney(fee);
-                if (t) t.textContent = formatMoney(total);
+                if (s) s.textContent = formatMoneyMinor(totals.subtotalMinor);
+                if (sf) sf.textContent = formatMoneyMinor(totals.serviceFeeMinor);
+                if (pf) pf.textContent = formatMoneyMinor(totals.processingFeeMinor);
+                if (t) t.textContent = formatMoneyMinor(totals.totalMinor);
                 if (row) row.textContent = selectedTierName + ' \u00D7 ' + qty;
                 if (btn) {
                     const eventId = document.getElementById('event-cover')?.dataset.eventId || '';
@@ -876,7 +886,7 @@
                         return;
                     }
 
-                    btn.textContent = 'Buy Tickets \u2014 ' + formatMoney(total);
+                    btn.textContent = 'Buy Tickets \u2014 ' + formatMoneyMinor(totals.totalMinor);
                     btn.removeAttribute('aria-disabled');
                     // Pass order info in URL
                     const params = new URLSearchParams({
@@ -885,7 +895,7 @@
                         tier_name: selectedTierName,
                         qty: qty,
                         price: selectedPrice,
-                        total: total,
+                        total: (totals.totalMinor / 100).toFixed(2),
                         currency: eventCurrency,
                     });
                     btn.href = 'checkout.html?' + params.toString();
@@ -935,7 +945,7 @@
                     eventCurrency = (event.currency || 'GHS').toUpperCase();
 
                     // Update page title & meta
-                    document.title = event.title + ' \u2014 Abonten Tickets';
+                    document.title = event.title + ' \u2014 AbontenTickets';
                     document.querySelector('meta[name="description"]')?.setAttribute('content',
                         event.description.substring(0, 160));
 

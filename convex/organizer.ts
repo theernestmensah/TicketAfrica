@@ -706,7 +706,7 @@ export const checkInTicket = mutation({
                 event_id: ticket.event_id,
                 order_id: ticket.order_id,
                 subject: `Your ticket was scanned for ${event?.title || "your event"}`,
-                body: "Your Abonten Tickets QR ticket was successfully scanned at entry.",
+                body: "Your AbontenTickets QR ticket was successfully scanned at entry.",
                 template_key: "ticket_scanned",
                 data: {
                     event_title: event?.title || "Your Event",

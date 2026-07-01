@@ -51,7 +51,7 @@ const configEnv = {
 const publicConfig = `export const TA_CONFIG = {
   APP_VERSION: '1.0.0',
   APP_ENV: 'production',
-  APP_NAME: 'Abonten Tickets',
+  APP_NAME: 'AbontenTickets',
   SUPABASE_URL: ${JSON.stringify(configEnv.SUPABASE_URL)},
   SUPABASE_ANON_KEY: ${JSON.stringify(configEnv.SUPABASE_ANON_KEY)},
   PAYSTACK_PUBLIC_KEY: '${env.PAYSTACK_PUBLIC_KEY}',

@@ -17,6 +17,18 @@ function supportedCheckoutCurrencies() {
     return new Set(raw.split(",").map((currency) => normalizeCurrency(currency)).filter(Boolean));
 }
 
+const ABONTEN_SERVICE_FEE_RATE = 0.05;
+const PAYMENT_PROCESSING_FEE_RATE = 0.035;
+const SMS_DELIVERY_FEE_MINOR = 100;
+
+function calculateCheckoutFees(subtotalMinor: number) {
+    return {
+        serviceFee: Math.round(subtotalMinor * ABONTEN_SERVICE_FEE_RATE),
+        processingFee: Math.round(subtotalMinor * PAYMENT_PROCESSING_FEE_RATE),
+        smsDeliveryFee: SMS_DELIVERY_FEE_MINOR,
+    };
+}
+
 function isPositiveInteger(value: number) {
     return Number.isInteger(value) && value > 0;
 }
@@ -40,19 +52,26 @@ function makeTicketNumber(orderId: unknown, sequence: number) {
 }
 
 function makeScanToken(_orderId: unknown, _sequence: number) {
-    return `TAQR_${new Date().getFullYear()}_${randomToken(32)}`;
+    return `ABTQR_${new Date().getFullYear()}_${randomToken(32)}`;
 }
 
 function calculateOrderSplit(order: any, verifiedAmount: number) {
     const organizerGross = order.items.reduce((sum: number, item: any) => {
         return sum + (item.unit_price * item.quantity);
     }, 0);
-    const ticketAfricaFee = Math.round((organizerGross / 100) * 0.05) * 100;
-    const smsDeliveryFee = Math.max(0, order.total_amount - organizerGross - ticketAfricaFee);
+    const targetFees = calculateCheckoutFees(organizerGross);
+    const feePool = Math.max(0, order.total_amount - organizerGross);
+    const serviceFee = Math.min(targetFees.serviceFee, feePool);
+    const smsDeliveryFee = Math.min(targetFees.smsDeliveryFee, Math.max(0, feePool - serviceFee));
+    const processingFee = Math.min(
+        targetFees.processingFee,
+        Math.max(0, feePool - serviceFee - smsDeliveryFee),
+    );
     const buyerGatewayFee = Math.max(0, verifiedAmount - order.total_amount);
     return {
         organizerGross,
-        ticketAfricaFee,
+        serviceFee,
+        processingFee,
         smsDeliveryFee,
         buyerGatewayFee,
     };
@@ -138,9 +157,8 @@ export const createCheckout = mutation({
             });
         }
 
-        const serviceFee = Math.round((expectedSubtotal / 100) * 0.05) * 100;
-        const smsDeliveryFee = 100;
-        const expectedTotal = expectedSubtotal + serviceFee + smsDeliveryFee;
+        const fees = calculateCheckoutFees(expectedSubtotal);
+        const expectedTotal = expectedSubtotal + fees.serviceFee + fees.processingFee + fees.smsDeliveryFee;
 
         if (args.total_amount !== expectedTotal) {
             throw new Error("Checkout total does not match current ticket prices.");
@@ -413,9 +431,19 @@ export const completeVerifiedOrder = internalMutation({
             type: "ticket_africa_fee",
             account: "ticket_africa",
             direction: "credit",
-            amount: split.ticketAfricaFee,
-            description: "Abonten Tickets service fee collected from buyer",
+            amount: split.serviceFee,
+            description: "AbontenTickets service fee collected from buyer",
         });
+        if (split.processingFee > 0) {
+            await ctx.db.insert("ledger_entries", {
+                ...ledgerBase,
+                type: "gateway_collection_fee",
+                account: "payment_processor",
+                direction: "credit",
+                amount: split.processingFee,
+                description: "Payment processing charge collected from buyer",
+            });
+        }
         if (split.smsDeliveryFee > 0) {
             await ctx.db.insert("ledger_entries", {
                 ...ledgerBase,
@@ -449,7 +477,7 @@ export const completeVerifiedOrder = internalMutation({
             event_id: order.event_id,
             order_id: args.order_id.toString(),
             subject: `Your tickets for ${event.title || "your event"}`,
-            body: `Your Abonten Tickets order is confirmed. Open your wallet to view your QR tickets.`,
+            body: `Your AbontenTickets order is confirmed. Open your wallet to view your QR tickets.`,
             template_key: "ticket_confirmation",
             data: {
                 order_ref: args.order_id.toString(),

@@ -1,6 +1,6 @@
 # Clerk Free Setup
 
-Abonten Tickets uses Clerk for identity and Convex for app roles. This avoids paid Clerk Organizations while keeping buyer, organizer, and admin roles in the Convex `users` table.
+AbontenTickets uses Clerk for identity and Convex for app roles. This avoids paid Clerk Organizations while keeping buyer, organizer, and admin roles in the Convex `users` table.
 
 ## Clerk Dashboard
 

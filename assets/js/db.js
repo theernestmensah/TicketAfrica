@@ -1,6 +1,6 @@
 /**
  * @file db.js
- * @description Abonten Tickets -- Convex Backend Layer.
+ * @description AbontenTickets -- Convex Backend Layer.
  *
  * This file connects directly to Convex using ConvexHttpClient from esm.sh.
  */

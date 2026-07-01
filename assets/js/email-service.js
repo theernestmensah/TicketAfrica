@@ -1,5 +1,5 @@
 /**
- * Abonten Tickets client-side email helpers.
+ * AbontenTickets client-side email helpers.
  *
  * Email delivery is optional. Configure EmailJS values in env.js to enable it:
  * EMAILJS_PUBLIC_KEY, EMAILJS_SERVICE_ID, and the relevant template IDs.
@@ -17,6 +17,7 @@ const EMAILJS_CONFIG = {
         welcomeOrganizer: window.ENV?.EMAILJS_TEMPLATE_WELCOME_ORG || '',
     }
 };
+const BRAND_NAME = 'AbontenTickets';
 
 let _emailJsReady = false;
 let _emailJsPromise = null;
@@ -98,6 +99,7 @@ window.TAMail = {
             total: totalGhc,
             order_ref: ref,
             wallet_link: window.location.origin + '/account.html',
+            brand_name: BRAND_NAME,
         });
     },
 
@@ -110,6 +112,7 @@ window.TAMail = {
             message: opts.message,
             org_name: opts.org_name || 'The Organizer',
             year: new Date().getFullYear(),
+            brand_name: BRAND_NAME,
         });
     },
 
@@ -122,6 +125,7 @@ window.TAMail = {
             event_venue: opts.event_venue || '',
             ticket_type: opts.ticket_type || 'General Admission',
             qr_link: opts.qr_link || (window.location.origin + '/account.html'),
+            brand_name: BRAND_NAME,
         });
     },
 
@@ -137,6 +141,7 @@ window.TAMail = {
                     : 'USSD',
             reference: opts.ref || '',
             eta: '2 business days',
+            brand_name: BRAND_NAME,
         });
     },
 
@@ -147,6 +152,7 @@ window.TAMail = {
             events_link: window.location.origin + '/events.html',
             account_link: window.location.origin + '/account.html',
             year: new Date().getFullYear(),
+            brand_name: BRAND_NAME,
         });
     },
 
@@ -157,6 +163,7 @@ window.TAMail = {
             org_name: opts.org_name || '',
             dashboard_link: window.location.origin + '/organizer-dashboard.html',
             year: new Date().getFullYear(),
+            brand_name: BRAND_NAME,
         });
     },
 

@@ -1,5 +1,5 @@
 /* ============================================================
-   ABONTEN TICKETS — Shared Navigation & Footer Renderer
+   AbontenTickets — Shared Navigation & Footer Renderer
    This script injects the nav and footer into every page.
    ============================================================ */
 
@@ -16,7 +16,7 @@
   <nav class="site-nav nav--transparent" data-transparent="true" id="site-nav">
     <div class="container">
       <div class="nav-inner">
-        <a href="/index.html" class="nav-logo" id="nav-logo" aria-label="Abonten Tickets home">
+        <a href="/index.html" class="nav-logo" id="nav-logo" aria-label="AbontenTickets home">
           <span class="nav-logo__mark" aria-hidden="true">
             <img src="/assets/img/abonten-mark.jpeg" alt="" loading="eager" />
           </span>
@@ -108,7 +108,7 @@
   <div class="nav-mobile-overlay" id="nav-mobile-overlay"></div>
   <div class="nav-mobile-drawer" id="nav-mobile-drawer">
     <div class="nav-mobile-header">
-      <a href="/index.html" class="nav-logo" aria-label="Abonten Tickets home">
+      <a href="/index.html" class="nav-logo" aria-label="AbontenTickets home">
         <span class="nav-logo__mark" aria-hidden="true">
           <img src="/assets/img/abonten-mark.jpeg" alt="" loading="eager" />
         </span>
@@ -176,7 +176,7 @@
     <div class="container">
       <div class="footer-grid">
         <div class="footer-brand">
-          <a href="/index.html" class="nav-logo" style="margin-bottom:var(--space-2);" aria-label="Abonten Tickets home">
+          <a href="/index.html" class="nav-logo" style="margin-bottom:var(--space-2);" aria-label="AbontenTickets home">
             <span class="nav-logo__mark" aria-hidden="true">
               <img src="/assets/img/abonten-mark.jpeg" alt="" loading="lazy" />
             </span>
@@ -265,7 +265,7 @@
       </div>
 
       <div class="footer-bottom">
-        <p class="footer-bottom__copy">© 2026 Abonten Tickets Ltd. All rights reserved.</p>
+        <p class="footer-bottom__copy">© 2026 AbontenTickets Ltd. All rights reserved.</p>
         <div class="footer-bottom__links">
           <a href="/terms.html" class="footer-bottom__link">Terms of Service</a>
           <a href="/privacy.html" class="footer-bottom__link">Privacy Policy</a>

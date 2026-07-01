@@ -1,6 +1,6 @@
 /**
  * @file types.js
- * @description JSDoc type definitions for Abonten Tickets.
+ * @description JSDoc type definitions for AbontenTickets.
  *
  * These types match the Supabase database schema exactly.
  * If you add a Supabase migration, update the types here too.

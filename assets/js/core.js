@@ -1,5 +1,5 @@
 /* ============================================================
-   ABONTEN TICKETS — Core Platform JS
+   AbontenTickets — Core Platform JS
    ============================================================ */
 
 (function () {

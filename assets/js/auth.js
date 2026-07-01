@@ -1,6 +1,6 @@
 /**
  * @file auth.js
- * @description Abonten Tickets — Clerk authentication initialisation.
+ * @description AbontenTickets — Clerk authentication initialisation.
  *
  * Clerk is loaded via CDN script tag (window.Clerk).  This module waits for
  * the SDK to be available then initialises it and fires 'clerk-ready' on window

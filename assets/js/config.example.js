@@ -1,6 +1,6 @@
 /**
  * @file config.example.js
- * @description Configuration template for Abonten Tickets.
+ * @description Configuration template for AbontenTickets.
  *
  * HOW TO USE:
  *   1. Copy this file to assets/js/config.js
@@ -27,7 +27,7 @@ export const TA_CONFIG = {
     // ─── App ──────────────────────────────────────────────────────────────────
     APP_VERSION: '1.0.0',
     APP_ENV: 'development', // 'development' | 'staging' | 'production'
-    APP_NAME: 'Abonten Tickets',
+    APP_NAME: 'AbontenTickets',
 
     // ─── Supabase (Primary Backend) ───────────────────────────────────────────
     // Get these from: https://supabase.com/dashboard/project/<your-project>/settings/api

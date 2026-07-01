@@ -1,5 +1,5 @@
 -- =============================================================================
--- Abonten Tickets - RLS hardening
+-- AbontenTickets - RLS hardening
 -- Applies one standard access model across every public table.
 -- =============================================================================
 
