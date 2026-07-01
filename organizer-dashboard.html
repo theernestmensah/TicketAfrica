@@ -1454,6 +1454,20 @@
             syncLivePreview();
         }
 
+        function isConvexJwtSetupError(ex) {
+            const message = String(ex?.message || ex || '');
+            return ex?.code === 'MISSING_CONVEX_JWT_TEMPLATE'
+                || /No JWT template exists with name:\s*convex/i.test(message)
+                || /Clerk is missing the Convex JWT integration/i.test(message);
+        }
+
+        function createEventErrorMessage(ex) {
+            if (isConvexJwtSetupError(ex)) {
+                return 'Event creation is blocked because Clerk is not connected to Convex yet. In Clerk Dashboard, activate Integrations > Convex, or create a JWT template named "convex" with audience "convex". Then sign out and sign back in before creating the event.';
+            }
+            return ex?.message || 'Something went wrong. Please try again.';
+        }
+
         document.getElementById('create-event-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('ce-submit');
@@ -1526,7 +1540,7 @@
                     window.__setEvents(events || []);
                 }
             } catch (ex) {
-                err.textContent = ex.message || 'Something went wrong. Please try again.';
+                err.textContent = createEventErrorMessage(ex);
                 err.style.display = 'block';
             } finally {
                 btn.disabled = false;

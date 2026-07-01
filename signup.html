@@ -973,6 +973,16 @@
                         <div class="input-error" id="password-error">Password must be at least 8 characters.</div>
                     </div>
 
+                    <div class="input-group" id="grp-confirm-password">
+                        <label class="input-label" for="confirm-password">Confirm Password</label>
+                        <div class="input-wrapper">
+                            <iconify-icon icon="hugeicons:lock-password" class="input-icon"></iconify-icon>
+                            <input type="password" id="confirm-password" class="input-field"
+                                placeholder="Re-enter your password" autocomplete="new-password" required />
+                        </div>
+                        <div class="input-error" id="confirm-password-error">Passwords must match.</div>
+                    </div>
+
                     <div class="email-code-panel" id="email-code-panel" aria-live="polite">
                         <p class="email-code-note" id="email-code-note">Enter the verification code sent to your email.</p>
                         <div class="input-wrapper">
@@ -1086,12 +1096,14 @@
 
         // â”€â”€ Password Toggle â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         const pwdInput = document.getElementById('password');
+        const confirmPwdInput = document.getElementById('confirm-password');
         const pwdToggle = document.getElementById('pwd-toggle');
         const pwdIcon = document.getElementById('pwd-icon');
 
         pwdToggle.addEventListener('click', () => {
             const shown = pwdInput.type === 'text';
             pwdInput.type = shown ? 'password' : 'text';
+            confirmPwdInput.type = shown ? 'password' : 'text';
             pwdIcon.setAttribute('icon', shown ? 'hugeicons:view' : 'hugeicons:view-off-slash');
         });
 
@@ -1158,11 +1170,13 @@
         });
 
         // â”€â”€ Step indicator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-        const fields = ['fname', 'lname', 'email', 'country', 'password'];
+        const fields = ['fname', 'lname', 'email', 'country', 'password', 'confirm-password'];
         function updateSteps() {
             const fFilled = document.getElementById('fname').value && document.getElementById('lname').value;
             const eFilled = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(document.getElementById('email').value);
-            const pFilled = document.getElementById('password').value.length >= 8;
+            const passwordValue = document.getElementById('password').value;
+            const confirmValue = document.getElementById('confirm-password').value;
+            const pFilled = passwordValue.length >= 8 && confirmValue === passwordValue;
 
             const s1 = document.getElementById('step-1');
             const s2 = document.getElementById('step-2');
@@ -1181,7 +1195,7 @@
             }
         }
 
-        ['fname', 'lname', 'email', 'password'].forEach(id => {
+        ['fname', 'lname', 'email', 'password', 'confirm-password'].forEach(id => {
             document.getElementById(id)?.addEventListener('input', updateSteps);
         });
 
@@ -1190,6 +1204,17 @@
             document.getElementById(groupId)?.classList.toggle('has-error', show);
             return !show;
         }
+
+        function syncConfirmPasswordError() {
+            if (!confirmPwdInput.value) {
+                setError('grp-confirm-password', false);
+                return;
+            }
+            setError('grp-confirm-password', confirmPwdInput.value !== pwdInput.value);
+        }
+
+        pwdInput.addEventListener('input', syncConfirmPasswordError);
+        confirmPwdInput.addEventListener('input', syncConfirmPasswordError);
 
         function validateEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
 
@@ -1298,6 +1323,7 @@
             const email = document.getElementById('email').value.trim();
             const country = document.getElementById('country').value;
             const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
             const agreed = document.getElementById('agree-terms').checked;
             const alertEl = document.getElementById('auth-alert');
             alertEl.classList.remove('show');
@@ -1315,6 +1341,7 @@
             if (!validateEmail(email)) { setError('grp-email', true); valid = false; } else setError('grp-email', false);
             if (!country) { setError('grp-country', true); valid = false; } else setError('grp-country', false);
             if (password.length < 8) { setError('grp-password', true); valid = false; } else setError('grp-password', false);
+            if (!confirmPassword || confirmPassword !== password) { setError('grp-confirm-password', true); valid = false; } else setError('grp-confirm-password', false);
             if (!agreed) {
                 alertEl.classList.add('show');
                 document.getElementById('auth-alert-msg').textContent = 'Please accept the Terms of Service to continue.';
