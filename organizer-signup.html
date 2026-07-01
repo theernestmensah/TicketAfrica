@@ -395,6 +395,38 @@
             font-size: 12px;
         }
 
+        .email-code-panel {
+            display: none;
+            padding: var(--space-4);
+            border: 1px solid rgba(124, 58, 237, 0.18);
+            border-radius: var(--radius-lg);
+            background: rgba(124, 58, 237, 0.06);
+            margin-bottom: var(--space-4);
+        }
+
+        .email-code-panel.is-visible {
+            display: block;
+        }
+
+        .email-code-note {
+            margin: 0 0 var(--space-3);
+            color: var(--color-text-secondary);
+            font-size: var(--text-sm);
+            line-height: 1.5;
+        }
+
+        .email-code-actions {
+            display: flex;
+            gap: var(--space-2);
+            margin-top: var(--space-3);
+        }
+
+        .email-code-actions .btn-submit {
+            min-height: 44px;
+            flex: 1;
+            font-size: var(--text-sm);
+        }
+
         /* Country select */
         .country-select {
             width: 100%;
@@ -941,6 +973,19 @@
                         <div class="input-error" id="password-error">Password must be at least 8 characters.</div>
                     </div>
 
+                    <div class="email-code-panel" id="email-code-panel" aria-live="polite">
+                        <p class="email-code-note" id="email-code-note">Enter the verification code sent to your email.</p>
+                        <div class="input-wrapper">
+                            <iconify-icon icon="hugeicons:mail-validation-01" class="input-icon"></iconify-icon>
+                            <input type="text" id="email-code" class="input-field" inputmode="numeric" autocomplete="one-time-code"
+                                maxlength="8" placeholder="6-digit code" style="letter-spacing:0.18em;font-weight:700;" />
+                        </div>
+                        <div class="email-code-actions">
+                            <button type="button" class="btn-submit" id="verify-code-btn">Verify Code</button>
+                            <button type="button" class="btn-submit" id="resend-code-btn" style="background:var(--color-bg-elevated);color:var(--color-text-primary);">Resend</button>
+                        </div>
+                    </div>
+
                     <!-- Agreement -->
                     <div class="agreement" id="grp-terms">
                         <input type="checkbox" id="agree-terms" required />
@@ -1085,7 +1130,7 @@
             const score = [hasLen, hasUpper, hasNum, hasSym].filter(Boolean).length;
 
             const levels = ['', 'weak', 'weak', 'medium', 'strong'];
-            const labels = ['', '<iconify-icon inline icon="ph:warning-fill"></iconify-icon> Too weak', '<iconify-icon inline icon="ph:warning-fill"></iconify-icon> Weak', '<iconify-icon inline icon="ph:check-bold"></iconify-icon> Good', '<iconify-icon inline icon="ph:check-bold"></iconify-icon><iconify-icon inline icon="ph:check-bold"></iconify-icon> Strong'];
+            const labels = ['', 'Too weak', 'Weak', 'Good', 'Strong'];
             const colors = ['', 'var(--color-error)', 'var(--color-warning)', 'var(--color-warning)', 'var(--color-success)'];
 
             segments.forEach((seg, i) => {
@@ -1164,6 +1209,86 @@
             return first.longMessage || first.message || err?.message || 'Registration failed. Please try again.';
         }
 
+        let pendingEmailVerification = null;
+        const emailCodePanel = document.getElementById('email-code-panel');
+        const emailCodeInput = document.getElementById('email-code');
+        const emailCodeNote = document.getElementById('email-code-note');
+        const verifyCodeBtn = document.getElementById('verify-code-btn');
+        const resendCodeBtn = document.getElementById('resend-code-btn');
+
+        function showEmailCodePanel(email) {
+            emailCodePanel.classList.add('is-visible');
+            emailCodeNote.textContent = 'We sent a verification code to ' + email + '. Enter it below to finish creating your organizer account.';
+            emailCodeInput.value = '';
+            setTimeout(() => emailCodeInput.focus(), 50);
+        }
+
+        function setVerificationButtonsBusy(isBusy) {
+            verifyCodeBtn.disabled = isBusy;
+            resendCodeBtn.disabled = isBusy;
+            verifyCodeBtn.textContent = isBusy ? 'Verifying...' : 'Verify Code';
+        }
+
+        async function verifyPendingEmailCode() {
+            const alertEl = document.getElementById('auth-alert');
+            alertEl.classList.remove('show');
+            if (!pendingEmailVerification) {
+                alertEl.classList.add('show');
+                document.getElementById('auth-alert-msg').textContent = 'Start signup first so we can send a verification code.';
+                return;
+            }
+
+            const code = emailCodeInput.value.trim();
+            if (!code) {
+                alertEl.classList.add('show');
+                document.getElementById('auth-alert-msg').textContent = 'Enter the verification code sent to your email.';
+                emailCodeInput.focus();
+                return;
+            }
+
+            setVerificationButtonsBusy(true);
+            try {
+                const verification = await window.Clerk.client.signUp.attemptEmailAddressVerification({ code });
+                if (verification.status === 'complete') {
+                    await window.Clerk.setActive({ session: verification.createdSessionId });
+                    window.location.href = 'organizer-dashboard.html';
+                    return;
+                }
+                throw new Error('That code was not accepted. Please check the email and try again.');
+            } catch (err) {
+                alertEl.classList.add('show');
+                document.getElementById('auth-alert-msg').textContent = signupErrorMessage(err);
+            } finally {
+                setVerificationButtonsBusy(false);
+            }
+        }
+
+        verifyCodeBtn.addEventListener('click', verifyPendingEmailCode);
+        emailCodeInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                verifyPendingEmailCode();
+            }
+        });
+        resendCodeBtn.addEventListener('click', async function () {
+            const alertEl = document.getElementById('auth-alert');
+            alertEl.classList.remove('show');
+            if (!pendingEmailVerification) return;
+            resendCodeBtn.disabled = true;
+            resendCodeBtn.textContent = 'Sending...';
+            try {
+                await pendingEmailVerification.prepareEmailAddressVerification({ strategy: 'email_code' });
+                document.getElementById('auth-alert-msg').textContent = 'A new verification code has been sent.';
+                alertEl.classList.add('show');
+            } catch (err) {
+                alertEl.classList.add('show');
+                document.getElementById('auth-alert-msg').textContent = signupErrorMessage(err);
+            } finally {
+                resendCodeBtn.disabled = false;
+                resendCodeBtn.textContent = 'Resend';
+            }
+        });
+
         // â”€â”€ Form Submit â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         document.getElementById('signup-form').addEventListener('submit', async function (e) {
             e.preventDefault();
@@ -1203,6 +1328,15 @@
             btn.disabled = true;
 
             try {
+                if (pendingEmailVerification) {
+                    alertEl.classList.add('show');
+                    document.getElementById('auth-alert-msg').textContent = 'Enter the verification code below to finish creating your organizer account.';
+                    emailCodeInput.focus();
+                    btn.classList.remove('loading');
+                    btn.disabled = false;
+                    return;
+                }
+
                 if (window.Clerk) {
                     // Ensure Clerk is fully loaded
                     if (!window.Clerk.client) await window.Clerk.load();
@@ -1220,26 +1354,11 @@
                     if (signUpAttempt.status === 'missing_requirements' &&
                         signUpAttempt.unverifiedFields?.includes('email_address')) {
                         await signUpAttempt.prepareEmailAddressVerification({ strategy: 'email_code' });
-                        const code = window.prompt('We sent a 6-digit verification code to ' + email + '. Enter it here to finish creating your organizer account:');
-                        if (!code) {
-                            alertEl.classList.add('show');
-                            document.getElementById('auth-alert-msg').textContent =
-                                'Check your email for the verification code, then try signing up again to complete your organizer account.';
-                            btn.classList.remove('loading');
-                            btn.disabled = false;
-                            return;
-                        }
-                        const verification = await window.Clerk.client.signUp.attemptEmailAddressVerification({
-                            code: code.trim(),
-                        });
-                        if (verification.status === 'complete') {
-                            await window.Clerk.setActive({ session: verification.createdSessionId });
-                            window.location.href = 'organizer-dashboard.html';
-                            return;
-                        }
+                        pendingEmailVerification = signUpAttempt;
+                        showEmailCodePanel(email);
                         alertEl.classList.add('show');
                         document.getElementById('auth-alert-msg').textContent =
-                            'That code was not accepted. Please check the email and try again.';
+                            'Check your email for the verification code, then enter it below.';
                         btn.classList.remove('loading');
                         btn.disabled = false;
                         return;

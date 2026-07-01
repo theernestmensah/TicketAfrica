@@ -497,14 +497,18 @@
       updateAuthUI();
 
       // Pass the session token into Convex automatically so queries identify the User
-      if (state.user && window.ConvexDB?.client) {
-        window.ConvexDB.client.setAuth(async () => {
-          try {
-            return await clerk.session?.getToken({ template: 'convex' });
-          } catch (e) {
-            return null;
-          }
-        });
+      if (state.user && window.ConvexDB?.client) {
+        window.ConvexDB.client.setAuth(async () => {
+          try {
+            if (typeof window.AbontenTicketsGetConvexToken === 'function') {
+              return await window.AbontenTicketsGetConvexToken(clerk.session);
+            }
+            return await clerk.session?.getToken({ template: 'convex' });
+          } catch (e) {
+            console.warn('[AbontenTickets] Convex auth token unavailable.', e);
+            return null;
+          }
+        });
 
         // Sync language preference from/to Convex
         window.ConvexDB.getByClerkId(state.user.id)

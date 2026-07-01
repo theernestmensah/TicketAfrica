@@ -22,11 +22,54 @@ import { ConvexHttpClient } from "https://esm.sh/convex@1.32.0/browser";
 // -- Convex Config ---------------------------------------------------------
 const CONVEX_URL = window.ENV?.CONVEX_URL || 'https://zealous-ptarmigan-734.convex.cloud';
 const convex = new ConvexHttpClient(CONVEX_URL);
+let usedDefaultClerkToken = false;
+
+function isMissingConvexJwtTemplate(error) {
+    return /No JWT template exists with name:\s*convex/i.test(String(error?.message || error || ''));
+}
+
+function convexJwtSetupError(error) {
+    const setupError = new Error(
+        'Clerk is missing the Convex JWT integration. Activate the Convex integration in Clerk or create a JWT template named "convex", then sign out and sign back in.'
+    );
+    setupError.code = 'MISSING_CONVEX_JWT_TEMPLATE';
+    setupError.cause = error;
+    return setupError;
+}
+
+function normalizeConvexError(error) {
+    const message = String(error?.message || error || '');
+    if (isMissingConvexJwtTemplate(error)) return convexJwtSetupError(error);
+    if (usedDefaultClerkToken && /(auth|jwt|token|audience|application id|authenticated|unauthorized)/i.test(message)) {
+        return convexJwtSetupError(error);
+    }
+    return error;
+}
+
+async function getConvexAuthToken(session = window.Clerk?.session) {
+    if (!session) return null;
+    try {
+        usedDefaultClerkToken = false;
+        return await session.getToken({ template: 'convex' });
+    } catch (error) {
+        if (!isMissingConvexJwtTemplate(error)) throw error;
+        console.warn('[AbontenTickets] Clerk Convex JWT template is missing; trying the default Clerk session token.', error);
+        const fallbackToken = await session.getToken().catch(() => null);
+        if (fallbackToken) {
+            usedDefaultClerkToken = true;
+            return fallbackToken;
+        }
+        throw convexJwtSetupError(error);
+    }
+}
+
+window.AbontenTicketsGetConvexToken = getConvexAuthToken;
 
 async function syncConvexAuth() {
     if (window.Clerk && window.Clerk.session) {
-        const token = await window.Clerk.session.getToken({ template: 'convex' });
-        convex.setAuth(token);
+        const token = await getConvexAuthToken(window.Clerk.session);
+        if (token) convex.setAuth(token);
+        else convex.clearAuth();
     } else {
         convex.clearAuth();
     }
@@ -129,8 +172,12 @@ window.ConvexDB = {
             throw new Error("Rate limit exceeded for " + name + ". Please try again in a minute.");
         }
         args = args || {};
-        await syncConvexAuth();
-        return convex.query(name, args);
+        try {
+            await syncConvexAuth();
+            return await convex.query(name, args);
+        } catch (error) {
+            throw normalizeConvexError(error);
+        }
     },
     publicQuery: async function(name, args) {
         if (!checkClientRateLimit(name, 90, 60000)) {
@@ -144,16 +191,24 @@ window.ConvexDB = {
             throw new Error("Rate limit exceeded for " + name + ". Please try again in a minute.");
         }
         args = args || {};
-        await syncConvexAuth();
-        return convex.mutation(name, args);
+        try {
+            await syncConvexAuth();
+            return await convex.mutation(name, args);
+        } catch (error) {
+            throw normalizeConvexError(error);
+        }
     },
     action: async function(name, args) {
         if (!checkClientRateLimit(name, 60, 60000)) {
             throw new Error("Rate limit exceeded for " + name + ". Please try again in a minute.");
         }
         args = args || {};
-        await syncConvexAuth();
-        return convex.action(name, args);
+        try {
+            await syncConvexAuth();
+            return await convex.action(name, args);
+        } catch (error) {
+            throw normalizeConvexError(error);
+        }
     },
 
     // -- Events --

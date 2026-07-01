@@ -428,8 +428,8 @@ export const completeVerifiedOrder = internalMutation({
         });
         await ctx.db.insert("ledger_entries", {
             ...ledgerBase,
-            type: "ticket_africa_fee",
-            account: "ticket_africa",
+            type: "abonten_tickets_fee",
+            account: "abonten_tickets",
             direction: "credit",
             amount: split.serviceFee,
             description: "AbontenTickets service fee collected from buyer",
@@ -448,7 +448,7 @@ export const completeVerifiedOrder = internalMutation({
             await ctx.db.insert("ledger_entries", {
                 ...ledgerBase,
                 type: "sms_delivery_fee",
-                account: "ticket_africa",
+                account: "abonten_tickets",
                 direction: "credit",
                 amount: split.smsDeliveryFee,
                 description: "SMS and ticket delivery fee collected from buyer",

@@ -392,7 +392,7 @@ export const addTicketTier = mutation({
     handler: async (ctx, args) => {
         await assertEventAccess(ctx, args.event_id);
         if (!Number.isInteger(args.price) || args.price < 0) {
-            throw new Error("Ticket price must be a non-negative whole number in minor units.");
+            throw new Error("Ticket price must be a non-negative amount.");
         }
         if (!Number.isInteger(args.capacity) || args.capacity <= 0) {
             throw new Error("Ticket capacity must be at least 1.");

@@ -58,7 +58,7 @@ export default defineSchema({
         event_id: v.id("events"),
         name: v.string(),
         description: v.optional(v.string()),
-        price: v.number(),       // in minor units (pesewas, kobo, cents)
+        price: v.number(),       // in currency minor units
         capacity: v.number(),
         sold: v.number(),
         sales_start: v.string(),
@@ -189,7 +189,8 @@ export default defineSchema({
         payout_id: v.optional(v.id("payouts")),
         type: v.union(
             v.literal("ticket_sale"),
-            v.literal("ticket_africa_fee"),
+            v.literal("abonten_tickets_fee"),
+            v.literal("ticket_africa_fee"),
             v.literal("sms_delivery_fee"),
             v.literal("gateway_buyer_fee"),
             v.literal("gateway_collection_fee"),
@@ -199,7 +200,8 @@ export default defineSchema({
         ),
         account: v.union(
             v.literal("organizer"),
-            v.literal("ticket_africa"),
+            v.literal("abonten_tickets"),
+            v.literal("ticket_africa"),
             v.literal("payment_processor"),
             v.literal("buyer")
         ),

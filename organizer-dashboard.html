@@ -1316,6 +1316,12 @@
             syncPreviewPrice();
         }
 
+        function cedisToMinorUnits(value) {
+            const amount = Number(String(value || '').replace(/,/g, '').trim());
+            if (!Number.isFinite(amount) || amount < 0) return 0;
+            return Math.round(amount * 100);
+        }
+
         function syncPreviewPrice() {
             const currency = document.getElementById('ce-currency').value || 'GHS';
             const tiersContainer = document.getElementById('ce-tiers');
@@ -1335,7 +1341,7 @@
                 const idAttr = row.id;
                 const id = idAttr.replace('tier-row-', '');
                 const name = row.querySelector(`[name="tier-name-${id}"]`)?.value || 'General Admission';
-                const priceVal = parseInt(row.querySelector(`[name="tier-price-${id}"]`)?.value || '0');
+                const priceVal = cedisToMinorUnits(row.querySelector(`[name="tier-price-${id}"]`)?.value || '0');
                 const cap = parseInt(row.querySelector(`[name="tier-capacity-${id}"]`)?.value || '0');
                 const isFree = document.getElementById(`tier-free-toggle-${id}`)?.checked;
 
@@ -1428,8 +1434,8 @@
                         <input name="tier-name-${id}" type="text" placeholder="e.g. General Admission" required class="dash-input" style="min-height:38px;padding:8px 10px;" oninput="syncLivePreview()" />
                     </div>
                     <div>
-                        <label class="dash-label" style="display:block;margin-bottom:5px;">Price (pesewas)</label>
-                        <input name="tier-price-${id}" id="tier-price-input-${id}" type="number" min="0" placeholder="5000 = GHS 50" required class="dash-input" style="min-height:38px;padding:8px 10px;" oninput="syncLivePreview()" />
+                        <label class="dash-label" style="display:block;margin-bottom:5px;">Price (GHS)</label>
+                        <input name="tier-price-${id}" id="tier-price-input-${id}" type="number" min="0" step="0.01" placeholder="50 = GHS 50.00" required class="dash-input" style="min-height:38px;padding:8px 10px;" oninput="syncLivePreview()" />
                     </div>
                     <div>
                         <label class="dash-label" style="display:block;margin-bottom:5px;">Capacity</label>
@@ -1495,7 +1501,7 @@
                     const row = document.getElementById('tier-row-' + i);
                     if (!row) continue;
                     const name = row.querySelector(`[name="tier-name-${i}"]`)?.value?.trim();
-                    const price = parseInt(row.querySelector(`[name="tier-price-${i}"]`)?.value || '0');
+                    const price = cedisToMinorUnits(row.querySelector(`[name="tier-price-${i}"]`)?.value || '0');
                     const capacity = parseInt(row.querySelector(`[name="tier-capacity-${i}"]`)?.value || '0');
                     if (name && capacity > 0) {
                         await window.ConvexDB.addTicketTier({
