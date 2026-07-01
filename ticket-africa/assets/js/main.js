@@ -211,7 +211,7 @@
       <nav class="navbar navbar-expand-lg bg-white sticky-top">
         <div class="container">
           <a class="navbar-brand d-flex align-items-center gap-2 fw-bold text-brand" href="index.html">
-            <span class="brand-mark">TA</span><span>Abonten Tickets</span>
+            <span class="brand-mark"><img src="/assets/img/abonten-mark.jpeg" alt="" /></span><span>Abonten Tickets</span>
           </a>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>

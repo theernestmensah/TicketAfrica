@@ -61,17 +61,26 @@ body {
 }
 
 .dash-sidebar__logo-mark {
-    width: 38px;
-    height: 38px;
+    width: 56px;
+    height: 44px;
     border-radius: 10px;
-    background: var(--color-secondary);
+    background: #FFFFFF;
+    border: 1px solid rgba(255, 255, 255, 0.22);
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 1px;
     font-size: 20px;
     color: var(--color-text-primary);
-    box-shadow: 0 4px 12px rgba(var(--color-secondary-rgb), 0.3);
+    box-shadow: 0 10px 26px rgba(17, 24, 39, 0.20);
     flex-shrink: 0;
+    overflow: hidden;
+}
+
+.dash-sidebar__logo-mark img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
 
 .dash-sidebar__logo-text {
@@ -1205,9 +1214,9 @@ body {
 }
 
 .dash-sidebar__logo-mark {
-    background: linear-gradient(135deg, #f2cf72 0%, #b88712 100%);
+    background: #FFFFFF;
     border-radius: 12px;
-    box-shadow: 0 10px 28px rgba(184, 135, 18, 0.28);
+    box-shadow: 0 10px 28px rgba(17, 24, 39, 0.24);
     color: #111827;
 }
 
@@ -2308,9 +2317,9 @@ body.dash-sidebar-open {
 }
 
 .dash-sidebar__logo-mark {
-    background: rgba(255, 255, 255, 0.14) !important;
-    color: #FFFFFF !important;
-    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: #FFFFFF !important;
+    color: #111827 !important;
+    border: 1px solid rgba(255, 255, 255, 0.26);
 }
 
 .dash-sidebar__context,

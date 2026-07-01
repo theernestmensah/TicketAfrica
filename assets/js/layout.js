@@ -97,7 +97,7 @@
             </div>
           </div>
           <div id="clerk-user-button" hidden></div>
-          <button class="nav-mobile-toggle" id="nav-mobile-toggle" aria-label="Open menu">
+          <button class="nav-mobile-toggle" id="nav-mobile-toggle" type="button" aria-label="Open menu">
             <span></span><span></span><span></span>
           </button>
         </div>
@@ -284,7 +284,10 @@
 
     // Footer
     const footerTarget = document.getElementById('footer-root');
-    if (footerTarget) footerTarget.innerHTML = FOOTER_HTML;
+    if (footerTarget) footerTarget.innerHTML = FOOTER_HTML;
+
+    if (typeof window.AbontenTicketsInitNav === 'function') window.AbontenTicketsInitNav();
+    window.dispatchEvent(new Event('abonten:navigation-ready'));
 
     // Highlight active nav link
     const path = window.location.pathname.replace(/\/$/, '');

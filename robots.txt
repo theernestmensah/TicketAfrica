@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Disallow: /account.html
+Disallow: /checkout.html
+Disallow: /organizer-dashboard.html
+Disallow: /scanner.html
+Disallow: /payment-callback.html
+Disallow: /sso-callback.html
+Disallow: /maintenance.html
+
+Sitemap: https://abontentickets.com/sitemap.xml

@@ -2730,30 +2730,30 @@
     max-width: 650px !important;
     margin: 0 0 24px !important;
     text-align: left !important;
-    font-size: 0 !important;
+    font-size: clamp(3.8rem, 7.4vw, 6.7rem) !important;
     line-height: 0.88 !important;
     letter-spacing: 0 !important;
+    color: #FFFFFF !important;
 }
 
 .hero__headline::before {
-    content: "Abonten\A Tickets";
-    display: block;
-    white-space: pre-line;
-    font-size: clamp(3.8rem, 7.4vw, 6.7rem);
-    line-height: 0.88;
-    letter-spacing: 0;
-    color: #FFFFFF;
+    content: none !important;
 }
 
 .hero__headline-line {
-    display: none !important;
+    display: block !important;
 }
 
 .hero__headline-line--accent {
-    color: #F59E0B !important;
-    background: linear-gradient(135deg, #FFFFFF 0%, #FDE68A 36%, #F59E0B 100%) !important;
-    -webkit-background-clip: text !important;
-    background-clip: text !important;
+    color: #FFFFFF !important;
+    background: none !important;
+    -webkit-text-fill-color: currentColor !important;
+    -webkit-background-clip: border-box !important;
+    background-clip: border-box !important;
+}
+
+.hero__headline-line:nth-child(3) {
+    display: none !important;
 }
 
 .hero__subtext {
@@ -2911,7 +2911,7 @@
         padding-bottom: 18px !important;
     }
 
-    .hero__headline::before {
+    .hero__headline {
         font-size: clamp(2.65rem, 13vw, 3.8rem) !important;
         line-height: 0.95;
     }

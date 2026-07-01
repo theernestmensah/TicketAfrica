@@ -4,11 +4,10 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description"
+        content="Verify an Abonten Tickets QR code or ticket reference in seconds before entering an event." />
     <title>Verify Ticket Authenticity  -  Abonten Tickets</title>
     <script src="assets/js/env.js"></script>
-    <script type="module" src="/assets/js/db.js"></script>
-    <script src="assets/vendor/html5-qrcode.min.js" defer></script>
-    <script src="assets/vendor/html5-qrcode.browser.js" defer></script>
     <link rel="stylesheet" href="assets/css/core.css" />
     <link rel="stylesheet" href="assets/css/mobile.css" />
     <link rel="stylesheet" href="assets/css/nav-footer.css" />
@@ -296,23 +295,12 @@
             let html5QrCode = null;
             let cameraRunning = false;
             let qrLibraryWaiter = null;
+            let verifyRequestId = 0;
+            const CONVEX_URL = (window.ENV?.CONVEX_URL || 'https://zealous-ptarmigan-734.convex.cloud').replace(/\/+$/, '');
 
             function escapeHtml(value) {
                 return String(value ?? '').replace(/[&<>"']/g, function (char) {
                     return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char];
-                });
-            }
-
-            function waitForConvex() {
-                if (window.ConvexDB) return Promise.resolve();
-                return new Promise(function (resolve, reject) {
-                    const timer = setTimeout(function () {
-                        reject(new Error('Ticket database did not finish loading.'));
-                    }, 5000);
-                    window.addEventListener('convex-ready', function () {
-                        clearTimeout(timer);
-                        resolve();
-                    }, { once: true });
                 });
             }
 
@@ -327,16 +315,102 @@
                         : 'var(--color-text-muted)';
             }
 
-            function withTimeout(promise, timeoutMs, message) {
-                let timeoutId = null;
-                const timeout = new Promise(function (_, reject) {
-                    timeoutId = setTimeout(function () {
-                        reject(new Error(message));
-                    }, timeoutMs);
+            function loadScript(src) {
+                const existing = document.querySelector('script[src="' + src + '"]');
+                if (existing) {
+                    return existing.dataset.loaded === 'true'
+                        ? Promise.resolve()
+                        : new Promise(function (resolve, reject) {
+                            existing.addEventListener('load', resolve, { once: true });
+                            existing.addEventListener('error', reject, { once: true });
+                        });
+                }
+
+                return new Promise(function (resolve, reject) {
+                    const script = document.createElement('script');
+                    script.src = src;
+                    script.async = true;
+                    script.onload = function () {
+                        script.dataset.loaded = 'true';
+                        resolve();
+                    };
+                    script.onerror = function () {
+                        reject(new Error('Could not load QR scanner library.'));
+                    };
+                    document.head.appendChild(script);
                 });
-                return Promise.race([promise, timeout]).finally(function () {
-                    clearTimeout(timeoutId);
+            }
+
+            function normalizeTicketCode(value) {
+                let code = String(value || '').trim();
+                if (!code) return '';
+
+                try {
+                    const parsed = JSON.parse(code);
+                    if (parsed && typeof parsed === 'object') {
+                        code = String(parsed.qr_code || parsed.scan_token || parsed.ticket_number || parsed.code || parsed.ref || code).trim();
+                    }
+                } catch (_) {}
+
+                try {
+                    const url = new URL(code);
+                    const params = url.searchParams;
+                    code = params.get('code') ||
+                        params.get('ticket') ||
+                        params.get('ticket_number') ||
+                        params.get('qr_code') ||
+                        params.get('scan_token') ||
+                        params.get('ref') ||
+                        decodeURIComponent(url.pathname.split('/').filter(Boolean).pop() || code);
+                } catch (_) {}
+
+                return String(code || '').trim();
+            }
+
+            async function verifyTicketDirect(ref, signal) {
+                const response = await fetch(CONVEX_URL + '/api/query', {
+                    method: 'POST',
+                    signal,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Convex-Client': 'abontentickets-verify-page'
+                    },
+                    body: JSON.stringify({
+                        path: 'organizer:verifyTicket',
+                        format: 'convex_encoded_json',
+                        args: [{ qr_code: ref }]
+                    })
                 });
+
+                if (!response.ok && response.status !== 560) {
+                    throw new Error('Ticket database is not reachable.');
+                }
+
+                const payload = await response.json();
+                if (payload.status === 'success') return payload.value;
+                if (payload.status === 'error') throw new Error(payload.errorMessage || 'Ticket verification failed.');
+                throw new Error('Unexpected verification response.');
+            }
+
+            function verifyTicketFast(ref, timeoutMs) {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(function () {
+                    controller.abort();
+                }, timeoutMs);
+
+                return verifyTicketDirect(ref, controller.signal)
+                    .catch(function (error) {
+                        if (error && error.name === 'AbortError') {
+                            throw new Error('Verification timed out. Please check your connection and try again.');
+                        }
+                        if (window.ConvexDB?.verifyTicket) {
+                            return window.ConvexDB.verifyTicket(ref);
+                        }
+                        throw error;
+                    })
+                    .finally(function () {
+                        clearTimeout(timeoutId);
+                    });
             }
 
             function setScannerStatus(message, type) {
@@ -378,38 +452,43 @@
             function waitForQrLibrary() {
                 if (getHtml5QrcodeClass()) return Promise.resolve();
                 if (qrLibraryWaiter) return qrLibraryWaiter;
-                qrLibraryWaiter = new Promise(function (resolve, reject) {
-                    let done = false;
-                    let interval = null;
-                    let timeout = null;
-                    const finish = function () {
-                        if (done) return;
-                        const Html5QrcodeClass = getHtml5QrcodeClass();
-                        if (!Html5QrcodeClass) return;
-                        done = true;
-                        clearInterval(interval);
-                        clearTimeout(timeout);
-                        window.removeEventListener('html5-qrcode-ready', finish);
-                        window.removeEventListener('html5-qrcode-error', fail);
-                        resolve();
-                    };
-                    const fail = function () {
-                        if (done) return;
-                        done = true;
-                        clearInterval(interval);
-                        clearTimeout(timeout);
-                        window.removeEventListener('html5-qrcode-ready', finish);
-                        window.removeEventListener('html5-qrcode-error', fail);
-                        reject(new Error('QR scanner library did not finish loading.'));
-                    };
-                    interval = setInterval(function () {
-                        finish();
-                    }, 150);
-                    timeout = setTimeout(fail, 8000);
-                    window.addEventListener('html5-qrcode-ready', finish);
-                    window.addEventListener('html5-qrcode-error', fail);
-                    finish();
-                });
+                qrLibraryWaiter = loadScript('assets/vendor/html5-qrcode.min.js')
+                    .then(function () {
+                        return loadScript('assets/vendor/html5-qrcode.browser.js');
+                    })
+                    .then(function () {
+                        if (getHtml5QrcodeClass()) return;
+                        return new Promise(function (resolve, reject) {
+                            let done = false;
+                            let interval = null;
+                            let timeout = null;
+                            const finish = function () {
+                                if (done) return;
+                                const Html5QrcodeClass = getHtml5QrcodeClass();
+                                if (!Html5QrcodeClass) return;
+                                done = true;
+                                clearInterval(interval);
+                                clearTimeout(timeout);
+                                window.removeEventListener('html5-qrcode-ready', finish);
+                                window.removeEventListener('html5-qrcode-error', fail);
+                                resolve();
+                            };
+                            const fail = function () {
+                                if (done) return;
+                                done = true;
+                                clearInterval(interval);
+                                clearTimeout(timeout);
+                                window.removeEventListener('html5-qrcode-ready', finish);
+                                window.removeEventListener('html5-qrcode-error', fail);
+                                reject(new Error('QR scanner library did not finish loading.'));
+                            };
+                            interval = setInterval(finish, 150);
+                            timeout = setTimeout(fail, 8000);
+                            window.addEventListener('html5-qrcode-ready', finish);
+                            window.addEventListener('html5-qrcode-error', fail);
+                            finish();
+                        });
+                    });
                 return qrLibraryWaiter;
             }
 
@@ -429,7 +508,7 @@
             }
 
             async function handleDecodedCode(decodedText) {
-                const code = String(decodedText || '').trim();
+                const code = normalizeTicketCode(decodedText);
                 if (!code) return;
                 document.getElementById('ticket-ref-input').value = code;
                 await stopCameraScanner();
@@ -445,18 +524,15 @@
             }
 
             async function verifyCode(rawRef) {
-                const ref = String(rawRef || '').trim();
+                const ref = normalizeTicketCode(rawRef);
                 const resultDiv = document.getElementById('verify-result');
                 if (!ref) { TA.toast('Enter a ticket reference code', 'warning'); return; }
 
+                const requestId = ++verifyRequestId;
                 const startedAt = performance.now();
-                setVerifyStatus(window.ConvexDB ? 'Checking ticket...' : 'Connecting to verifier...', 'info');
-                await waitForConvex();
-                const result = await withTimeout(
-                    window.ConvexDB.verifyTicket(ref),
-                    10000,
-                    'Verification took too long. Please check your connection and try again.'
-                );
+                setVerifyStatus('Checking ticket...', 'info');
+                const result = await verifyTicketFast(ref, 6500);
+                if (requestId !== verifyRequestId) return;
 
                 resultDiv.style.display = 'block';
 

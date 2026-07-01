@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description"
         content="Organizer Dashboard - Manage your events, track sales, and pay out on Abonten Tickets." />
+    <meta name="robots" content="noindex, nofollow" />
     <title>Organizer Dashboard - Abonten Tickets</title>
     <script src="assets/js/env.js"></script>
     <script type="module" src="/assets/js/db.js"></script>
@@ -40,7 +41,7 @@
     <aside class="dash-sidebar" id="dash-sidebar">
         <a href="/index.html" class="dash-sidebar__logo">
             <div class="dash-sidebar__logo-mark">
-                <iconify-icon icon="hugeicons:ticket-01"></iconify-icon>
+                <img src="/assets/img/abonten-mark.jpeg" alt="" />
             </div>
                 <span class="dash-sidebar__logo-text">Abonten<span>Tickets</span></span>
         </a>
@@ -438,6 +439,7 @@
                     : ev.status === 'draft'
                         ? '<span class="badge badge-draft">Draft</span>'
                         : '<span class="badge badge-scheduled">Scheduled</span>';
+                const scannerUrl = `scanner.html?event_id=${encodeURIComponent(ev._id)}`;
 
                 return `<tr>
                     <td data-label="Event">
@@ -458,7 +460,7 @@
                     <td data-label="Revenue" class="td-value">${ev.currency || 'GHS'} ${((sold * (ev.base_price ?? 0)) / 100).toFixed(2)}</td>
                     <td data-label="Actions">
                         <div class="inline-actions">
-                        <a href="scanner.html?event_id=${ev._id}" title="Open scanner for this event"
+                        <a href="${scannerUrl}" title="Open scanner for this event"
                             class="dash-mini-button dash-mini-button--info">Scan</a>
                         <button onclick="openManagePanel('${ev._id}', '${(ev.title || '').replace(/'/g, "\\'")}')"
                             class="dash-mini-button">Manage
