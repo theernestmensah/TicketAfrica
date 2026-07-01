@@ -1,5 +1,5 @@
 /* ============================================================
-   TICKET AFRICA — Navigation Logic
+   ABONTEN TICKETS — Navigation Logic
    ============================================================ */
 
 (function () {

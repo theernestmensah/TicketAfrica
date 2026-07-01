@@ -1,6 +1,6 @@
 /**
  * @file types.js
- * @description JSDoc type definitions for Ticket Africa.
+ * @description JSDoc type definitions for Abonten Tickets.
  *
  * These types match the Supabase database schema exactly.
  * If you add a Supabase migration, update the types here too.
@@ -103,7 +103,7 @@
  * @property {string}  holder_name
  * @property {string}  holder_email
  * @property {string}  holder_phone
- * @property {string}  ticket_number  Human-readable, e.g. "TKA-2026-83921"
+ * @property {string}  ticket_number  Human-readable, e.g. "ABT-2026-83921"
  * @property {string}  [qr_url]       Signed URL for QR display
  * @property {string}  [seat]         e.g. "Block C, Row 12, Seat 7"
  * @property {string}  issued_at

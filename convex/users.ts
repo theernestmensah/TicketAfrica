@@ -128,10 +128,10 @@ export const upsertUser = mutation({
             recipient_phone: args.phone !== undefined ? sanitizePhone(args.phone) : undefined,
             recipient_name: args.first_name,
             user_id: userId,
-            subject: isOrganizer ? "Welcome to Ticket Africa for Organizers" : "Welcome to Ticket Africa",
+            subject: isOrganizer ? "Welcome to Abonten Tickets for Organizers" : "Welcome to Abonten Tickets",
             body: isOrganizer
-                ? `Hi ${args.first_name}, welcome to Ticket Africa. Your organizer account is ready. You can create your first event, add ticket tiers, and prepare for your first buyers.`
-                : `Hi ${args.first_name}, welcome to Ticket Africa. Your account is ready. When organizers publish events, you can discover them, pay locally, and receive secure QR-code tickets.`,
+                ? `Hi ${args.first_name}, welcome to Abonten Tickets. Your organizer account is ready. You can create your first event, add ticket tiers, and prepare for your first buyers.`
+                : `Hi ${args.first_name}, welcome to Abonten Tickets. Your account is ready. When organizers publish events, you can discover them, pay locally, and receive secure QR-code tickets.`,
             template_key: isOrganizer ? "welcome_organizer" : "welcome_buyer",
             data: {
                 first_name: sanitizeText(args.first_name),

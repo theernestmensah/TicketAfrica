@@ -1,6 +1,6 @@
 /**
  * @file supabase.js
- * @description Supabase client singleton for Ticket Africa.
+ * @description Supabase client singleton for Abonten Tickets.
  *
  * SETUP:
  *   Replace the placeholder values in /assets/js/config.js with your
@@ -17,7 +17,7 @@ import { TA_CONFIG } from '../config.js';
 
 if (!TA_CONFIG.SUPABASE_URL || !TA_CONFIG.SUPABASE_ANON_KEY) {
     console.error(
-        '[TicketAfrica] Supabase credentials missing. ' +
+        '[AbontenTickets] Supabase credentials missing. ' +
         'Copy assets/js/config.example.js → assets/js/config.js and fill in your project values.'
     );
 }
@@ -39,7 +39,7 @@ export const supabase = createClient(
         },
         global: {
             headers: {
-                'x-app-name': 'ticket-africa-web',
+                'x-app-name': 'abontentickets-web',
                 'x-app-version': TA_CONFIG.APP_VERSION,
             },
         },

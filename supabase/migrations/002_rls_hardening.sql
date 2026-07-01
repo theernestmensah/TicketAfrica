@@ -1,5 +1,5 @@
 -- =============================================================================
--- Ticket Africa - RLS hardening
+-- Abonten Tickets - RLS hardening
 -- Applies one standard access model across every public table.
 -- =============================================================================
 

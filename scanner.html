@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ticket Scanner  -  Ticket Africa</title>
+    <title>Ticket Scanner  -  Abonten Tickets</title>
     <script src="assets/js/env.js"></script>
     <script type="module" src="/assets/js/db.js"></script>
     <script src="assets/vendor/html5-qrcode.min.js" defer></script>
@@ -683,7 +683,7 @@
     <!-- Scanner Header -->
     <div class="scanner-header">
         <div class="scanner-header__left">
-            <div class="scanner-logo">Ticket<span>Africa</span></div>
+                <div class="scanner-logo">Abonten<span>Tickets</span></div>
             <div style="width:1px;height:20px;background:var(--color-border);"></div>
             <div class="scanner-event-name" id="scanner-event-name">Select an Event to Scan</div>
         </div>
@@ -769,7 +769,7 @@
                     Manual Ticket Lookup</div>
                 <div class="lookup-bar">
                     <input type="text" class="lookup-input" id="lookup-input"
-                        placeholder="Enter ticket code TKA-XXXX-XXXXX" />
+                        placeholder="Enter ticket code ABT-XXXX-XXXXX" />
                     <button class="lookup-btn" id="lookup-btn">Look Up</button>
                 </div>
             </div>
@@ -885,8 +885,8 @@
             });
 
             document.getElementById('btn-camera').addEventListener('click', function () {
-                if (window.TicketAfricaScanner && window.TicketAfricaScanner.startCamera) {
-                    window.TicketAfricaScanner.startCamera();
+                if (window.AbontenTicketsScanner && window.AbontenTicketsScanner.startCamera) {
+                    window.AbontenTicketsScanner.startCamera();
                 } else {
                     window.TA && TA.toast('Scanner is still loading. Try again in a moment.', 'info');
                 }

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Verify Ticket Authenticity  -  Ticket Africa</title>
+    <title>Verify Ticket Authenticity  -  Abonten Tickets</title>
     <script src="assets/js/env.js"></script>
     <script type="module" src="/assets/js/db.js"></script>
     <script src="assets/vendor/html5-qrcode.min.js" defer></script>
@@ -32,6 +32,15 @@
         .verify-input-row {
             display: flex;
             gap: var(--space-3);
+        }
+
+        .verify-status {
+            min-height: 20px;
+            margin-top: var(--space-3);
+            color: var(--color-text-muted);
+            font-size: var(--text-sm);
+            line-height: 1.45;
+            text-align: left;
         }
 
         .verify-result {
@@ -166,8 +175,43 @@
         }
 
         @media(max-width:640px) {
+            .verify-hero {
+                padding: var(--space-16) 0;
+                overflow: hidden;
+            }
+
+            .verify-hero .container {
+                max-width: 100%;
+                overflow: hidden;
+            }
+
+            .verify-box {
+                width: 100%;
+                max-width: calc(100vw - 32px);
+                padding: var(--space-5);
+            }
+
+            .verify-input-row {
+                flex-direction: column;
+            }
+
+            .verify-input-row .form-control {
+                min-width: 0;
+                width: 100%;
+            }
+
+            .verify-input-row .btn {
+                width: 100%;
+            }
+
+            .verify-result,
             .trust-list {
+                max-width: calc(100vw - 32px);
                 grid-template-columns: 1fr;
+            }
+
+            .trust-item__desc {
+                overflow-wrap: anywhere;
             }
 
             .ticket-detail-grid {
@@ -192,10 +236,11 @@
                     style="font-size:var(--text-sm);font-weight:700;margin-bottom:var(--space-4);color:var(--color-text-secondary);">
                     Enter Ticket Reference Number</div>
                 <div class="verify-input-row">
-                    <input type="text" class="form-control" id="ticket-ref-input" placeholder="TKA-2026-83921"
+                    <input type="text" class="form-control" id="ticket-ref-input" placeholder="ABT-2026-83921"
                         style="flex:1;font-family:var(--font-mono);letter-spacing:0.05em;" />
                     <button class="btn btn--primary" id="verify-btn" style="white-space:nowrap;">Verify</button>
                 </div>
+                <div class="verify-status" id="verify-status" role="status" aria-live="polite"></div>
                 <div
                     style="display:flex;align-items:center;gap:var(--space-3);margin:var(--space-5) 0;color:var(--color-text-muted);font-size:var(--text-sm);">
                     <div style="flex:1;height:1px;background:var(--color-border);"></div>or<div
@@ -235,9 +280,9 @@
                 </div>
                 <div class="trust-item">
                     <div class="trust-item__icon"><iconify-icon icon="hugeicons:smart-phone-01" style="vertical-align:middle;"></iconify-icon></div>
-                    <div class="trust-item__title">Buy Only from Ticket Africa</div>
+                    <div class="trust-item__title">Buy Only from Abonten Tickets</div>
                     <div class="trust-item__desc">Never buy tickets from WhatsApp, Facebook, or strangers. Official
-                        sales only via ticketafrica.com or our USSD channel.</div>
+                        sales only via abontentickets.com or our USSD channel.</div>
                 </div>
             </div>
         </div>
@@ -263,11 +308,34 @@
                 return new Promise(function (resolve, reject) {
                     const timer = setTimeout(function () {
                         reject(new Error('Ticket database did not finish loading.'));
-                    }, 8000);
+                    }, 5000);
                     window.addEventListener('convex-ready', function () {
                         clearTimeout(timer);
                         resolve();
                     }, { once: true });
+                });
+            }
+
+            function setVerifyStatus(message, type) {
+                const status = document.getElementById('verify-status');
+                if (!status) return;
+                status.textContent = message || '';
+                status.style.color = type === 'error'
+                    ? '#EF4444'
+                    : type === 'success'
+                        ? '#15803D'
+                        : 'var(--color-text-muted)';
+            }
+
+            function withTimeout(promise, timeoutMs, message) {
+                let timeoutId = null;
+                const timeout = new Promise(function (_, reject) {
+                    timeoutId = setTimeout(function () {
+                        reject(new Error(message));
+                    }, timeoutMs);
+                });
+                return Promise.race([promise, timeout]).finally(function () {
+                    clearTimeout(timeoutId);
                 });
             }
 
@@ -367,7 +435,13 @@
                 await stopCameraScanner();
                 document.getElementById('verify-qr-panel').style.display = 'none';
                 setScannerStatus('QR code captured. Verifying ticket...', 'success');
-                await verifyCode(code);
+                try {
+                    await verifyCode(code);
+                } catch (e) {
+                    console.warn('[TA] Verify QR result error:', e);
+                    setVerifyStatus(e.message || 'Verification unavailable. Please try again.', 'error');
+                    TA.toast('Could not verify ticket. Please try again.', 'error');
+                }
             }
 
             async function verifyCode(rawRef) {
@@ -375,8 +449,14 @@
                 const resultDiv = document.getElementById('verify-result');
                 if (!ref) { TA.toast('Enter a ticket reference code', 'warning'); return; }
 
+                const startedAt = performance.now();
+                setVerifyStatus(window.ConvexDB ? 'Checking ticket...' : 'Connecting to verifier...', 'info');
                 await waitForConvex();
-                const result = await window.ConvexDB.verifyTicket(ref);
+                const result = await withTimeout(
+                    window.ConvexDB.verifyTicket(ref),
+                    10000,
+                    'Verification took too long. Please check your connection and try again.'
+                );
 
                 resultDiv.style.display = 'block';
 
@@ -431,6 +511,8 @@
                     </div>`;
                 }
 
+                const elapsed = Math.max(0.1, (performance.now() - startedAt) / 1000).toFixed(1);
+                setVerifyStatus('Verification complete in ' + elapsed + 's.', 'success');
                 resultDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
 
@@ -445,6 +527,7 @@
                     await verifyCode(ref);
                 } catch (e) {
                     console.warn('[TA] Verify error:', e);
+                    setVerifyStatus(e.message || 'Verification unavailable. Please try again.', 'error');
                     const resultDiv = document.getElementById('verify-result');
                     resultDiv.style.display = 'block';
                     resultDiv.innerHTML = `

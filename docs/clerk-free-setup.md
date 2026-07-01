@@ -1,6 +1,6 @@
 # Clerk Free Setup
 
-Ticket Africa uses Clerk for identity and Convex for app roles. This avoids paid Clerk Organizations while keeping buyer, organizer, and admin roles in the Convex `users` table.
+Abonten Tickets uses Clerk for identity and Convex for app roles. This avoids paid Clerk Organizations while keeping buyer, organizer, and admin roles in the Convex `users` table.
 
 ## Clerk Dashboard
 

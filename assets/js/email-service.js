@@ -1,5 +1,5 @@
 /**
- * Ticket Africa client-side email helpers.
+ * Abonten Tickets client-side email helpers.
  *
  * Email delivery is optional. Configure EmailJS values in env.js to enable it:
  * EMAILJS_PUBLIC_KEY, EMAILJS_SERVICE_ID, and the relevant template IDs.
@@ -82,7 +82,7 @@ async function sendEmail(templateId, params) {
 
 window.TAMail = {
     sendTicketConfirmation: async function(order) {
-        const ref = 'TKA-' + String(order._id || '').slice(-8).toUpperCase();
+        const ref = 'ABT-' + String(order._id || '').slice(-8).toUpperCase();
         const tickets = (order.items || [])
             .map(i => `${i.quantity} x ${i.tier_name || 'Ticket'}`)
             .join(', ');

@@ -109,6 +109,15 @@ async function logScanEvent(ctx: any, args: {
 async function findTicketByCode(ctx: any, code: string) {
     const normalized = code.trim();
     if (!normalized) return null;
+    const normalizedTicketNumber = normalized.toUpperCase();
+
+    if (/^(ABT|TKA)-/.test(normalizedTicketNumber)) {
+        const byTicketNumber = await ctx.db
+            .query("tickets")
+            .withIndex("by_ticket_number", (q: any) => q.eq("ticket_number", normalizedTicketNumber))
+            .first();
+        if (byTicketNumber) return byTicketNumber;
+    }
 
     const byScanToken = await ctx.db
         .query("tickets")
@@ -124,7 +133,7 @@ async function findTicketByCode(ctx: any, code: string) {
 
     return await ctx.db
         .query("tickets")
-        .withIndex("by_ticket_number", (q: any) => q.eq("ticket_number", normalized.toUpperCase()))
+        .withIndex("by_ticket_number", (q: any) => q.eq("ticket_number", normalizedTicketNumber))
         .first();
 }
 
@@ -697,7 +706,7 @@ export const checkInTicket = mutation({
                 event_id: ticket.event_id,
                 order_id: ticket.order_id,
                 subject: `Your ticket was scanned for ${event?.title || "your event"}`,
-                body: "Your Ticket Africa QR ticket was successfully scanned at entry.",
+                body: "Your Abonten Tickets QR ticket was successfully scanned at entry.",
                 template_key: "ticket_scanned",
                 data: {
                     event_title: event?.title || "Your Event",

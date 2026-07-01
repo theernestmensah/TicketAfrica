@@ -1,5 +1,5 @@
 (function () {
-  const TA = window.TicketAfrica;
+  const TA = window.AbontenTickets;
   const events = TA.getStored(TA.STORAGE_KEYS.events, []);
   const orders = TA.allOrders();
 
@@ -140,7 +140,7 @@
         ${metric("Orders", eventOrders.length, "Paid")}
         ${metric("Tickets sold", eventOrders.reduce((s, o) => s + Number(o.quantity || 1), 0), "Across types")}
         ${metric("Gross revenue", TA.money(revenue), "Includes fees")}
-        ${metric("Service fees", TA.money(eventOrders.reduce((s, o) => s + Number(o.serviceFee || 0), 0)), "Ticket Africa")}
+        ${metric("Service fees", TA.money(eventOrders.reduce((s, o) => s + Number(o.serviceFee || 0), 0)), "Abonten Tickets")}
       </div>
       <div class="panel bg-white p-3"><h2 class="h5">Ticket type breakdown</h2>${ticketBreakdown(eventOrders)}</div>`;
   }

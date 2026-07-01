@@ -1,5 +1,5 @@
 (function () {
-  const TA = window.TicketAfrica;
+  const TA = window.AbontenTickets;
   let activeOrder = null;
 
   function renderResult(message, type) {
@@ -20,7 +20,7 @@
       markUsed.classList.add("d-none");
 
       if (!activeOrder) {
-        renderResult("<strong>Invalid ticket.</strong> No matching Ticket Africa code was found.", "danger");
+        renderResult("<strong>Invalid ticket.</strong> No matching Abonten Tickets code was found.", "danger");
         return;
       }
       if (activeOrder.ticketStatus === "used") {

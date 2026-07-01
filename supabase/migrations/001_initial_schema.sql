@@ -1,5 +1,5 @@
 -- =============================================================================
--- Ticket Africa — Supabase Database Schema
+-- Abonten Tickets — Supabase Database Schema
 -- Migration: 001_initial_schema.sql
 --
 -- Run this in Supabase SQL Editor or via `supabase db push`
@@ -240,7 +240,7 @@ CREATE TABLE public.tickets (
   holder_name       TEXT NOT NULL,
   holder_email      TEXT NOT NULL,
   holder_phone      TEXT,
-  ticket_number     TEXT NOT NULL UNIQUE,   -- TKA-YYYY-NNNNN
+  ticket_number     TEXT NOT NULL UNIQUE,   -- ABT-YYYY-NNNNN
   qr_storage_path   TEXT,                   -- Path in ticket-assets bucket (private)
   qr_nonce          UUID DEFAULT uuid_generate_v4(),  -- Rotates on every valid scan
   seat              TEXT,                   -- e.g. "Block C, Row 12, Seat 7"
@@ -432,11 +432,11 @@ RETURNS TABLE (
   WHERE event_id = p_event_id;
 $$;
 
--- Ticket number generator: TKA-YYYY-NNNNN
+-- Ticket number generator: ABT-YYYY-NNNNN
 CREATE SEQUENCE IF NOT EXISTS ticket_number_seq START 10000 INCREMENT 1;
 CREATE OR REPLACE FUNCTION public.generate_ticket_number()
 RETURNS TEXT LANGUAGE sql AS $$
-  SELECT 'TKA-' || TO_CHAR(CURRENT_DATE, 'YYYY') || '-' || LPAD(nextval('ticket_number_seq')::TEXT, 5, '0');
+  SELECT 'ABT-' || TO_CHAR(CURRENT_DATE, 'YYYY') || '-' || LPAD(nextval('ticket_number_seq')::TEXT, 5, '0');
 $$;
 
 -- =============================================================================

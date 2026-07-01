@@ -1,6 +1,6 @@
 /**
  * @file config.js
- * @description Configuration for Ticket Africa.
+ * @description Configuration for Abonten Tickets.
  *
  * ENVIRONMENT STRUCTURE:
  *   We support three environments:
@@ -22,7 +22,7 @@ export const TA_CONFIG = {
     // ─── App ──────────────────────────────────────────────────────────────────
     APP_VERSION: '1.0.0',
     APP_ENV: 'development', // 'development' | 'staging' | 'production'
-    APP_NAME: 'Ticket Africa',
+    APP_NAME: 'Abonten Tickets',
 
     // ─── Supabase (Primary Backend) ───────────────────────────────────────────
     SUPABASE_URL: 'https://hnigxmplgkzfrjooyvzk.supabase.co',

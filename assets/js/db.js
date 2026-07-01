@@ -1,6 +1,6 @@
 /**
  * @file db.js
- * @description Ticket Africa -- Convex Backend Layer.
+ * @description Abonten Tickets -- Convex Backend Layer.
  *
  * This file connects directly to Convex using ConvexHttpClient from esm.sh.
  */
@@ -132,6 +132,13 @@ window.ConvexDB = {
         await syncConvexAuth();
         return convex.query(name, args);
     },
+    publicQuery: async function(name, args) {
+        if (!checkClientRateLimit(name, 90, 60000)) {
+            throw new Error("Rate limit exceeded for " + name + ". Please try again in a minute.");
+        }
+        args = args || {};
+        return convex.query(name, args);
+    },
     mutation: async function(name, args) {
         if (!checkClientRateLimit(name, 60, 60000)) {
             throw new Error("Rate limit exceeded for " + name + ". Please try again in a minute.");
@@ -215,7 +222,7 @@ window.ConvexDB = {
 
     // -- Tickets --
     checkInTicket: function(args) { return window.ConvexDB.mutation("organizer:checkInTicket", args); },
-    verifyTicket: function(qr_code) { return window.ConvexDB.query("organizer:verifyTicket", { qr_code: qr_code }); },
+    verifyTicket: function(qr_code) { return window.ConvexDB.publicQuery("organizer:verifyTicket", { qr_code: qr_code }); },
     listScanEventsByEvent: function(event_id, limit) { return window.ConvexDB.query("organizer:listScanEventsByEvent", { event_id: event_id, limit: limit || 50 }); },
 
     // -- Polls --
@@ -243,4 +250,4 @@ window.ConvexDB = {
 
 // Notify the rest of the app that the database layer is ready
 window.dispatchEvent(new Event('convex-ready'));
-console.log('[TicketAfrica] Convex backend initialised');
+console.log('[AbontenTickets] Convex backend initialised');

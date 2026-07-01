@@ -1,6 +1,6 @@
 /**
  * @file auth.js
- * @description Ticket Africa — Clerk authentication initialisation.
+ * @description Abonten Tickets — Clerk authentication initialisation.
  *
  * Clerk is loaded via CDN script tag (window.Clerk).  This module waits for
  * the SDK to be available then initialises it and fires 'clerk-ready' on window
@@ -14,7 +14,7 @@ const PUBLISHABLE_KEY = window.ENV?.CLERK_PUBLISHABLE_KEY || 'pk_test_ZGl2aW5lLW
 
 export async function initClerk() {
     if (!PUBLISHABLE_KEY) {
-        console.warn('[TicketAfrica] Clerk publishable key is not set in auth.js');
+        console.warn('[AbontenTickets] Clerk publishable key is not set in auth.js');
         return null;
     }
 
@@ -26,7 +26,7 @@ export async function initClerk() {
     }
 
     if (typeof window.Clerk === 'undefined') {
-        console.warn('[TicketAfrica] Clerk SDK did not load in time — auth features unavailable.');
+        console.warn('[AbontenTickets] Clerk SDK did not load in time — auth features unavailable.');
         return null;
     }
 
@@ -48,10 +48,10 @@ export async function initClerk() {
 
         // Dispatch so layout.js and page scripts know Auth is ready
         window.dispatchEvent(new Event('clerk-ready'));
-        console.log('[TicketAfrica] Clerk initialised ✓');
+        console.log('[AbontenTickets] Clerk initialised ✓');
         return clerk;
     } catch (err) {
-        console.error('[TicketAfrica] Error starting Clerk:', err);
+        console.error('[AbontenTickets] Error starting Clerk:', err);
         return null;
     }
 }

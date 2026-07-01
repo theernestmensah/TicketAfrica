@@ -1,5 +1,5 @@
 /* ============================================================
-   TICKET AFRICA — HOMEPAGE STYLES
+   ABONTEN TICKETS — HOMEPAGE STYLES
    ============================================================ */
 
 /* ─── $10B Hero — No Eyebrows, All Conviction ────────────── */
@@ -2736,7 +2736,7 @@
 }
 
 .hero__headline::before {
-    content: "Ticket\A Africa";
+    content: "Abonten\A Tickets";
     display: block;
     white-space: pre-line;
     font-size: clamp(3.8rem, 7.4vw, 6.7rem);
@@ -2775,6 +2775,24 @@
 .hero__stats-row,
 .hero__search-wrap {
     justify-content: flex-start !important;
+}
+
+.hero__cta-primary {
+    background: linear-gradient(135deg, #FDE68A 0%, #F59E0B 100%) !important;
+    color: #111827 !important;
+    border-color: rgba(251, 191, 36, 0.58) !important;
+    box-shadow: 0 18px 44px rgba(245, 158, 11, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.38) !important;
+}
+
+.hero__cta-primary:hover {
+    background: linear-gradient(135deg, #FBBF24 0%, #D97706 100%) !important;
+    color: #111827 !important;
+}
+
+.hero__cta-secondary {
+    background: #FFFFFF !important;
+    color: #4C1D95 !important;
+    border-color: rgba(255, 255, 255, 0.72) !important;
 }
 
 .hero__stats-row {
@@ -2876,31 +2894,125 @@
 @media (max-width: 640px) {
     .hero {
         min-height: auto !important;
+        overflow: clip;
+    }
+
+    .hero__content .container {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        padding-left: 16px;
+        padding-right: 16px;
+        overflow: hidden;
     }
 
     .hero__content {
-        padding-top: 76px !important;
-        padding-bottom: 14px !important;
+        padding-top: 54px !important;
+        padding-bottom: 18px !important;
     }
 
     .hero__headline::before {
-        font-size: clamp(3.4rem, 16vw, 4.7rem) !important;
+        font-size: clamp(2.65rem, 13vw, 3.8rem) !important;
+        line-height: 0.95;
+    }
+
+    .hero__subtext {
+        margin-bottom: 22px !important;
+    }
+
+    .hero__subtext::before {
+        font-size: 1rem !important;
+    }
+
+    .hero__canvas {
+        display: none !important;
+    }
+
+    .hero__bg-mesh {
+        opacity: 0.28 !important;
+        background-size: 44px 44px !important;
+    }
+
+    .trust-bar {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+
+    .trust-bar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .trust-bar__inner {
+        width: max-content;
+        animation: none !important;
+        transform: none !important;
     }
 
     .hero__ctas {
         width: 100%;
+        max-width: calc(100vw - 32px);
         margin-bottom: 20px !important;
+    }
+
+    .hero__ctas .btn {
+        max-width: 100%;
     }
 
     .hero__stats-row {
         width: 100%;
+        max-width: calc(100vw - 32px);
         display: grid !important;
         grid-template-columns: repeat(2, minmax(0, 1fr));
         margin-bottom: 18px !important;
         padding: 12px !important;
+        gap: 12px !important;
+        min-width: 0;
+    }
+
+    .hero__stat-item {
+        min-width: 0;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 3px;
+    }
+
+    .hero__stat-num,
+    .hero__stat-txt {
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .hero__stat-sep {
         display: none;
+    }
+
+    .hero__command-inner {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        overflow: hidden;
+    }
+
+    .hero__search-wrap {
+        width: 100%;
+        max-width: calc(100vw - 32px);
+    }
+
+    .hero__command-field,
+    .hero__command-input {
+        min-width: 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hero__canvas {
+        display: none !important;
+    }
+
+    .trust-bar__inner,
+    .hero__headline-line--accent {
+        animation: none !important;
     }
 }

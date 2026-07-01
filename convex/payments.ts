@@ -27,7 +27,7 @@ function randomToken(bytes = 32) {
 }
 
 function makeTicketNumber(orderId: unknown, sequence: number) {
-    return `TKA-${new Date().getFullYear()}-${compactId(orderId)}-${String(sequence).padStart(3, "0")}`;
+    return `ABT-${new Date().getFullYear()}-${compactId(orderId)}-${String(sequence).padStart(3, "0")}`;
 }
 
 function makeScanToken(_orderId: unknown, _sequence: number) {
@@ -164,7 +164,7 @@ export const setPaystackReference = mutation({
             throw new Error("Buyer email does not match this order.");
         }
 
-        if (!/^TKA_[A-Za-z0-9_]{8,80}$/.test(sanitizedReference)) {
+        if (!/^(ABT|TKA)_[A-Za-z0-9_]{8,80}$/.test(sanitizedReference)) {
             throw new Error("Invalid Paystack reference format.");
         }
 
@@ -398,7 +398,7 @@ export const completeVerifiedOrder = internalMutation({
             account: "ticket_africa",
             direction: "credit",
             amount: split.ticketAfricaFee,
-            description: "Ticket Africa service fee collected from buyer",
+            description: "Abonten Tickets service fee collected from buyer",
         });
         if (split.smsDeliveryFee > 0) {
             await ctx.db.insert("ledger_entries", {
@@ -433,7 +433,7 @@ export const completeVerifiedOrder = internalMutation({
             event_id: order.event_id,
             order_id: args.order_id.toString(),
             subject: `Your tickets for ${event.title || "your event"}`,
-            body: `Your Ticket Africa order is confirmed. Open your wallet to view your QR tickets.`,
+            body: `Your Abonten Tickets order is confirmed. Open your wallet to view your QR tickets.`,
             template_key: "ticket_confirmation",
             data: {
                 order_ref: args.order_id.toString(),

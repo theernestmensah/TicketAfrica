@@ -1,5 +1,5 @@
 /* ============================================================
-   TICKET AFRICA — NAVIGATION & FOOTER COMPONENTS
+   ABONTEN TICKETS — NAVIGATION & FOOTER COMPONENTS
    ============================================================ */
 
 /* ─── Site Navigation ────────────────────────────────────── */
@@ -51,24 +51,34 @@
 .nav-logo {
     display: flex;
     align-items: center;
-    gap: var(--space-3);
+    gap: var(--space-2);
     font-family: var(--font-display);
     font-weight: 800;
     font-size: var(--text-xl);
     color: var(--color-text-primary);
     letter-spacing: 0;
+    min-width: 0;
 }
 
 .nav-logo__mark {
     width: 36px;
     height: 36px;
     border-radius: var(--radius-md);
-    background: linear-gradient(135deg, var(--color-secondary), var(--color-accent));
+    background: #FFFFFF;
+    border: 1px solid rgba(17, 24, 39, 0.10);
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    box-shadow: 0 0 16px rgba(var(--color-secondary-rgb), 0.3);
+    overflow: hidden;
+    box-shadow: 0 8px 18px rgba(var(--color-secondary-rgb), 0.14);
+}
+
+.nav-logo__mark img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(1.1);
 }
 
 .nav-logo__mark svg {
@@ -77,8 +87,16 @@
     fill: white;
 }
 
-.nav-logo__text span {
+.nav-logo__wordmark {
+    display: inline-flex;
+    align-items: baseline;
     color: var(--color-text-primary);
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.nav-logo__wordmark span {
+    color: var(--color-secondary);
 }
 
 /* Main Menu */
@@ -552,12 +570,9 @@
 }
 
 .site-footer .nav-logo__mark {
-    background: linear-gradient(135deg, var(--color-secondary), var(--color-accent));
-    box-shadow: 0 0 20px rgba(var(--color-secondary-rgb), 0.3);
-}
-
-.site-footer .nav-logo__mark iconify-icon {
-    color: #111827;
+    background: #FFFFFF;
+    border-color: rgba(17, 24, 39, 0.10);
+    box-shadow: 0 10px 24px rgba(17, 24, 39, 0.10);
 }
 
 .site-footer .footer-market-tag {
@@ -791,13 +806,19 @@
     .nav-logo {
         min-width: 0;
         gap: var(--space-2);
-        font-size: 1.18rem;
+        max-width: calc(100vw - 116px);
+        font-size: 1rem;
         line-height: 1;
     }
 
+    .nav-logo__wordmark {
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
     .nav-logo__mark {
-        width: 36px;
-        height: 36px;
+        width: 34px;
+        height: 34px;
     }
 
     .nav-actions {
@@ -833,7 +854,7 @@
 
 @media (max-width: 360px) {
     .nav-logo {
-        font-size: 1.05rem;
+        font-size: 0.92rem;
     }
 }
 
@@ -860,9 +881,9 @@
 }
 
 .site-nav.nav--transparent .nav-inner {
-    background: rgba(17, 24, 39, 0.32);
-    border-color: rgba(255, 255, 255, 0.18);
-    box-shadow: 0 22px 70px rgba(17, 24, 39, 0.28);
+    background: rgba(255, 255, 255, 0.94);
+    border-color: rgba(255, 255, 255, 0.42);
+    box-shadow: 0 20px 54px rgba(17, 24, 39, 0.14);
 }
 
 .site-nav.scrolled {
@@ -878,13 +899,13 @@
 
 .site-nav.nav--transparent .nav-logo,
 .site-nav.nav--transparent .nav-link {
-    color: rgba(255, 255, 255, 0.86);
+    color: var(--color-text-secondary);
 }
 
 .site-nav.nav--transparent .nav-link:hover,
 .site-nav.nav--transparent .nav-link.active {
-    color: #FFFFFF;
-    background: rgba(255, 255, 255, 0.12);
+    color: var(--color-text-primary);
+    background: rgba(var(--color-secondary-rgb), 0.08);
 }
 
 .nav-logo {
@@ -893,13 +914,13 @@
 
 .nav-logo__mark {
     border-radius: 10px;
-    background: linear-gradient(135deg, #7C3AED 0%, #F59E0B 100%);
-    box-shadow: 0 12px 30px rgba(124, 58, 237, 0.24);
+    background: #FFFFFF;
+    box-shadow: 0 12px 30px rgba(124, 58, 237, 0.14);
 }
 
 .site-nav.nav--transparent .nav-logo__mark {
-    background: rgba(255, 255, 255, 0.14);
-    border: 1px solid rgba(255, 255, 255, 0.20);
+    background: #FFFFFF;
+    border: 1px solid rgba(17, 24, 39, 0.10);
 }
 
 .nav-link {
@@ -961,5 +982,35 @@
         min-height: 58px;
         border-radius: 0 0 18px 18px;
         padding: 0 8px;
+        gap: 8px;
+        max-width: 100%;
+        overflow: hidden;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
+
+    .nav-logo {
+        max-width: calc(100vw - 74px);
+        min-width: 0;
+        font-size: 0.98rem;
+    }
+
+    .nav-logo__wordmark {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .nav-actions {
+        flex-shrink: 0;
+        gap: 0;
+    }
+
+    .nav-actions #nav-login {
+        display: none !important;
+    }
+
+    .nav-mobile-toggle {
+        flex-shrink: 0;
     }
 }

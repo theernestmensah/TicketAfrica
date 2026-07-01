@@ -1,6 +1,6 @@
 /**
  * @file services/index.js
- * @description Central service registry for Ticket Africa.
+ * @description Central service registry for Abonten Tickets.
  *
  * All application code imports from here — never from individual service files.
  * This creates a single seam for swapping backends.

@@ -1,5 +1,5 @@
 (function () {
-  const TA = window.TicketAfrica;
+  const TA = window.AbontenTickets;
 
   function selectionPayload() {
     const selection = TA.getSelection();
@@ -20,7 +20,7 @@
       <h2 class="h5">${event.title}</h2>
       <p class="text-muted mb-3">${TA.dateLabel(event.date)} at ${event.location}</p>
       <div class="d-flex justify-content-between"><span>${selection.ticketType} x ${selection.quantity}</span><strong>${TA.money(totals.subtotal)}</strong></div>
-      <div class="d-flex justify-content-between"><span>Ticket Africa service fee</span><strong>${TA.money(totals.fee)}</strong></div>
+      <div class="d-flex justify-content-between"><span>Abonten Tickets service fee</span><strong>${TA.money(totals.fee)}</strong></div>
       <hr>
       <div class="d-flex justify-content-between fs-5"><span>Total paid</span><strong>${TA.money(totals.total)}</strong></div>`;
 

@@ -113,7 +113,7 @@ export const deliverQueued = action({
     handler: async (ctx, args): Promise<{ processed: number; sent: number; failed: number }> => {
         const brevoApiKey = process.env.BREVO_API_KEY;
         const senderEmail = process.env.BREVO_SENDER_EMAIL;
-        const senderName = process.env.BREVO_SENDER_NAME || "Ticket Africa";
+        const senderName = process.env.BREVO_SENDER_NAME || "Abonten Tickets";
 
         const messages = await ctx.runQuery(internal.messages.listQueued, { limit: args.limit || 25 });
         let sent = 0;
@@ -161,7 +161,7 @@ export const deliverQueued = action({
                         subject: message.subject,
                         htmlContent: renderHtmlMessage(message),
                         textContent: message.body,
-                        tags: ["ticket-africa", message.type],
+                        tags: ["abontentickets", message.type],
                         params: message.data,
                     }),
                 });
@@ -262,11 +262,11 @@ function messageContent(message: any) {
                 ],
                 actionLabel: "Open Organizer Dashboard",
                 actionUrl: data.account_link || "/organizer-dashboard.html",
-                footer: "You are receiving this because you created a Ticket Africa organizer account.",
+                footer: "You are receiving this because you created an Abonten Tickets organizer account.",
             };
         case "welcome_buyer":
             return {
-                heading: "Your Ticket Africa account is ready",
+                heading: "Your Abonten Tickets account is ready",
                 intro: "When organizers publish events, you can discover them, pay locally, and receive secure QR-code tickets.",
                 details: [
                     "Browse events when they go live.",
@@ -275,12 +275,12 @@ function messageContent(message: any) {
                 ],
                 actionLabel: "Browse Events",
                 actionUrl: data.events_link || "/events.html",
-                footer: "You are receiving this because you created a Ticket Africa attendee account.",
+                footer: "You are receiving this because you created an Abonten Tickets attendee account.",
             };
         case "ticket_confirmation":
             return {
                 heading: `Your tickets for ${eventTitle}`,
-                intro: "Your order is confirmed. Your QR tickets are now available in your Ticket Africa wallet.",
+                intro: "Your order is confirmed. Your QR tickets are now available in your Abonten Tickets wallet.",
                 details: [
                     eventDate ? `Event date: ${eventDate}` : "",
                     eventVenue ? `Venue: ${eventVenue}` : "",
@@ -288,7 +288,7 @@ function messageContent(message: any) {
                 ].filter(Boolean),
                 actionLabel: "Open My Tickets",
                 actionUrl: data.wallet_link || "/account.html",
-                footer: "You are receiving this because you bought a Ticket Africa event ticket.",
+                footer: "You are receiving this because you bought an Abonten Tickets event ticket.",
             };
         case "event_created":
             return {
@@ -301,7 +301,7 @@ function messageContent(message: any) {
                 ].filter(Boolean),
                 actionLabel: "Manage Event",
                 actionUrl: data.dashboard_link || "/organizer-dashboard.html",
-                footer: "You are receiving this because you created an event on Ticket Africa.",
+                footer: "You are receiving this because you created an event on Abonten Tickets.",
             };
         case "ticket_scanned":
             return {
@@ -314,14 +314,14 @@ function messageContent(message: any) {
                 ].filter(Boolean),
                 actionLabel: "Open My Tickets",
                 actionUrl: data.wallet_link || "/account.html",
-                footer: "You are receiving this because a Ticket Africa QR ticket assigned to you was scanned.",
+                footer: "You are receiving this because an Abonten Tickets QR ticket assigned to you was scanned.",
             };
         case "attendee_update":
             return {
                 heading: eventTitle,
                 intro: escapeHtml(message.subject),
                 details: [escapeHtml(message.body)],
-                actionLabel: "Open Ticket Africa",
+                actionLabel: "Open Abonten Tickets",
                 actionUrl: data.account_link || data.events_link || "/account.html",
                 footer: "You are receiving this because you bought or registered for this event.",
             };
@@ -330,9 +330,9 @@ function messageContent(message: any) {
                 heading: escapeHtml(message.subject),
                 intro: escapeHtml(message.body),
                 details: [],
-                actionLabel: "Open Ticket Africa",
+                actionLabel: "Open Abonten Tickets",
                 actionUrl: data.wallet_link || data.account_link || data.events_link,
-                footer: "You are receiving this because you use Ticket Africa.",
+                footer: "You are receiving this because you use Abonten Tickets.",
             };
     }
 }
@@ -355,7 +355,7 @@ function renderHtmlMessage(message: any): string {
   <body style="margin:0;background:#f3f4f6;font-family:Arial,sans-serif;color:#111827;">
     <div style="max-width:640px;margin:0 auto;padding:0 18px 32px;">
       <div style="height:6px;background:#111827;margin-bottom:28px;"></div>
-      <div style="text-align:center;font-size:24px;font-weight:800;color:#111827;margin-bottom:36px;">Ticket Africa</div>
+      <div style="text-align:center;font-size:24px;font-weight:800;color:#111827;margin-bottom:36px;">Abonten Tickets</div>
       <div style="background:#ffffff;border:1px solid #e5e7eb;padding:32px 28px;">
         <h1 style="font-size:26px;line-height:1.25;margin:0 0 28px;color:#111827;text-align:center;">${content.heading}</h1>
         <p style="margin:0 0 16px;">${recipientName}</p>

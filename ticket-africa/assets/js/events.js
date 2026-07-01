@@ -1,5 +1,5 @@
 (function () {
-  const TA = window.TicketAfrica;
+  const TA = window.AbontenTickets;
   const events = TA.getStored(TA.STORAGE_KEYS.events, []);
 
   function approvedEvents() {

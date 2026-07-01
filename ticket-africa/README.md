@@ -1,6 +1,6 @@
-# Ticket Africa Frontend MVP
+# Abonten Tickets Frontend MVP
 
-Ticket Africa is a static frontend MVP for a Ghana-focused event ticketing platform. It uses only HTML, CSS, Bootstrap 5 CDN, and vanilla JavaScript.
+Abonten Tickets is a static frontend MVP for a Ghana-focused event ticketing platform. It uses only HTML, CSS, Bootstrap 5 CDN, and vanilla JavaScript.
 
 ## How to run
 
@@ -32,7 +32,7 @@ Open `index.html` directly in a browser. No backend, build step, React, Next.js,
 - GHS 101 to GHS 300 ticket: GHS 7 fee
 - Above GHS 300 ticket: GHS 10 fee
 
-The checkout total is ticket price plus the Ticket Africa service fee, multiplied by quantity.
+The checkout total is ticket price plus the Abonten Tickets service fee, multiplied by quantity.
 
 ## Notes for future backend work
 

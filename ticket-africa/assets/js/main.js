@@ -211,7 +211,7 @@
       <nav class="navbar navbar-expand-lg bg-white sticky-top">
         <div class="container">
           <a class="navbar-brand d-flex align-items-center gap-2 fw-bold text-brand" href="index.html">
-            <span class="brand-mark">TA</span><span>Ticket Africa</span>
+            <span class="brand-mark">TA</span><span>Abonten Tickets</span>
           </a>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -235,7 +235,7 @@
     slot.innerHTML = `
       <footer class="py-4 mt-5">
         <div class="container d-flex flex-column flex-md-row justify-content-between gap-2">
-          <span class="fw-bold">Ticket Africa</span>
+          <span class="fw-bold">Abonten Tickets</span>
           <span class="small">Mock frontend MVP for Ghana-focused event ticketing.</span>
         </div>
       </footer>`;
@@ -249,7 +249,7 @@
   renderNav();
   renderFooter();
 
-  window.TicketAfrica = {
+  window.AbontenTickets = {
     STORAGE_KEYS,
     getStored,
     setStored,

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Checkout  -  Ticket Africa</title>
+    <title>Checkout  -  Abonten Tickets</title>
     <script src="assets/js/env.js"></script>
     <script type="module" src="/assets/js/db.js"></script>
     <link rel="stylesheet" href="assets/css/core.css" />
@@ -653,7 +653,7 @@
                     <div class="pay-method" id="pm-wallet" data-method="wallet">
                         <div class="pay-method__icon" style="background:rgba(124, 58, 237,0.15);"><iconify-icon icon="ph:ticket" style="vertical-align:middle;"></iconify-icon></div>
                         <div class="pay-method__info">
-                            <div class="pay-method__name">Ticket Africa Wallet</div>
+                            <div class="pay-method__name">Abonten Tickets Wallet</div>
                             <div class="pay-method__desc">Balance: GHS 0.00  -  Insufficient funds</div>
                         </div>
                         <div class="pay-method__radio"></div>
@@ -741,7 +741,7 @@
                                 <iconify-icon inline icon="ph:check-bold" style="color:var(--color-success);"></iconify-icon> SMS confirmation to your phone</div>
                             <div
                                 style="font-size:var(--text-sm);color:var(--color-text-secondary);display:flex;gap:var(--space-2);align-items:center;">
-                                <iconify-icon inline icon="ph:check-bold" style="color:var(--color-success);"></iconify-icon> Ticket Africa Wallet backup</div>
+                                <iconify-icon inline icon="ph:check-bold" style="color:var(--color-success);"></iconify-icon> Abonten Tickets Wallet backup</div>
                             <div
                                 style="font-size:var(--text-sm);color:var(--color-text-secondary);display:flex;gap:var(--space-2);align-items:center;">
                                 <iconify-icon inline icon="ph:check-bold" style="color:var(--color-success);"></iconify-icon> Email with event details</div>
@@ -763,14 +763,14 @@
                 </div>
                 <h2 style="margin-bottom:var(--space-3);">Payment Successful!</h2>
                 <p style="color:var(--color-text-muted);font-size:var(--text-sm);margin-bottom:var(--space-6);">Your
-                    tickets have been issued and sent to your phone and email. Check your Ticket Africa wallet.</p>
+                    tickets have been issued and sent to your phone and email. Check your Abonten Tickets wallet.</p>
                 <div
                     style="background:var(--color-bg-elevated);border:1px solid var(--color-border);border-radius:var(--radius-lg);padding:var(--space-4);margin-bottom:var(--space-6);">
                     <div style="font-size:var(--text-xs);color:var(--color-text-muted);margin-bottom:var(--space-2);">
                         Reference Number</div>
                     <div
                         style="font-family:var(--font-mono);font-size:var(--text-lg);font-weight:800;color:var(--color-text-primary);">
-                        TKA-2026-83921</div>
+                        ABT-2026-83921</div>
                 </div>
                 <a href="account.html" class="btn btn--primary btn--full btn--lg" id="go-to-wallet">View My Tickets</a>
             </div>
@@ -878,12 +878,12 @@
                     .slice(-16)
                     .toUpperCase()
                     .padStart(8, '0');
-                return `TKA_${compactOrder}_${Date.now().toString(36).toUpperCase()}`;
+                return `ABT_${compactOrder}_${Date.now().toString(36).toUpperCase()}`;
             }
 
             function getSelectedPaymentChannels() {
                 const method = document.querySelector('.pay-method.selected')?.dataset.method;
-                if (method === 'wallet') throw new Error('Ticket Africa Wallet payments are not available yet.');
+                if (method === 'wallet') throw new Error('Abonten Tickets Wallet payments are not available yet.');
                 if (method === 'momo') return ['mobile_money'];
                 if (method === 'card') return ['card'];
                 if (method === 'bank') return ['bank_transfer'];
@@ -1020,7 +1020,7 @@
 
                         clearInterval(timer);
                         const refNum = orderId.toString().slice(-8).toUpperCase();
-                        document.querySelector('#success-modal [style*="font-family:var(--font-mono)"]').textContent = 'TKA-' + refNum;
+                        document.querySelector('#success-modal [style*="font-family:var(--font-mono)"]').textContent = 'ABT-' + refNum;
                         document.getElementById('success-modal').style.display = 'flex';
                     }
 

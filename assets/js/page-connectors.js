@@ -1,7 +1,7 @@
 /**
  * page-connectors.js
  * ─────────────────────────────────────────────────────────────────────────────
- * Ticket Africa — Page-level Convex data connectors.
+ * Abonten Tickets — Page-level Convex data connectors.
  *
  * Each connector is self-contained and fires only on the relevant page.
  * All connectors wait for 'convex-ready' before querying.
@@ -44,7 +44,7 @@ function moneyFromMinor(amount, currency) {
 
 window.downloadTicketFile = function downloadTicketFile(ticketCode, eventTitle, ticketType, eventDate, venue) {
     const lines = [
-        'Ticket Africa Ticket',
+        'Abonten Tickets Ticket',
         '',
         `Event: ${eventTitle || 'Event'}`,
         `Ticket: ${ticketType || 'Ticket'}`,
@@ -58,7 +58,7 @@ window.downloadTicketFile = function downloadTicketFile(ticketCode, eventTitle, 
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${ticketCode || 'ticket-africa-ticket'}.txt`;
+    a.download = `${ticketCode || 'abontentickets-ticket'}.txt`;
     a.click();
     URL.revokeObjectURL(url);
 };
@@ -469,7 +469,7 @@ async function loadWallet(email) {
                 : isUpcoming
                     ? `<span class="badge badge--success">Valid</span>`
                     : `<span class="badge badge--primary">${escapeHtml(ticket.status || order.status || 'Active')}</span>`;
-            const ticketNumber = ticket.ticket_number || `TKA-${String(order._id).slice(-8).toUpperCase()}`;
+            const ticketNumber = ticket.ticket_number || `ABT-${String(order._id).slice(-8).toUpperCase()}`;
             const scanCode = ticket.scan_token || ticket.qr_code || ticketNumber;
             const eventDate = order.event_date ? new Date(order.event_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : dateStr;
             const eventTitle = escapeHtml(order.event_title || order.event_id || 'Event');
@@ -498,7 +498,7 @@ async function loadWallet(email) {
                 <div class="ticket-card__bottom">
                     <div class="ticket-info-row"><span>Ticket No.</span><span style="font-family:var(--font-mono);font-size:var(--text-xs);">${safeNumber}</span></div>
                     <div class="ticket-info-row"><span>Ticket Type</span><span>${ticketType}</span></div>
-                    <div class="ticket-info-row"><span>Order Ref</span><span style="font-family:var(--font-mono);font-size:var(--text-xs);">TKA-${String(order._id).slice(-8).toUpperCase()}</span></div>
+                    <div class="ticket-info-row"><span>Order Ref</span><span style="font-family:var(--font-mono);font-size:var(--text-xs);">ABT-${String(order._id).slice(-8).toUpperCase()}</span></div>
                     <div class="ticket-info-row"><span>Total Paid</span><span>${moneyFromMinor(order.total_amount || 0, order.currency || 'GHS')}</span></div>
                 </div>
                 <div class="ticket-card__qr">
@@ -540,7 +540,7 @@ async function loadWallet(email) {
         if (supportSelect) {
             const base = '<option value="">None - General enquiry</option>';
             supportSelect.innerHTML = base + (orders || []).map(o =>
-                `<option value="${escapeAttr(o._id)}">${escapeHtml(o.event_title || 'Event')} (TKA-${escapeHtml(String(o._id).slice(-8).toUpperCase())})</option>`
+                `<option value="${escapeAttr(o._id)}">${escapeHtml(o.event_title || 'Event')} (ABT-${escapeHtml(String(o._id).slice(-8).toUpperCase())})</option>`
             ).join('');
         }
 
@@ -598,7 +598,7 @@ async function loadPurchaseHistory(email) {
                 ].join('\n');
                 const blob = new Blob([csv], { type: 'text/csv' });
                 const url = URL.createObjectURL(blob);
-                const a = document.createElement('a'); a.href = url; a.download = 'ticket-africa-history.csv';
+                const a = document.createElement('a'); a.href = url; a.download = 'abontentickets-history.csv';
                 a.click(); URL.revokeObjectURL(url);
             });
         }
@@ -755,7 +755,7 @@ async function initScannerPage() {
         }
     }
 
-    window.TicketAfricaScanner = {
+    window.AbontenTicketsScanner = {
         handleCode: handleTicketCode,
         startCamera: startCameraScanner,
     };
@@ -852,7 +852,7 @@ async function initEventDetailPage() {
         if (!event) return;
 
         // Update <title> and meta-description
-        document.title = `${event.title} — Ticket Africa`;
+        document.title = `${event.title} — Abonten Tickets`;
         const metaDesc = document.querySelector('meta[name="description"]');
         if (metaDesc) metaDesc.setAttribute('content', event.description || event.title);
 
@@ -993,7 +993,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const path = window.location.pathname.replace(/\\/g, '/').split('/').pop() || 'index.html';
 
     if (path === '' || path === 'index.html') {
-        initHomePage();
+        // The shared layout hydrates homepage counts, featured events, and polls from a single Convex pass.
+        return;
     } else if (path === 'events.html') {
         initEventsPage();
         hookEventsPageFilters();

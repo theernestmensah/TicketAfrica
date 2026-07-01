@@ -1,5 +1,5 @@
 /* ============================================================
-   TICKET AFRICA — Core Platform JS
+   ABONTEN TICKETS — Core Platform JS
    ============================================================ */
 
 (function () {
@@ -213,9 +213,9 @@
     /* ── Internationalization (i18n) ────────────────────── */
     window.TA_LANGUAGES = {
         en: {
-            hero_headline_1: "Every great",
-            hero_headline_2: "starts here.",
-            hero_headline_accent: "African event",
+            hero_headline_1: "Abonten",
+            hero_headline_2: "for every event.",
+            hero_headline_accent: "Tickets",
             hero_subtext: "Tickets. Verified. Delivered. Across Ghana, Nigeria, Kenya, South Africa & Rwanda.",
             hero_browse_btn: "Browse Events",
             hero_organizer_btn: "Sell Tickets",
@@ -274,9 +274,9 @@
             dash_request_payout: "Request Payout"
         },
         fr: {
-            hero_headline_1: "Chaque grand",
-            hero_headline_2: "commence ici.",
-            hero_headline_accent: "événement africain",
+            hero_headline_1: "Abonten",
+            hero_headline_2: "pour chaque événement.",
+            hero_headline_accent: "Tickets",
             hero_subtext: "Billets. Vérifiés. Livrés. À travers le Ghana, le Nigéria, le Kenya, l'Afrique du Sud & le Rwanda.",
             hero_browse_btn: "Parcourir les Événements",
             hero_organizer_btn: "Vendre des Billets",
@@ -335,9 +335,9 @@
             dash_request_payout: "Demander un Paiement"
         },
         sw: {
-            hero_headline_1: "Kila tukio kubwa la",
-            hero_headline_2: "huanzia hapa.",
-            hero_headline_accent: "Afrika",
+            hero_headline_1: "Abonten",
+            hero_headline_2: "kwa kila tukio.",
+            hero_headline_accent: "Tickets",
             hero_subtext: "Tiketi. Zilizothibitishwa. Zilizotumwa. Kote Ghana, Nigeria, Kenya, Afrika Kusini & Rwanda.",
             hero_browse_btn: "Tafuta Matukio",
             hero_organizer_btn: "Uza Tiketi",

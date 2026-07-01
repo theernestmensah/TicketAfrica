@@ -1,5 +1,5 @@
 /* ============================================================
-   TICKET AFRICA — Shared Navigation & Footer Renderer
+   ABONTEN TICKETS — Shared Navigation & Footer Renderer
    This script injects the nav and footer into every page.
    ============================================================ */
 
@@ -16,11 +16,11 @@
   <nav class="site-nav nav--transparent" data-transparent="true" id="site-nav">
     <div class="container">
       <div class="nav-inner">
-        <a href="/index.html" class="nav-logo" id="nav-logo">
-          <div class="nav-logo__mark">
-            <iconify-icon icon="hugeicons:ticket-01"></iconify-icon>
-          </div>
-          <span>Ticket<span>Africa</span></span>
+        <a href="/index.html" class="nav-logo" id="nav-logo" aria-label="Abonten Tickets home">
+          <span class="nav-logo__mark" aria-hidden="true">
+            <img src="/assets/img/abonten-mark.jpeg" alt="" loading="eager" />
+          </span>
+          <span class="nav-logo__wordmark">Abonten<span>Tickets</span></span>
         </a>
 
         <div class="nav-menu" id="nav-menu">
@@ -74,7 +74,7 @@
           </div>
           <div class="nav-user" id="nav-user" hidden>
             <button class="nav-user__button" id="nav-user-toggle" type="button" aria-haspopup="menu" aria-expanded="false">
-              <span class="nav-user__avatar" id="nav-user-avatar" aria-hidden="true">TA</span>
+              <span class="nav-user__avatar" id="nav-user-avatar" aria-hidden="true">AT</span>
               <span class="nav-user__meta">
                 <span class="nav-user__status">Signed in</span>
                 <span class="nav-user__name" id="nav-user-name">Account</span>
@@ -108,11 +108,11 @@
   <div class="nav-mobile-overlay" id="nav-mobile-overlay"></div>
   <div class="nav-mobile-drawer" id="nav-mobile-drawer">
     <div class="nav-mobile-header">
-      <a href="/index.html" class="nav-logo">
-        <div class="nav-logo__mark">
-          <iconify-icon icon="hugeicons:ticket-01"></iconify-icon>
-        </div>
-        <span>Ticket<span>Africa</span></span>
+      <a href="/index.html" class="nav-logo" aria-label="Abonten Tickets home">
+        <span class="nav-logo__mark" aria-hidden="true">
+          <img src="/assets/img/abonten-mark.jpeg" alt="" loading="eager" />
+        </span>
+        <span class="nav-logo__wordmark">Abonten<span>Tickets</span></span>
       </a>
       <button class="nav-mobile-close" id="nav-mobile-close" aria-label="Close menu">
         <iconify-icon icon="hugeicons:cancel-01" style="width:18px;height:18px;"></iconify-icon>
@@ -142,7 +142,7 @@
     </div>
     <div class="nav-mobile-actions">
       <div class="nav-mobile-account" id="mob-user-card" hidden>
-        <span class="nav-user__avatar" id="mob-user-avatar" aria-hidden="true">TA</span>
+        <span class="nav-user__avatar" id="mob-user-avatar" aria-hidden="true">AT</span>
         <span class="nav-mobile-account__meta">
           <span class="nav-mobile-account__status">Signed in</span>
           <span class="nav-mobile-account__name" id="mob-user-name">Account</span>
@@ -176,11 +176,11 @@
     <div class="container">
       <div class="footer-grid">
         <div class="footer-brand">
-          <a href="/index.html" class="nav-logo" style="margin-bottom:var(--space-2);">
-            <div class="nav-logo__mark">
-              <iconify-icon icon="hugeicons:ticket-01"></iconify-icon>
-            </div>
-            <span>Ticket<span>Africa</span></span>
+          <a href="/index.html" class="nav-logo" style="margin-bottom:var(--space-2);" aria-label="Abonten Tickets home">
+            <span class="nav-logo__mark" aria-hidden="true">
+              <img src="/assets/img/abonten-mark.jpeg" alt="" loading="lazy" />
+            </span>
+            <span class="nav-logo__wordmark">Abonten<span>Tickets</span></span>
           </a>
           <p class="footer-brand__desc">Africa's leading event ticketing infrastructure. Powering millions of ticket transactions across the continent with trust, speed, and security.</p>
           <div class="footer-trust-marks">
@@ -265,7 +265,7 @@
       </div>
 
       <div class="footer-bottom">
-        <p class="footer-bottom__copy">© 2026 Ticket Africa Ltd. All rights reserved.</p>
+        <p class="footer-bottom__copy">© 2026 Abonten Tickets Ltd. All rights reserved.</p>
         <div class="footer-bottom__links">
           <a href="/terms.html" class="footer-bottom__link">Terms of Service</a>
           <a href="/privacy.html" class="footer-bottom__link">Privacy Policy</a>
@@ -318,7 +318,20 @@
   // Hook up Backend & Auto-seed
   window.addEventListener('convex-ready', async () => {
     try {
-      const events = await window.ConvexDB.listEvents();
+      const needsEventData = Boolean(
+        document.getElementById('featured-events-grid') ||
+        document.getElementById('events-grid') ||
+        document.getElementById('stat-live-events') ||
+        document.getElementById('cat-count-concerts') ||
+        document.getElementById('city-count-accra') ||
+        document.getElementById('fc-concerts') ||
+        document.getElementById('discovery-subtitle')
+      );
+      const needsPollData = Boolean(document.getElementById('home-polls-grid'));
+
+      if (!needsEventData && !needsPollData) return;
+
+      const events = needsEventData ? await window.ConvexDB.listEvents() : [];
 
       if (events && events.length > 0) {
         // ── Update category counts from real data ──
@@ -513,7 +526,7 @@
     setTimeout(initAuthUI, 500); // Give inject a moment
   });
 
-  const initTicketAfricaAuthUI = () => {
+  const initAbontenTicketsAuthUI = () => {
     const loginBtn = document.getElementById('nav-login');
     const mobileLoginBtn = document.getElementById('mob-login');
     const signupBtn = document.getElementById('nav-signup');
@@ -562,8 +575,8 @@
     };
 
     const getInitials = (name) => {
-      const parts = String(name || 'TA').trim().split(/\s+/).filter(Boolean);
-      return (parts.length > 1 ? parts[0][0] + parts[parts.length - 1][0] : parts[0]?.slice(0, 2) || 'TA').toUpperCase();
+      const parts = String(name || 'AT').trim().split(/\s+/).filter(Boolean);
+      return (parts.length > 1 ? parts[0][0] + parts[parts.length - 1][0] : parts[0]?.slice(0, 2) || 'AT').toUpperCase();
     };
 
     const setAvatar = (el, user, name) => {
@@ -641,17 +654,17 @@
     }
   };
 
-  const waitForTicketAfricaAuthUI = (attemptsLeft = 30) => {
-    initTicketAfricaAuthUI();
+  const waitForAbontenTicketsAuthUI = (attemptsLeft = 30) => {
+    initAbontenTicketsAuthUI();
     if (window.Clerk) {
-      Promise.resolve(window.Clerk.load?.()).catch(() => {}).finally(initTicketAfricaAuthUI);
+      Promise.resolve(window.Clerk.load?.()).catch(() => {}).finally(initAbontenTicketsAuthUI);
       return;
     }
-    if (attemptsLeft > 0) setTimeout(() => waitForTicketAfricaAuthUI(attemptsLeft - 1), 200);
+    if (attemptsLeft > 0) setTimeout(() => waitForAbontenTicketsAuthUI(attemptsLeft - 1), 200);
   };
 
-  window.addEventListener('clerk-ready', initTicketAfricaAuthUI);
-  window.addEventListener('load', () => waitForTicketAfricaAuthUI());
-  window.addEventListener('DOMContentLoaded', () => setTimeout(waitForTicketAfricaAuthUI, 250));
+  window.addEventListener('clerk-ready', initAbontenTicketsAuthUI);
+  window.addEventListener('load', () => waitForAbontenTicketsAuthUI());
+  window.addEventListener('DOMContentLoaded', () => setTimeout(waitForAbontenTicketsAuthUI, 250));
 
 })();

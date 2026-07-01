@@ -1,5 +1,5 @@
 (function () {
-  const TA = window.TicketAfrica;
+  const TA = window.AbontenTickets;
 
   function findOrder() {
     const id = TA.getQuery("order");
@@ -20,7 +20,7 @@
         <div class="ticket-top p-4">
           <div class="d-flex justify-content-between gap-3">
             <div>
-              <p class="eyebrow mb-1">Ticket Africa Pass</p>
+              <p class="eyebrow mb-1">Abonten Tickets Pass</p>
               <h1 class="h3 mb-0">${order.eventTitle}</h1>
             </div>
             <div>${TA.statusBadge(order.ticketStatus)}</div>
