@@ -114,7 +114,10 @@ if (!spec.ok) {
   }
 }
 
-const vercel = run(vercelCli, ["whoami"]);
+const vercelArgs = process.env.VERCEL_TOKEN
+  ? ["whoami", "--token", process.env.VERCEL_TOKEN]
+  : ["whoami"];
+const vercel = run(vercelCli, vercelArgs);
 line(vercel.ok, "Vercel auth", vercel.ok ? vercel.stdout.trim() : "not logged in");
 if (!vercel.ok) blockers.push("Log in to Vercel or provide VERCEL_TOKEN before frontend deploy.");
 
