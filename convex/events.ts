@@ -278,6 +278,7 @@ export const createEventWithTiers = mutation({
         city: v.string(),
         country: v.string(),
         address: v.string(),
+        publish: v.optional(v.boolean()),
         tiers: v.array(v.object({
             name: v.string(),
             description: v.optional(v.string()),
@@ -312,6 +313,19 @@ export const createEventWithTiers = mutation({
             }
         }
 
+        const publishNow = args.publish === true;
+        if (publishNow) {
+            const supportedCurrencies = supportedCheckoutCurrencies();
+            if (!supportedCurrencies.has(currency)) {
+                throw new ConvexError(`Checkout is not enabled for ${currency}. Save as draft or use ${Array.from(supportedCurrencies).join(", ")}.`);
+            }
+            const eventEnd = new Date(args.end_date).getTime();
+            const saleableTier = sanitizedTiers.some((tier) => tier.capacity > 0 && eventEnd > Date.now());
+            if (!saleableTier) {
+                throw new ConvexError("At least one ticket tier must be available before creating the live event.");
+            }
+        }
+
         const slug = sanitizedTitle.toLowerCase().replace(/[^a-z0-9]+/g, "-") + "-" + Date.now();
         const eventId = await ctx.db.insert("events", {
             org_id: args.org_id,
@@ -323,7 +337,7 @@ export const createEventWithTiers = mutation({
             end_date: args.end_date,
             cover_image: args.cover_image ?? "",
             currency,
-            status: "draft",
+            status: publishNow ? "published" : "draft",
             location: {
                 venue_name: sanitizeText(args.venue_name),
                 city: sanitizeText(args.city),

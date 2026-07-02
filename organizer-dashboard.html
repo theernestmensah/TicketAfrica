@@ -943,8 +943,11 @@
                             <button type="button" id="wizard-next-btn" onclick="nextWizardStep()" class="btn btn--primary" style="display:flex;align-items:center;gap:6px;min-height:42px;">
                                 Next <iconify-icon icon="ph:arrow-right-bold"></iconify-icon>
                             </button>
-                            <button type="submit" id="ce-submit" class="btn btn--primary" style="display:none;min-height:42px;background:linear-gradient(135deg, var(--color-secondary) 0%, var(--color-accent) 100%);color:var(--color-on-accent);font-weight:800;">
-                                Create Event (Save Draft)
+                            <button type="button" id="ce-save-draft" class="btn btn--ghost" style="display:none;min-height:42px;">
+                                Save Draft
+                            </button>
+                            <button type="button" id="ce-create-event" class="btn btn--primary" style="display:none;min-height:42px;background:linear-gradient(135deg, var(--color-secondary) 0%, var(--color-accent) 100%);color:var(--color-on-accent);font-weight:800;">
+                                Create Event
                             </button>
                         </div>
                     </div>
@@ -1097,7 +1100,8 @@
             // Button configurations
             const backBtn = document.getElementById('wizard-back-btn');
             const nextBtn = document.getElementById('wizard-next-btn');
-            const submitBtn = document.getElementById('ce-submit');
+            const saveDraftBtn = document.getElementById('ce-save-draft');
+            const createEventBtn = document.getElementById('ce-create-event');
 
             if (backBtn) {
                 backBtn.style.visibility = step === 1 ? 'hidden' : 'visible';
@@ -1105,11 +1109,13 @@
 
             if (step === 4) {
                 nextBtn.style.display = 'none';
-                submitBtn.style.display = 'block';
+                saveDraftBtn.style.display = 'block';
+                createEventBtn.style.display = 'block';
                 syncLivePreview(); // final sync
             } else {
                 nextBtn.style.display = 'block';
-                submitBtn.style.display = 'none';
+                saveDraftBtn.style.display = 'none';
+                createEventBtn.style.display = 'none';
             }
         }
 
@@ -1503,13 +1509,15 @@
             return tiers;
         }
 
-        document.getElementById('create-event-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('ce-submit');
+        async function submitCreateEvent(publish) {
+            const saveDraftBtn = document.getElementById('ce-save-draft');
+            const createEventBtn = document.getElementById('ce-create-event');
+            const activeBtn = publish ? createEventBtn : saveDraftBtn;
             const err = document.getElementById('ce-error');
             err.style.display = 'none';
-            btn.disabled = true;
-            btn.textContent = 'Connecting...';
+            saveDraftBtn.disabled = true;
+            createEventBtn.disabled = true;
+            activeBtn.textContent = publish ? 'Creating...' : 'Saving...';
 
             try {
                 // Wait up to 8 seconds for ConvexDB to be ready (it loads as a module)
@@ -1522,11 +1530,11 @@
 
                 // Resolve the organizer record on demand. This covers brand-new organizers with no events yet.
                 if (!_currentOrgId) {
-                    btn.textContent = 'Loading your account...';
+                    activeBtn.textContent = 'Loading account...';
                     await ensureOrganizerOrgId();
                 }
 
-                btn.textContent = 'Creating...';
+                activeBtn.textContent = publish ? 'Creating...' : 'Saving...';
 
                 const startDt = new Date(document.getElementById('ce-start').value).toISOString();
                 const endDt = new Date(document.getElementById('ce-end').value).toISOString();
@@ -1547,13 +1555,14 @@
                     address: document.getElementById('ce-address').value.trim(),
                     city: document.getElementById('ce-city').value.trim(),
                     country: document.getElementById('ce-country').value,
+                    publish,
                     tiers,
                 };
 
                 await window.ConvexDB.createEventWithTiers(eventPayload);
 
                 closeCreateModal();
-                window.TA?.toast('Event created as Draft! Publish it when ready.', 'success');
+                window.TA?.toast(publish ? 'Event created and published!' : 'Event saved as draft.', 'success');
 
                 // Refresh table - scoped to this organizer's org
                 if (_currentOrgId) {
@@ -1566,10 +1575,18 @@
                 err.textContent = createEventErrorMessage(ex);
                 err.style.display = 'block';
             } finally {
-                btn.disabled = false;
-                btn.textContent = 'Create Event (Save as Draft)';
+                saveDraftBtn.disabled = false;
+                createEventBtn.disabled = false;
+                saveDraftBtn.textContent = 'Save Draft';
+                createEventBtn.textContent = 'Create Event';
             }
+        }
+
+        document.getElementById('create-event-form').addEventListener('submit', (e) => {
+            e.preventDefault();
         });
+        document.getElementById('ce-save-draft').addEventListener('click', () => submitCreateEvent(false));
+        document.getElementById('ce-create-event').addEventListener('click', () => submitCreateEvent(true));
 
         /* -- Event Actions -- */
         async function handlePublish(eventId) {
