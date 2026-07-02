@@ -234,6 +234,7 @@ window.ConvexDB = {
 
     // -- Event Mutations --
     createEvent: function(args) { return window.ConvexDB.mutation("events:createEvent", args); },
+    createEventWithTiers: function(args) { return window.ConvexDB.mutation("events:createEventWithTiers", args); },
     updateEvent: function(args) { return window.ConvexDB.mutation("events:updateEvent", args); },
     publishEvent: function(event_id) { return window.ConvexDB.mutation("events:publishEvent", { event_id: event_id }); },
     cancelEvent: function(event_id) { return window.ConvexDB.mutation("events:cancelEvent", { event_id: event_id }); },

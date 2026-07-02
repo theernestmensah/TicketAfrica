@@ -1465,7 +1465,25 @@
             if (isConvexJwtSetupError(ex)) {
                 return 'Event creation is blocked because Clerk is not connected to Convex yet. In Clerk Dashboard, activate Integrations > Convex, or create a JWT template named "convex" with audience "convex". Then sign out and sign back in before creating the event.';
             }
-            return ex?.message || 'Something went wrong. Please try again.';
+            const message = ex?.message || '';
+            if (/\[Request ID:[^\]]+\]\s*Server Error/i.test(message)) {
+                return 'The event was not saved because the backend rejected one of the event details. Refresh the page, make sure your ticket tier has a name, GHS price, and capacity, then try again.';
+            }
+            return message || 'Something went wrong. Please try again.';
+        }
+
+        function collectCreateEventTiers() {
+            const tiers = [];
+            for (let i = 1; i <= tierCount; i++) {
+                const row = document.getElementById('tier-row-' + i);
+                if (!row) continue;
+                const name = row.querySelector(`[name="tier-name-${i}"]`)?.value?.trim();
+                const price = cedisToMinorUnits(row.querySelector(`[name="tier-price-${i}"]`)?.value || '0');
+                const capacity = parseInt(row.querySelector(`[name="tier-capacity-${i}"]`)?.value || '0', 10);
+                if (!name && !capacity) continue;
+                tiers.push({ name, price, capacity });
+            }
+            return tiers;
         }
 
         document.getElementById('create-event-form').addEventListener('submit', async (e) => {
@@ -1495,8 +1513,12 @@
 
                 const startDt = new Date(document.getElementById('ce-start').value).toISOString();
                 const endDt = new Date(document.getElementById('ce-end').value).toISOString();
+                const tiers = collectCreateEventTiers();
+                if (!tiers.length) {
+                    throw new Error('Add at least one ticket tier with a name, price, and capacity.');
+                }
 
-                const eventId = await window.ConvexDB.createEvent({
+                const eventPayload = {
                     org_id: _currentOrgId,
                     title: document.getElementById('ce-title').value.trim(),
                     description: document.getElementById('ce-description').value.trim(),
@@ -1508,26 +1530,10 @@
                     address: document.getElementById('ce-address').value.trim(),
                     city: document.getElementById('ce-city').value.trim(),
                     country: document.getElementById('ce-country').value,
-                });
+                    tiers,
+                };
 
-                // Add ticket tiers
-                for (let i = 1; i <= tierCount; i++) {
-                    const row = document.getElementById('tier-row-' + i);
-                    if (!row) continue;
-                    const name = row.querySelector(`[name="tier-name-${i}"]`)?.value?.trim();
-                    const price = cedisToMinorUnits(row.querySelector(`[name="tier-price-${i}"]`)?.value || '0');
-                    const capacity = parseInt(row.querySelector(`[name="tier-capacity-${i}"]`)?.value || '0');
-                    if (name && capacity > 0) {
-                        await window.ConvexDB.addTicketTier({
-                            event_id: eventId,
-                            name,
-                            price,
-                            capacity,
-                            sales_start: startDt,
-                            sales_end: endDt,
-                        });
-                    }
-                }
+                await window.ConvexDB.createEventWithTiers(eventPayload);
 
                 closeCreateModal();
                 window.TA?.toast('Event created as Draft! Publish it when ready.', 'success');

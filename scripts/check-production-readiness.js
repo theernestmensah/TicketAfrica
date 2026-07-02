@@ -91,6 +91,7 @@ if (!spec.ok) {
   const required = [
     "events.js:getEventBySlug",
     "events.js:getTicketTiers",
+    "events.js:createEventWithTiers",
     "payments.js:createCheckout",
     "payments.js:setPaystackReference",
     "payments.js:verifyPaystackPayment",

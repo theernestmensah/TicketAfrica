@@ -263,6 +263,113 @@ export const createEvent = mutation({
     },
 });
 
+// Create a draft event and its ticket tiers in one transaction.
+export const createEventWithTiers = mutation({
+    args: {
+        org_id: v.id("organizations"),
+        title: v.string(),
+        description: v.string(),
+        category: v.string(),
+        start_date: v.string(),
+        end_date: v.string(),
+        cover_image: v.optional(v.string()),
+        currency: v.string(),
+        venue_name: v.string(),
+        city: v.string(),
+        country: v.string(),
+        address: v.string(),
+        tiers: v.array(v.object({
+            name: v.string(),
+            description: v.optional(v.string()),
+            price: v.number(),
+            capacity: v.number(),
+        })),
+    },
+    handler: async (ctx, args) => {
+        await assertOrgAccess(ctx, args.org_id);
+        const user = await getCurrentUser(ctx);
+        const sanitizedTitle = sanitizeText(args.title);
+        const currency = normalizeCurrency(args.currency);
+        assertDateRange(args.start_date, args.end_date);
+        if (!currency) throw new Error("Currency is required.");
+        if (!sanitizedTitle) throw new Error("Event title is required.");
+        if (!args.tiers.length) throw new Error("Add at least one ticket tier.");
+
+        const sanitizedTiers = args.tiers.map((tier) => ({
+            name: sanitizeText(tier.name),
+            description: tier.description !== undefined ? sanitizeText(tier.description) : undefined,
+            price: tier.price,
+            capacity: tier.capacity,
+        }));
+
+        for (const tier of sanitizedTiers) {
+            if (!tier.name) throw new Error("Ticket tier name is required.");
+            if (!Number.isInteger(tier.price) || tier.price < 0) {
+                throw new Error("Ticket price must be a non-negative amount.");
+            }
+            if (!Number.isInteger(tier.capacity) || tier.capacity <= 0) {
+                throw new Error("Ticket capacity must be at least 1.");
+            }
+        }
+
+        const slug = sanitizedTitle.toLowerCase().replace(/[^a-z0-9]+/g, "-") + "-" + Date.now();
+        const eventId = await ctx.db.insert("events", {
+            org_id: args.org_id,
+            title: sanitizedTitle,
+            slug,
+            description: sanitizeHtml(args.description),
+            category: sanitizeText(args.category),
+            start_date: args.start_date,
+            end_date: args.end_date,
+            cover_image: args.cover_image ?? "",
+            currency,
+            status: "draft",
+            location: {
+                venue_name: sanitizeText(args.venue_name),
+                city: sanitizeText(args.city),
+                country: sanitizeText(args.country),
+                address: sanitizeText(args.address),
+            },
+            created_at: new Date().toISOString(),
+        });
+
+        for (const tier of sanitizedTiers) {
+            await ctx.db.insert("ticket_tiers", {
+                event_id: eventId,
+                name: tier.name,
+                description: tier.description,
+                price: tier.price,
+                capacity: tier.capacity,
+                sold: 0,
+                sales_start: args.start_date,
+                sales_end: args.end_date,
+            });
+        }
+
+        await ctx.runMutation(internal.messages.enqueue, {
+            type: "event_created",
+            channel: "email",
+            recipient_email: user.email,
+            recipient_phone: user.phone,
+            recipient_name: user.first_name,
+            user_id: user._id,
+            org_id: args.org_id,
+            event_id: eventId,
+            subject: `Event draft created: ${sanitizedTitle}`,
+            body: `${sanitizedTitle} has been created as a draft. Review the details before publishing.`,
+            template_key: "event_created",
+            data: {
+                event_title: sanitizedTitle,
+                event_date: args.start_date,
+                event_venue: sanitizeText(args.venue_name),
+                dashboard_link: "/organizer-dashboard.html",
+            },
+        });
+
+        return eventId;
+    },
+});
+
 // Update event details
 export const updateEvent = mutation({
     args: {
