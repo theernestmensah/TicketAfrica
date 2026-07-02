@@ -1,5 +1,5 @@
 import { query, mutation } from "./_generated/server";
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 import { internal } from "./_generated/api";
 import { sanitizeText, sanitizeEmail, sanitizePhone } from "./sanitize";
 
@@ -179,12 +179,16 @@ export const getOrCreateOrg = mutation({
         email: v.string(),
     },
     handler: async (ctx, args) => {
-        const { user } = await getCurrentUser(ctx);
+        let { user } = await getCurrentUser(ctx);
         if (user._id !== args.owner_id && user.role !== "admin") {
-            throw new Error("You can only create an organization for your own account.");
+            throw new ConvexError("You can only create an organization for your own account.");
+        }
+        if (user.role === "buyer") {
+            await ctx.db.patch(user._id, { role: "organizer" });
+            user = { ...user, role: "organizer" };
         }
         if (user.role !== "organizer" && user.role !== "admin") {
-            throw new Error("Organizer account required.");
+            throw new ConvexError("Organizer account required.");
         }
 
         const existing = await ctx.db
