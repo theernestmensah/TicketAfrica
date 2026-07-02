@@ -447,20 +447,15 @@
 
     if (!loginBtn && !mobileLoginBtn && !userBtnDiv) return; // Wait for DOM inject
 
-    const openSignIn = (e) => {
-      e.preventDefault();
-      const drawer = document.getElementById('nav-mobile-drawer');
-      const overlay = document.getElementById('nav-mobile-overlay');
-      if (drawer) drawer.classList.remove('open');
-      if (overlay) overlay.classList.remove('active');
-      document.body.style.overflow = '';
-
-      if (clerk?.openSignIn) {
-        clerk.openSignIn();
-      } else {
-        window.location.href = '/login.html';
-      }
-    };
+    const openSignIn = (e) => {
+      e?.preventDefault?.();
+      const drawer = document.getElementById('nav-mobile-drawer');
+      const overlay = document.getElementById('nav-mobile-overlay');
+      if (drawer) drawer.classList.remove('open');
+      if (overlay) overlay.classList.remove('active');
+      document.body.style.overflow = '';
+      window.location.href = '/login.html';
+    };
 
     // Update UI based on auth state
     const updateAuthUI = () => {
@@ -561,15 +556,11 @@
       document.body.style.overflow = '';
     };
 
-    const openSignIn = (e) => {
-      e.preventDefault();
-      closeDrawer();
-      if (window.Clerk?.openSignIn) {
-        window.Clerk.openSignIn();
-      } else {
-        window.location.href = '/login.html';
-      }
-    };
+    const openSignIn = (e) => {
+      e?.preventDefault?.();
+      closeDrawer();
+      window.location.href = '/login.html';
+    };
 
     const setVisible = (el, visible, displayValue) => {
       if (!el) return;

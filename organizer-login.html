@@ -850,6 +850,80 @@
             return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
         }
 
+        let clerkReadyPromise = null;
+
+        function waitForClerkScript(script, timeoutMs = 12000) {
+            return new Promise((resolve, reject) => {
+                if (window.Clerk) {
+                    resolve(window.Clerk);
+                    return;
+                }
+
+                let timeout;
+                let poll;
+                const cleanup = () => {
+                    clearTimeout(timeout);
+                    clearInterval(poll);
+                };
+
+                timeout = setTimeout(() => {
+                    cleanup();
+                    reject(new Error('Authentication is taking too long to load. Please refresh and try again.'));
+                }, timeoutMs);
+
+                poll = setInterval(() => {
+                    if (window.Clerk) {
+                        cleanup();
+                        resolve(window.Clerk);
+                    }
+                }, 100);
+
+                script.addEventListener('load', () => {
+                    if (window.Clerk) {
+                        cleanup();
+                        resolve(window.Clerk);
+                    }
+                }, { once: true });
+                script.addEventListener('error', () => {
+                    cleanup();
+                    reject(new Error('Authentication could not load. Check your connection and try again.'));
+                }, { once: true });
+            });
+        }
+
+        async function ensureClerkReady() {
+            if (clerkReadyPromise) return clerkReadyPromise;
+            clerkReadyPromise = (async () => {
+                let script = document.getElementById('clerk-sdk');
+                if (!script) {
+                    script = document.createElement('script');
+                    script.id = 'clerk-sdk';
+                    script.src = 'https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js';
+                    script.setAttribute('data-clerk-publishable-key', window.ENV?.CLERK_PUBLISHABLE_KEY || 'pk_test_ZGl2aW5lLWZyb2ctMjUuY2xlcmsuYWNjb3VudHMuZGV2JA');
+                    script.async = true;
+                    script.crossOrigin = 'anonymous';
+                    document.body.appendChild(script);
+                }
+
+                const clerk = window.Clerk || await waitForClerkScript(script);
+                if (!clerk) throw new Error('Authentication could not start. Please refresh and try again.');
+                await clerk.load();
+                return clerk;
+            })();
+            return clerkReadyPromise;
+        }
+
+        function getSignInResource(clerk) {
+            return clerk?.client?.signIn || clerk?.signIn;
+        }
+
+        function authErrorMessage(err) {
+            return err?.errors?.[0]?.longMessage
+                || err?.errors?.[0]?.message
+                || err?.message
+                || 'Invalid email or password. Please try again.';
+        }
+
         // Live validation
         document.getElementById('email').addEventListener('blur', function () {
             const valid = validateEmail(this.value);
@@ -894,35 +968,30 @@
             btn.disabled = true;
 
             try {
-                if (window.Clerk) {
-                    // Ensure Clerk is loaded
-                    if (!window.Clerk.client) await window.Clerk.load();
+                const clerk = await ensureClerkReady();
+                const signIn = getSignInResource(clerk);
+                if (!signIn?.create) {
+                    throw new Error('Authentication is not ready yet. Please refresh and try again.');
+                }
 
-                    // 1. Create a sign-in attempt with email + password
-                    const signInAttempt = await window.Clerk.client.signIn.create({
-                        identifier: email,
-                        password,
-                    });
+                const signInAttempt = await signIn.create({
+                    identifier: email,
+                    password,
+                });
 
-                    // 2. If complete, set the active session and redirect
-                    if (signInAttempt.status === 'complete') {
-                        await window.Clerk.setActive({ session: signInAttempt.createdSessionId });
-                        window.location.href = 'organizer-dashboard.html';
-                    } else {
-                        // Multi-factor or other step required
-                        alertEl.classList.add('show');
-                        document.getElementById('auth-alert-msg').textContent =
-                            'Additional verification required. Please complete the sign-in flow.';
-                        btn.classList.remove('loading');
-                        btn.disabled = false;
-                    }
+                if (signInAttempt.status === 'complete') {
+                    await clerk.setActive({ session: signInAttempt.createdSessionId });
+                    window.location.href = 'organizer-dashboard.html';
                 } else {
-                    throw new Error('Authentication is still loading. Please refresh and try again.');
+                    alertEl.classList.add('show');
+                    document.getElementById('auth-alert-msg').textContent =
+                        'Additional verification required. Please complete the sign-in flow.';
+                    btn.classList.remove('loading');
+                    btn.disabled = false;
                 }
             } catch (err) {
                 alertEl.classList.add('show');
-                const msg = err?.errors?.[0]?.message || err?.message || 'Invalid email or password. Please try again.';
-                document.getElementById('auth-alert-msg').textContent = msg;
+                document.getElementById('auth-alert-msg').textContent = authErrorMessage(err);
                 btn.classList.remove('loading');
                 btn.disabled = false;
             }
@@ -937,20 +1006,13 @@
             btn.style.opacity = '0.6';
             
             try {
-                if (!window.Clerk) {
-                    throw new Error('Auth system not loaded yet. Please wait a moment and try again.');
-                }
-                
-                // Ensure Clerk is fully loaded before accessing client
-                if (!window.Clerk.client) {
-                    await window.Clerk.load();
-                }
-                
-                if (!window.Clerk.client) {
-                    throw new Error('Failed to initialize Auth system.');
+                const clerk = await ensureClerkReady();
+                const signIn = getSignInResource(clerk);
+                if (!signIn?.authenticateWithRedirect) {
+                    throw new Error('Authentication is not ready yet. Please refresh and try again.');
                 }
 
-                await window.Clerk.client.signIn.authenticateWithRedirect({
+                await signIn.authenticateWithRedirect({
                     strategy,
                     redirectUrl: `${window.location.origin}/sso-callback.html?redirect=organizer`,
                     redirectUrlComplete: `${window.location.origin}/organizer-dashboard.html`,
@@ -979,29 +1041,17 @@
             }
         });
 
-        // Inject Clerk & initialize
-        const clerkScript = document.createElement('script');
-        clerkScript.src = 'https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js';
-        clerkScript.setAttribute('data-clerk-publishable-key', window.ENV.CLERK_PUBLISHABLE_KEY);
-        clerkScript.async = true;
-        clerkScript.crossOrigin = 'anonymous';
-        clerkScript.onload = async function () {
-            try {
-                await window.Clerk.load();
-                // Already signed in  -  send straight to dashboard
-                if (window.Clerk.user) {
-                    window.location.replace('organizer-dashboard.html');
-                    return;
-                }
-                // Listen for sign-in completion (e.g. after setActive)
-                window.Clerk.addListener(({ user }) => {
-                    if (user) window.location.replace('organizer-dashboard.html');
-                });
-            } catch (e) {
-                console.warn('Clerk init error:', e);
+        ensureClerkReady().then((clerk) => {
+            if (clerk.user) {
+                window.location.replace('organizer-dashboard.html');
+                return;
             }
-        };
-        document.body.appendChild(clerkScript);
+            clerk.addListener?.(({ user }) => {
+                if (user) window.location.replace('organizer-dashboard.html');
+            });
+        }).catch((e) => {
+            console.warn('Clerk init error:', e);
+        });
     </script>
 </body>
 
