@@ -1317,9 +1317,14 @@
         }
 
         function cedisToMinorUnits(value) {
-            const amount = Number(String(value || '').replace(/,/g, '').trim());
-            if (!Number.isFinite(amount) || amount < 0) return 0;
+            const amount = parseCedisAmount(value);
+            if (!Number.isFinite(amount)) return 0;
             return Math.round(amount * 100);
+        }
+
+        function parseCedisAmount(value) {
+            const amount = Number(String(value || '').replace(/,/g, '').trim());
+            return Number.isFinite(amount) && amount >= 0 ? amount : NaN;
         }
 
         function syncPreviewPrice() {
@@ -1465,9 +1470,15 @@
             if (isConvexJwtSetupError(ex)) {
                 return 'Event creation is blocked because Clerk is not connected to Convex yet. In Clerk Dashboard, activate Integrations > Convex, or create a JWT template named "convex" with audience "convex". Then sign out and sign back in before creating the event.';
             }
-            const message = ex?.message || '';
+            if (typeof ex?.data === 'string' && ex.data.trim()) return ex.data;
+            if (ex?.data?.message) return ex.data.message;
+            const message = String(ex?.message || ex || '');
+            const uncaughtConvexMessage = message.match(/Uncaught ConvexError:\s*([^\n]+)/i);
+            if (uncaughtConvexMessage?.[1]) return uncaughtConvexMessage[1].trim();
+            const convexMessage = message.match(/ConvexError:\s*([^\n]+)/i);
+            if (convexMessage?.[1]) return convexMessage[1].trim();
             if (/\[Request ID:[^\]]+\]\s*Server Error/i.test(message)) {
-                return 'The event was not saved because the backend rejected one of the event details. Refresh the page, make sure your ticket tier has a name, GHS price, and capacity, then try again.';
+                return message + ' Please send this request ID if it happens again.';
             }
             return message || 'Something went wrong. Please try again.';
         }
@@ -1478,9 +1489,15 @@
                 const row = document.getElementById('tier-row-' + i);
                 if (!row) continue;
                 const name = row.querySelector(`[name="tier-name-${i}"]`)?.value?.trim();
-                const price = cedisToMinorUnits(row.querySelector(`[name="tier-price-${i}"]`)?.value || '0');
+                const priceInput = row.querySelector(`[name="tier-price-${i}"]`);
+                const priceRaw = priceInput?.value || '';
+                const priceAmount = parseCedisAmount(priceRaw);
+                const price = Math.round(priceAmount * 100);
                 const capacity = parseInt(row.querySelector(`[name="tier-capacity-${i}"]`)?.value || '0', 10);
-                if (!name && !capacity) continue;
+                if (!name && !priceRaw && !capacity) continue;
+                if (!name) throw new Error(`Tier ${i}: enter a ticket tier name.`);
+                if (!Number.isFinite(priceAmount)) throw new Error(`Tier ${i}: enter a valid GHS price.`);
+                if (!Number.isInteger(capacity) || capacity <= 0) throw new Error(`Tier ${i}: enter a capacity of at least 1.`);
                 tiers.push({ name, price, capacity });
             }
             return tiers;

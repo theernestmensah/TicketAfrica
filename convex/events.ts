@@ -1,5 +1,5 @@
 import { query, mutation } from "./_generated/server";
-import { v } from "convex/values";
+import { ConvexError, v } from "convex/values";
 import { internal } from "./_generated/api";
 import { sanitizeText, sanitizeHtml } from "./sanitize";
 
@@ -16,10 +16,10 @@ function assertDateRange(startDate: string, endDate: string) {
     const start = new Date(startDate);
     const end = new Date(endDate);
     if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
-        throw new Error("Event dates must be valid.");
+        throw new ConvexError("Event dates must be valid.");
     }
     if (end <= start) {
-        throw new Error("Event end date must be after the start date.");
+        throw new ConvexError("Event end date must be after the start date.");
     }
 }
 
@@ -27,10 +27,10 @@ function assertTierWindow(salesStart: string, salesEnd: string) {
     const start = new Date(salesStart);
     const end = new Date(salesEnd);
     if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
-        throw new Error("Ticket sale dates must be valid.");
+        throw new ConvexError("Ticket sale dates must be valid.");
     }
     if (end <= start) {
-        throw new Error("Ticket sales end date must be after the sales start date.");
+        throw new ConvexError("Ticket sales end date must be after the sales start date.");
     }
 }
 
@@ -291,9 +291,9 @@ export const createEventWithTiers = mutation({
         const sanitizedTitle = sanitizeText(args.title);
         const currency = normalizeCurrency(args.currency);
         assertDateRange(args.start_date, args.end_date);
-        if (!currency) throw new Error("Currency is required.");
-        if (!sanitizedTitle) throw new Error("Event title is required.");
-        if (!args.tiers.length) throw new Error("Add at least one ticket tier.");
+        if (!currency) throw new ConvexError("Currency is required.");
+        if (!sanitizedTitle) throw new ConvexError("Event title is required.");
+        if (!args.tiers.length) throw new ConvexError("Add at least one ticket tier.");
 
         const sanitizedTiers = args.tiers.map((tier) => ({
             name: sanitizeText(tier.name),
@@ -303,12 +303,12 @@ export const createEventWithTiers = mutation({
         }));
 
         for (const tier of sanitizedTiers) {
-            if (!tier.name) throw new Error("Ticket tier name is required.");
+            if (!tier.name) throw new ConvexError("Ticket tier name is required.");
             if (!Number.isInteger(tier.price) || tier.price < 0) {
-                throw new Error("Ticket price must be a non-negative amount.");
+                throw new ConvexError("Ticket price must be a non-negative amount.");
             }
             if (!Number.isInteger(tier.capacity) || tier.capacity <= 0) {
-                throw new Error("Ticket capacity must be at least 1.");
+                throw new ConvexError("Ticket capacity must be at least 1.");
             }
         }
 
@@ -345,26 +345,6 @@ export const createEventWithTiers = mutation({
                 sales_end: args.end_date,
             });
         }
-
-        await ctx.runMutation(internal.messages.enqueue, {
-            type: "event_created",
-            channel: "email",
-            recipient_email: user.email,
-            recipient_phone: user.phone,
-            recipient_name: user.first_name,
-            user_id: user._id,
-            org_id: args.org_id,
-            event_id: eventId,
-            subject: `Event draft created: ${sanitizedTitle}`,
-            body: `${sanitizedTitle} has been created as a draft. Review the details before publishing.`,
-            template_key: "event_created",
-            data: {
-                event_title: sanitizedTitle,
-                event_date: args.start_date,
-                event_venue: sanitizeText(args.venue_name),
-                dashboard_link: "/organizer-dashboard.html",
-            },
-        });
 
         return eventId;
     },
